@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/download"
 	"container/heap"
+	"container/list"
 	"fmt"
 	"log"
 	"strings"
@@ -10,6 +11,12 @@ import (
 
 type point struct {
 	x, y int
+}
+
+type qi struct {
+	pos       point
+	riskLevel int
+	index     int
 }
 
 var dx = [4]int{0, 0, -1, 1}
@@ -27,19 +34,8 @@ func main() {
 }
 
 func part1(input string) {
-	var lines []string
-	in := strings.NewReader(input)
-	for {
-		var line string
-		_, err := fmt.Fscanln(in, &line)
-		if err != nil {
-			break
-		}
-		lines = append(lines, line)
-	}
-
+	lines := strings.Split(input, "\n")
 	grid := make(map[point]int)
-
 	for x, row := range lines {
 		if row == "" {
 			continue
@@ -49,53 +45,37 @@ func part1(input string) {
 		}
 	}
 
-	var maxx, maxy = len(lines[0]) - 1, len(lines) - 1
+	var maxx, maxy = len(lines[0]) - 1, len(lines) - 2
 	start := point{0, 0}
 	target := point{maxx, maxy}
 
-	risk := func(pos point) int {
-		og := point{pos.x % (maxx + 1), pos.y % (maxy + 1)}
-		risk := grid[og] +
-			(pos.x)/(maxx+1) + (pos.y)/(maxy+1)
-		if risk > 9 {
-			return risk - 9
-		}
-		return risk
-	}
+	queue := list.New()
+
 	shortestAt := make(map[point]int)
-	pq := make(PriorityQueue, 0)
-	heap.Init(&pq)
-	pq.Push(qi{pos: start, riskLevel: 0})
-	for pq.Len() > 0 {
-		head := heap.Pop(&pq).(qi)
+	queue.PushBack(qi{pos: start, riskLevel: 0})
+	for queue.Len() > 0 {
+		front := queue.Front()
+		head := front.Value.(qi)
+		queue.Remove(front)
+
 		for i := 0; i < 4; i++ {
 			next := point{head.pos.x + dx[i], head.pos.y + dy[i]}
 			if next.x > target.x || next.x < 0 || next.y > target.y || next.y < 0 {
 				continue
 			}
-			nextRisk := head.riskLevel + risk(next)
+			nextRisk := head.riskLevel + grid[next]
 			if sAt, ok := shortestAt[next]; ok && sAt <= nextRisk {
 				continue
 			}
 			shortestAt[next] = nextRisk
-			pq.Push(qi{pos: next, riskLevel: nextRisk})
+			queue.PushBack(qi{pos: next, riskLevel: nextRisk})
 		}
 	}
 	fmt.Println("Result: ", shortestAt[target])
 }
 
 func part2(input string) {
-	var lines []string
-	in := strings.NewReader(input)
-	for {
-		var line string
-		_, err := fmt.Fscanln(in, &line)
-		if err != nil {
-			break
-		}
-		lines = append(lines, line)
-	}
-
+	lines := strings.Split(input, "\n")
 	grid := make(map[point]int)
 
 	for x, row := range lines {
@@ -104,7 +84,7 @@ func part2(input string) {
 		}
 	}
 
-	var maxx, maxy = len(lines[0]) - 1, len(lines) - 1
+	var maxx, maxy = len(lines[0]) - 1, len(lines) - 2
 	start := point{0, 0}
 	target := point{(maxx+1)*5 - 1, (maxy+1)*5 - 1}
 
@@ -120,7 +100,7 @@ func part2(input string) {
 	shortestAt := make(map[point]int)
 	pq := make(PriorityQueue, 0)
 	heap.Init(&pq)
-	pq.Push(qi{pos: start, riskLevel: 0})
+	heap.Push(&pq, qi{pos: start, riskLevel: 0})
 	for pq.Len() > 0 {
 		head := heap.Pop(&pq).(qi)
 		for i := 0; i < 4; i++ {
@@ -133,16 +113,10 @@ func part2(input string) {
 				continue
 			}
 			shortestAt[next] = nextRisk
-			pq.Push(qi{pos: next, riskLevel: nextRisk})
+			heap.Push(&pq, qi{pos: next, riskLevel: nextRisk})
 		}
 	}
 	fmt.Println("Result: ", shortestAt[target])
-}
-
-type qi struct {
-	pos       point
-	riskLevel int
-	index     int
 }
 
 type PriorityQueue []qi
