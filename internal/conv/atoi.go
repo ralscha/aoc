@@ -12,3 +12,11 @@ func MustAtoi(s string) int {
 	}
 	return i
 }
+
+func MustAtoiArray(s []string) []int {
+	var result []int
+	for _, v := range s {
+		result = append(result, MustAtoi(v))
+	}
+	return result
+}
