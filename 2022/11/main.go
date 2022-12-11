@@ -31,42 +31,7 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 
-	monkeys := make(map[int]*monkey)
-	for i := 0; i < len(lines); i += 7 {
-		first := strings.Fields(lines[i])
-		monkeyNo := conv.MustAtoi(first[1][:len(first[1])-1])
-		items := strings.Fields(lines[i+1])[2:]
-		itemsNo := make([]int, len(items))
-		for j := range items {
-			if items[j][len(items[j])-1] == ',' {
-				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])-1])
-			} else {
-				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])])
-			}
-		}
-
-		operationStr := strings.Fields(lines[i+2])[3:]
-		operation := operationStr[1]
-		operationValue := operationStr[2]
-		operationValueInt := -1
-		if operationValue != "old" {
-			operationValueInt = conv.MustAtoi(operationValue)
-		}
-
-		test := conv.MustAtoi(strings.Fields(lines[i+3])[3])
-		ifTrue := conv.MustAtoi(strings.Fields(lines[i+4])[5])
-		ifFalse := conv.MustAtoi(strings.Fields(lines[i+5])[5])
-
-		monkeys[monkeyNo] = &monkey{
-			items:          itemsNo,
-			operation:      operation,
-			operationValue: operationValueInt,
-			test:           test,
-			ifTrue:         ifTrue,
-			ifFalse:        ifFalse,
-		}
-	}
-
+	monkeys := createMonkeys(lines)
 	inspectCount := make(map[int]int)
 
 	for i := 0; i < 20; i++ {
@@ -103,59 +68,16 @@ func part1(input string) {
 		}
 	}
 
-	var top1, top2 int
-	for _, count := range inspectCount {
-		if count > top1 {
-			top2 = top1
-			top1 = count
-		} else if count > top2 {
-			top2 = count
-		}
-	}
-
-	fmt.Println(top1 * top2)
+	printTop2Multiplication(inspectCount)
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
+	monkeys := createMonkeys(lines)
 
-	monkeys := make(map[int]*monkey)
 	prod := 1
-
-	for i := 0; i < len(lines); i += 7 {
-		first := strings.Fields(lines[i])
-		monkeyNo := conv.MustAtoi(first[1][:len(first[1])-1])
-		items := strings.Fields(lines[i+1])[2:]
-		itemsNo := make([]int, len(items))
-		for j := range items {
-			if items[j][len(items[j])-1] == ',' {
-				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])-1])
-			} else {
-				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])])
-			}
-		}
-
-		operationStr := strings.Fields(lines[i+2])[3:]
-		operation := operationStr[1]
-		operationValue := operationStr[2]
-		operationValueInt := -1
-		if operationValue != "old" {
-			operationValueInt = conv.MustAtoi(operationValue)
-		}
-
-		test := conv.MustAtoi(strings.Fields(lines[i+3])[3])
-		prod *= test
-		ifTrue := conv.MustAtoi(strings.Fields(lines[i+4])[5])
-		ifFalse := conv.MustAtoi(strings.Fields(lines[i+5])[5])
-
-		monkeys[monkeyNo] = &monkey{
-			items:          itemsNo,
-			operation:      operation,
-			operationValue: operationValueInt,
-			test:           test,
-			ifTrue:         ifTrue,
-			ifFalse:        ifFalse,
-		}
+	for _, m := range monkeys {
+		prod *= m.test
 	}
 
 	inspectCount := make(map[int]int)
@@ -194,6 +116,10 @@ func part2(input string) {
 		}
 	}
 
+	printTop2Multiplication(inspectCount)
+}
+
+func printTop2Multiplication(inspectCount map[int]int) {
 	var top1, top2 int
 	for _, count := range inspectCount {
 		if count > top1 {
@@ -205,4 +131,43 @@ func part2(input string) {
 	}
 
 	fmt.Println(top1 * top2)
+}
+
+func createMonkeys(lines []string) map[int]*monkey {
+	monkeys := make(map[int]*monkey)
+	for i := 0; i < len(lines); i += 7 {
+		first := strings.Fields(lines[i])
+		monkeyNo := conv.MustAtoi(first[1][:len(first[1])-1])
+		items := strings.Fields(lines[i+1])[2:]
+		itemsNo := make([]int, len(items))
+		for j := range items {
+			if items[j][len(items[j])-1] == ',' {
+				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])-1])
+			} else {
+				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])])
+			}
+		}
+
+		operationStr := strings.Fields(lines[i+2])[3:]
+		operation := operationStr[1]
+		operationValue := operationStr[2]
+		operationValueInt := -1
+		if operationValue != "old" {
+			operationValueInt = conv.MustAtoi(operationValue)
+		}
+
+		test := conv.MustAtoi(strings.Fields(lines[i+3])[3])
+		ifTrue := conv.MustAtoi(strings.Fields(lines[i+4])[5])
+		ifFalse := conv.MustAtoi(strings.Fields(lines[i+5])[5])
+
+		monkeys[monkeyNo] = &monkey{
+			items:          itemsNo,
+			operation:      operation,
+			operationValue: operationValueInt,
+			test:           test,
+			ifTrue:         ifTrue,
+			ifFalse:        ifFalse,
+		}
+	}
+	return monkeys
 }
