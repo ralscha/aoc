@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/mathx"
 	"fmt"
 	"log"
 	"math"
@@ -50,7 +51,7 @@ func shortestRoute(distances map[string]map[string]int) int {
 	}
 
 	shortestDistance := math.MaxInt32
-	for _, route := range permutations(locations) {
+	for _, route := range mathx.StringPermutations(locations) {
 		distance := 0
 		for i := 0; i < len(route)-1; i++ {
 			distance += distances[route[i]][route[i+1]]
@@ -70,7 +71,7 @@ func longestRoute(distances map[string]map[string]int) int {
 	}
 
 	longestDistance := math.MinInt32
-	for _, route := range permutations(locations) {
+	for _, route := range mathx.StringPermutations(locations) {
 		distance := 0
 		for i := 0; i < len(route)-1; i++ {
 			distance += distances[route[i]][route[i+1]]
@@ -81,23 +82,4 @@ func longestRoute(distances map[string]map[string]int) int {
 	}
 
 	return longestDistance
-}
-
-func permutations(s []string) [][]string {
-	if len(s) == 0 {
-		return [][]string{}
-	}
-	if len(s) == 1 {
-		return [][]string{s}
-	}
-	var result [][]string
-	for i, v := range s {
-		remaining := make([]string, 0, len(s)-1)
-		remaining = append(remaining, s[:i]...)
-		remaining = append(remaining, s[i+1:]...)
-		for _, p := range permutations(remaining) {
-			result = append(result, append([]string{v}, p...))
-		}
-	}
-	return result
 }

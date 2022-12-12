@@ -13,10 +13,10 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	part1(input)
+	part1and2(input)
 }
 
-func part1(input string) {
+func part1and2(input string) {
 	fmt.Println(input)
 	if input[len(input)-1] == '\n' {
 		input = input[:len(input)-1]
