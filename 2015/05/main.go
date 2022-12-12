@@ -66,7 +66,7 @@ func isNice(line string) bool {
 		return false
 	}
 
-	// It does not contain the strings ab, cd, pq, or xy
+	// It does not contain the strings: ab, cd, pq, or xy
 	if strings.Contains(line, "ab") || strings.Contains(line, "cd") || strings.Contains(line, "pq") || strings.Contains(line, "xy") {
 		return false
 	}

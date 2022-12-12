@@ -90,12 +90,12 @@ func part2(input string) {
 	fmt.Println(input1[0])
 	oxygen, err := strconv.ParseInt(input1[0], 2, 64)
 	if err != nil {
-		log.Fatalf("ParseInt failed: %d %v", input1[0], err)
+		log.Fatalf("ParseInt failed: %s %v", input1[0], err)
 	}
 	fmt.Println(input2[0])
 	co2, err := strconv.ParseInt(input2[0], 2, 64)
 	if err != nil {
-		log.Fatalf("ParseInt failed: %d %v", input2[0], err)
+		log.Fatalf("ParseInt failed: %s %v", input2[0], err)
 	}
 
 	fmt.Println("Result: ", oxygen*co2)
