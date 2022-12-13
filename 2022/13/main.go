@@ -89,7 +89,7 @@ func parseAndCheck(line1, line2 string) bool {
 		log.Fatalf("unmarshalling failed: %v", err)
 		return false
 	}
-	return compare(t1, t2) == 1 || compare(t1, t2) == 0
+	return compare(t1, t2) == -1 || compare(t1, t2) == 0
 }
 
 func compare(input1 any, input2 any) int {
