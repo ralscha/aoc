@@ -124,7 +124,6 @@ func compare(input1 any, input2 any) int {
 			if len(input1.([]any)) < len(input2.([]any)) {
 				return -1
 			}
-			return 0
 		}
 	}
 	return 0
