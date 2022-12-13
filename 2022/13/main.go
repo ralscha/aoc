@@ -61,7 +61,7 @@ func part2(input string) {
 	packages = append(packages, end)
 
 	sort.Slice(packages, func(i, j int) bool {
-		return compare(packages[i], packages[j]) != -1
+		return compare(packages[i], packages[j]) == -1
 	})
 
 	startIndex := 0
@@ -98,9 +98,9 @@ func compare(input1 any, input2 any) int {
 		switch input2.(type) {
 		case float64:
 			if input1.(float64) < input2.(float64) {
-				return 1
-			} else if input1.(float64) > input2.(float64) {
 				return -1
+			} else if input1.(float64) > input2.(float64) {
+				return 1
 			} else {
 				return 0
 			}
@@ -114,7 +114,7 @@ func compare(input1 any, input2 any) int {
 		case []any:
 			for i := 0; i < len(input1.([]any)); i++ {
 				if i >= len(input2.([]any)) {
-					return -1
+					return 1
 				}
 				c := compare(input1.([]any)[i], input2.([]any)[i])
 				if c != 0 {
@@ -122,7 +122,7 @@ func compare(input1 any, input2 any) int {
 				}
 			}
 			if len(input1.([]any)) < len(input2.([]any)) {
-				return 1
+				return -1
 			}
 			return 0
 		}
