@@ -51,7 +51,7 @@ func shortestRoute(distances map[string]map[string]int) int {
 	}
 
 	shortestDistance := math.MaxInt32
-	for _, route := range mathx.StringPermutations(locations) {
+	for _, route := range mathx.Permutations(locations) {
 		distance := 0
 		for i := 0; i < len(route)-1; i++ {
 			distance += distances[route[i]][route[i+1]]
@@ -71,7 +71,7 @@ func longestRoute(distances map[string]map[string]int) int {
 	}
 
 	longestDistance := math.MinInt32
-	for _, route := range mathx.StringPermutations(locations) {
+	for _, route := range mathx.Permutations(locations) {
 		distance := 0
 		for i := 0; i < len(route)-1; i++ {
 			distance += distances[route[i]][route[i+1]]

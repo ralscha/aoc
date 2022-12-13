@@ -71,7 +71,7 @@ func maxHappiness(persons map[string]*person) {
 		names = append(names, name)
 	}
 
-	perms := mathx.StringPermutations(names)
+	perms := mathx.Permutations(names)
 	maxHappiness := 0
 	for _, perm := range perms {
 		happiness := 0

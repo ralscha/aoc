@@ -30,8 +30,8 @@ func part1(input string) {
 	for _, line := range lines {
 		if strings.HasPrefix(line, "turn off ") {
 			coords := strings.Split(line[9:], sep)
-			start := conv.MustAtoiArray(strings.Split(coords[0], ","))
-			end := conv.MustAtoiArray(strings.Split(coords[1], ","))
+			start := conv.ToIntSlice(strings.Split(coords[0], ","))
+			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
 					grid[x][y] = false
@@ -39,8 +39,8 @@ func part1(input string) {
 			}
 		} else if strings.HasPrefix(line, "turn on ") {
 			coords := strings.Split(line[8:], sep)
-			start := conv.MustAtoiArray(strings.Split(coords[0], ","))
-			end := conv.MustAtoiArray(strings.Split(coords[1], ","))
+			start := conv.ToIntSlice(strings.Split(coords[0], ","))
+			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
 					grid[x][y] = true
@@ -48,8 +48,8 @@ func part1(input string) {
 			}
 		} else if strings.HasPrefix(line, "toggle ") {
 			coords := strings.Split(line[7:], sep)
-			start := conv.MustAtoiArray(strings.Split(coords[0], ","))
-			end := conv.MustAtoiArray(strings.Split(coords[1], ","))
+			start := conv.ToIntSlice(strings.Split(coords[0], ","))
+			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
 					grid[x][y] = !grid[x][y]
@@ -81,8 +81,8 @@ func part2(input string) {
 	for _, line := range lines {
 		if strings.HasPrefix(line, "turn off ") {
 			coords := strings.Split(line[9:], sep)
-			start := conv.MustAtoiArray(strings.Split(coords[0], ","))
-			end := conv.MustAtoiArray(strings.Split(coords[1], ","))
+			start := conv.ToIntSlice(strings.Split(coords[0], ","))
+			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
 					if grid[x][y] > 0 {
@@ -92,8 +92,8 @@ func part2(input string) {
 			}
 		} else if strings.HasPrefix(line, "turn on ") {
 			coords := strings.Split(line[8:], sep)
-			start := conv.MustAtoiArray(strings.Split(coords[0], ","))
-			end := conv.MustAtoiArray(strings.Split(coords[1], ","))
+			start := conv.ToIntSlice(strings.Split(coords[0], ","))
+			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
 					grid[x][y]++
@@ -101,8 +101,8 @@ func part2(input string) {
 			}
 		} else if strings.HasPrefix(line, "toggle ") {
 			coords := strings.Split(line[7:], sep)
-			start := conv.MustAtoiArray(strings.Split(coords[0], ","))
-			end := conv.MustAtoiArray(strings.Split(coords[1], ","))
+			start := conv.ToIntSlice(strings.Split(coords[0], ","))
+			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
 					grid[x][y] += 2
