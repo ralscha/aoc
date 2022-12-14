@@ -135,16 +135,16 @@ func (n *node) canVisit() bool {
 }
 
 func addEdgeString(u, v string) {
-	if _, ok := adjmapString[u]; ok {
-		adjmapString[u] = append(adjmapString[u], v)
+	if val, ok := adjmapString[u]; ok {
+		adjmapString[u] = append(val, v)
 	} else {
 		adjmapString[u] = []string{v}
 	}
 }
 
 func addEdge(u, v *node) {
-	if _, ok := adjmap[u]; ok {
-		adjmap[u] = append(adjmap[u], v)
+	if val, ok := adjmap[u]; ok {
+		adjmap[u] = append(val, v)
 	} else {
 		adjmap[u] = []*node{v}
 	}

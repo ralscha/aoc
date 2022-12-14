@@ -56,3 +56,10 @@ func Max[E constraints.Ordered](inputOne E, rest ...E) E {
 	}
 	return max
 }
+
+func Abs[E constraints.Float | constraints.Integer](input E) E {
+	if input < 0 {
+		return -input
+	}
+	return input
+}

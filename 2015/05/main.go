@@ -97,9 +97,5 @@ func isNice2(line string) bool {
 			break
 		}
 	}
-	if !repeat {
-		return false
-	}
-
-	return true
+	return repeat
 }
