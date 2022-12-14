@@ -1,11 +1,11 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
 	"log"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -23,10 +23,7 @@ func main() {
 			elves = append(elves, totalCalories)
 			totalCalories = 0
 		} else {
-			calories, err := strconv.Atoi(line)
-			if err != nil {
-				log.Fatalf("converting input to int failed: %v", err)
-			}
+			calories := conv.MustAtoi(line)
 			totalCalories += calories
 		}
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
@@ -130,10 +131,7 @@ func filter(lines []string, winner, pos int) []string {
 	var filtered []string
 	for _, line := range lines {
 		char := line[pos : pos+1]
-		n, err := strconv.Atoi(char)
-		if err != nil {
-			log.Fatalf("conversion to int failed: %v", err)
-		}
+		n := conv.MustAtoi(char)
 		if n == winner {
 			filtered = append(filtered, line)
 		}

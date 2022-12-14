@@ -1,11 +1,11 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -41,24 +41,15 @@ func part1(input string) {
 			blank := strings.LastIndex(line, " ")
 			l := line[blank+1:]
 			ls := strings.Split(l, "=")
-			val, err := strconv.Atoi(ls[1])
-			if err != nil {
-				log.Fatalf("conversion failed: %s %v", ls[1], err)
-			}
+			val := conv.MustAtoi(ls[1])
 			folds = append(folds, fold{
 				dir: ls[0],
 				val: val,
 			})
 		} else if len(line) > 0 {
 			splitted := strings.Split(line, ",")
-			x, err := strconv.Atoi(splitted[0])
-			if err != nil {
-				log.Fatalf("conversion failed: %s %v", splitted[0], err)
-			}
-			y, err := strconv.Atoi(splitted[1])
-			if err != nil {
-				log.Fatalf("conversion failed: %s %v", splitted[1], err)
-			}
+			x := conv.MustAtoi(splitted[0])
+			y := conv.MustAtoi(splitted[1])
 			grid[point{
 				x: x,
 				y: y,
@@ -108,24 +99,15 @@ func part2(input string) {
 			blank := strings.LastIndex(line, " ")
 			l := line[blank+1:]
 			ls := strings.Split(l, "=")
-			val, err := strconv.Atoi(ls[1])
-			if err != nil {
-				log.Fatalf("conversion failed: %s %v", ls[1], err)
-			}
+			val := conv.MustAtoi(ls[1])
 			folds = append(folds, fold{
 				dir: ls[0],
 				val: val,
 			})
 		} else if len(line) > 0 {
 			splitted := strings.Split(line, ",")
-			x, err := strconv.Atoi(splitted[0])
-			if err != nil {
-				log.Fatalf("conversion failed: %s %v", splitted[0], err)
-			}
-			y, err := strconv.Atoi(splitted[1])
-			if err != nil {
-				log.Fatalf("conversion failed: %s %v", splitted[1], err)
-			}
+			x := conv.MustAtoi(splitted[0])
+			y := conv.MustAtoi(splitted[1])
 			grid[point{
 				x: x,
 				y: y,

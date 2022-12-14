@@ -1,10 +1,10 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -25,10 +25,7 @@ func part1(input string) {
 	lastNum := -1
 
 	for _, nums := range numbers {
-		num, err := strconv.Atoi(nums)
-		if err != nil {
-			log.Fatalf("conversion failed: %s %v", nums, err)
-		}
+		num := conv.MustAtoi(nums)
 
 		if lastNum != -1 && num > lastNum {
 			increasing += 1
@@ -46,10 +43,7 @@ func part2(input string) {
 	windowSum := 0
 
 	for ix, nums := range numbers {
-		num, err := strconv.Atoi(nums)
-		if err != nil {
-			log.Fatalf("conversion failed: %s %v", nums, err)
-		}
+		num := conv.MustAtoi(nums)
 		windowSum += num
 		if windowCount == 3 {
 			if windowSum > lastWindow && lastWindow != -1 {
@@ -57,10 +51,7 @@ func part2(input string) {
 			}
 			lastWindow = windowSum
 
-			firstNumOfWindow, err := strconv.Atoi(numbers[ix-2])
-			if err != nil {
-				log.Fatalf("conversion failed: %s %v", nums, err)
-			}
+			firstNumOfWindow := conv.MustAtoi(numbers[ix-2])
 			windowSum = windowSum - firstNumOfWindow
 		} else {
 			windowCount += 1

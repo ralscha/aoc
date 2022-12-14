@@ -1,11 +1,11 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -28,10 +28,7 @@ func part1(input string) {
 
 	var eco []*byte
 	for _, s := range splitted {
-		n, err := strconv.Atoi(s)
-		if err != nil {
-			log.Fatalf("conversion failed: %s %v", s, err)
-		}
+		n := conv.MustAtoi(s)
 		b := byte(n)
 		eco = append(eco, &b)
 	}
@@ -59,10 +56,7 @@ func part2(input string) {
 
 	var eco [9]int
 	for _, s := range splitted {
-		n, err := strconv.Atoi(s)
-		if err != nil {
-			log.Fatalf("conversion failed: %s %v", s, err)
-		}
+		n := conv.MustAtoi(s)
 
 		eco[n] = eco[n] + 1
 	}

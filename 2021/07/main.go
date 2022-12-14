@@ -1,11 +1,11 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -28,11 +28,7 @@ func part1(input string) {
 
 	var crabs []int
 	for _, s := range splitted {
-		n, err := strconv.Atoi(s)
-		if err != nil {
-			log.Fatalf("conversion failed: %s %v", s, err)
-		}
-
+		n := conv.MustAtoi(s)
 		crabs = append(crabs, n)
 	}
 
@@ -62,11 +58,7 @@ func part2(input string) {
 
 	var crabs []int
 	for _, s := range splitted {
-		n, err := strconv.Atoi(s)
-		if err != nil {
-			log.Fatalf("conversion failed: %s %v", s, err)
-		}
-
+		n := conv.MustAtoi(s)
 		crabs = append(crabs, n)
 	}
 

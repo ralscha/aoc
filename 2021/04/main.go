@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -130,10 +129,7 @@ func part2(input string) {
 			rowString := strings.Fields(line)
 
 			for ix, ns := range rowString {
-				n, err := strconv.Atoi(ns)
-				if err != nil {
-					log.Fatalf("conversion from string to int failed: %s %v", ns, err)
-				}
+				n := conv.MustAtoi(ns)
 				currentCard[row][ix] = &field{
 					number: n,
 					marked: false,

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
@@ -83,10 +84,7 @@ func part2(input string) {
 					outnum := findPattern(numbers, num)
 					outnumbers += strconv.Itoa(outnum)
 				}
-				outnumbersi, err := strconv.Atoi(outnumbers)
-				if err != nil {
-					log.Panicln(err)
-				}
+				outnumbersi := conv.MustAtoi(outnumbers)
 				sum += outnumbersi
 				break
 			}
