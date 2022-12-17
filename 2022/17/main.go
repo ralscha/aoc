@@ -37,6 +37,58 @@ func part1(input string) {
 		next: 0,
 	}
 
+	rocks := createRocks()
+
+	var chamber []row
+
+	noOfRocks := 2022
+
+	for i := 0; i < noOfRocks; i++ {
+		rockX := 2
+		rockY := 0
+		nextRock := rocks[i%5]
+		rockHeight := len(nextRock.grid)
+
+		highestRock := 0
+		for j := len(chamber) - 1; j >= 0; j-- {
+			row := chamber[j]
+			if !row[0] && !row[1] && !row[2] && !row[3] && !row[4] && !row[5] && !row[6] {
+				highestRock = j + 1
+				break
+			}
+		}
+
+		emptyRows := len(chamber) - (len(chamber) - highestRock)
+		missing := rockHeight + 3 - emptyRows
+		if missing < 0 {
+			chamber = chamber[missing*-1:]
+		} else {
+			for j := 0; j < missing; j++ {
+				chamber = append([]row{{}}, chamber...)
+			}
+		}
+
+		rockX += nextGas(gas)
+		if rockX < 0 {
+			rockX = 0
+		} else if rockX+len(nextRock.grid[0])-1 > 6 {
+			rockX -= 1
+		}
+		drawRock(chamber, nextRock, rockX, rockY)
+		fall(chamber, nextRock, rockX, rockY, gas)
+	}
+	height := 0
+	for i := len(chamber) - 1; i >= 0; i-- {
+		row := chamber[i]
+		if !row[0] && !row[1] && !row[2] && !row[3] && !row[4] && !row[5] && !row[6] {
+			break
+		}
+		height++
+	}
+	fmt.Println(height)
+}
+
+func createRocks() [5]rock {
 	var rocks [5]rock
 
 	rocks[0] = rock{
@@ -91,54 +143,7 @@ func part1(input string) {
 		right:  []int{1, 1},
 		bottom: []int{1, 1},
 	}
-
-	var chamber []row
-
-	noOfRocks := 2022
-
-	for i := 0; i < noOfRocks; i++ {
-		rockX := 2
-		rockY := 0
-		nextRock := rocks[i%5]
-		rockHeight := len(nextRock.grid)
-
-		highestRock := 0
-		for j := len(chamber) - 1; j >= 0; j-- {
-			row := chamber[j]
-			if !row[0] && !row[1] && !row[2] && !row[3] && !row[4] && !row[5] && !row[6] {
-				highestRock = j + 1
-				break
-			}
-		}
-
-		emptyRows := len(chamber) - (len(chamber) - highestRock)
-		missing := rockHeight + 3 - emptyRows
-		if missing < 0 {
-			chamber = chamber[missing*-1:]
-		} else {
-			for j := 0; j < missing; j++ {
-				chamber = append([]row{{}}, chamber...)
-			}
-		}
-
-		rockX += nextGas(gas)
-		if rockX < 0 {
-			rockX = 0
-		} else if rockX+len(nextRock.grid[0])-1 > 6 {
-			rockX -= 1
-		}
-		drawRock(chamber, nextRock, rockX, rockY)
-		fall(chamber, nextRock, rockX, rockY, gas)
-	}
-	height := 0
-	for i := len(chamber) - 1; i >= 0; i-- {
-		row := chamber[i]
-		if !row[0] && !row[1] && !row[2] && !row[3] && !row[4] && !row[5] && !row[6] {
-			break
-		}
-		height++
-	}
-	fmt.Println(height)
+	return rocks
 }
 
 func drawRock(chamber []row, currentRock rock, rockX int, rockY int) {
@@ -168,8 +173,7 @@ func fall(chamber []row, rock rock, rockX int, rockY int, gas *jet) {
 	nextY := rockY + 1
 
 	for nextY < len(chamber) {
-		isCollisionY1 := collisionY(chamber, rock, currentRockX, nextY)
-		if isCollisionY1 {
+		if collisionY(chamber, rock, currentRockX, nextY) {
 			return
 		}
 		eraseRock(chamber, rock, currentRockX, currentRockY)
