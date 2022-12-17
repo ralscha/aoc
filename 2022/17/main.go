@@ -128,16 +128,7 @@ func part1(input string) {
 			rockX -= 1
 		}
 		drawRock(chamber, nextRock, rockX, rockY)
-
-		//printChamber(chamber)
-		//fmt.Println()
 		fall(chamber, nextRock, rockX, rockY, gas)
-		//printChamber(chamber)
-		//fmt.Println()
-
-		//if i == 5 {
-		//	break
-		//}
 	}
 	height := 0
 	for i := len(chamber) - 1; i >= 0; i-- {
@@ -199,17 +190,6 @@ func nextGas(jetpattern *jet) int {
 	if jetpattern.next == len(jetpattern.jets) {
 		jetpattern.next = 0
 	}
-	if direction == '<' {
-		return -1
-	} else if direction == '>' {
-		return 1
-	} else {
-		return 0
-	}
-}
-
-func peekNextGas(jetpattern *jet) int {
-	direction := jetpattern.jets[jetpattern.next]
 	if direction == '<' {
 		return -1
 	} else if direction == '>' {
