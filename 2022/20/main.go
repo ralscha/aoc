@@ -56,9 +56,6 @@ func mix(numbers []number) []number {
 		numbers = append(numbers[:currentIx], numbers[currentIx+1:]...)
 
 		insertIndex := (currentIx + n.value) % len(numbers)
-		if n.value < 0 && insertIndex == 0 {
-			insertIndex = len(numbers)
-		}
 		if insertIndex < 0 {
 			insertIndex += len(numbers)
 		}
