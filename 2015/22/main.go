@@ -6,6 +6,7 @@ import (
 	"container/list"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 )
 
@@ -16,8 +17,8 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	part1(input)
-	//part2(input)
+	part1and2(input, false)
+	part1and2(input, true)
 }
 
 type spell struct {
@@ -31,6 +32,7 @@ type spell struct {
 }
 
 type state struct {
+	playerTurn  bool
 	spentMana   int
 	playerHp    int
 	playerMana  int
@@ -50,7 +52,7 @@ func makeSpells() []spell {
 	}
 }
 
-func part1(input string) {
+func part1and2(input string, part2 bool) {
 	splitted := strings.Fields(input)
 	bossHp := conv.MustAtoi(splitted[2])
 	bossDamage := conv.MustAtoi(splitted[4])
@@ -58,6 +60,7 @@ func part1(input string) {
 	spells := makeSpells()
 
 	initialState := state{
+		playerTurn: true,
 		spentMana:  0,
 		playerHp:   50,
 		playerMana: 500,
@@ -67,72 +70,73 @@ func part1(input string) {
 
 	queue := list.New()
 	queue.PushBack(initialState)
-
-	minMana := 999999999
+	minMana := math.MaxInt
 	for queue.Len() > 0 {
 		currentState := queue.Remove(queue.Front()).(state)
-		if currentState.playerHp <= 0 {
+		currentState.playerArmor = 0
+		if part2 && currentState.playerTurn {
+			currentState.playerHp--
+			if currentState.playerHp <= 0 {
+				continue
+			}
+		}
+
+		applyEffects(&currentState)
+		if currentState.bossHp <= 0 {
+			if currentState.spentMana < minMana {
+				minMana = currentState.spentMana
+			}
 			continue
 		}
 
-		if currentState.spentMana >= minMana {
-			continue
-		}
-
-		for _, spell := range spells {
-			if spell.cost > currentState.playerMana {
+		if !currentState.playerTurn {
+			// boss turn
+			applyBossAttack(&currentState)
+			if currentState.playerHp <= 0 {
 				continue
 			}
-
-			newState := currentState
-			newState.spentMana += spell.cost
-			newState.playerMana -= spell.cost
-
-			newState = applyEffects(newState)
-			if newState.bossHp <= 0 {
-				if newState.spentMana < minMana {
-					minMana = newState.spentMana
+			currentState.playerTurn = true
+			queue.PushBack(currentState)
+		} else {
+			// player turn
+			for _, sp := range spells {
+				// already active
+				alreadActive := false
+				if sp.duration != 0 {
+					for _, effect := range currentState.effects {
+						if effect.name == sp.name {
+							alreadActive = true
+							continue
+						}
+					}
 				}
-				continue
-			}
-
-			newState = applySpell(newState, spell)
-			if newState.bossHp <= 0 {
-				if newState.spentMana < minMana {
-					minMana = newState.spentMana
+				if alreadActive {
+					continue
 				}
-				continue
-			}
 
-			newState = applyEffects(newState)
-			if newState.bossHp <= 0 {
-				if newState.spentMana < minMana {
-					minMana = newState.spentMana
+				// not enough mana
+				if currentState.playerMana < sp.cost {
+					continue
 				}
-				continue
-			}
 
-			newState = applyBossAttack(newState)
-			if newState.bossHp <= 0 {
-				if newState.spentMana < minMana {
-					minMana = newState.spentMana
+				if currentState.spentMana+sp.cost <= minMana {
+					stateCopy := currentState
+					stateCopy.playerMana -= sp.cost
+					stateCopy.spentMana += sp.cost
+					stateCopy.effects = append(currentState.effects, sp)
+					stateCopy.playerTurn = false
+
+					queue.PushBack(stateCopy)
 				}
-				continue
 			}
-
-			queue.PushBack(newState)
 		}
 	}
 
 	fmt.Println(minMana)
 }
 
-func applyEffects(state *state) *state {
+func applyEffects(state *state) {
 	for i, effect := range state.effects {
-		if effect.duration == 0 {
-			continue
-		}
-
 		state.playerArmor += effect.armor
 		state.playerMana += effect.mana
 		state.playerHp += effect.heal
@@ -147,27 +151,14 @@ func applyEffects(state *state) *state {
 			newEffects = append(newEffects, effect)
 		}
 	}
-
-	return state
+	state.effects = newEffects
 }
 
-func applySpell(state *state, spell spell) *state {
-	state.playerArmor += spell.armor
-	state.playerMana += spell.mana
-	state.playerHp += spell.heal
-	state.bossHp -= spell.damage
-	state.effects = append(state.effects, spell)
-
-	return state
-}
-
-func applyBossAttack(state *state) *state {
+func applyBossAttack(state *state) {
 	damage := state.bossDamage - state.playerArmor
 	if damage < 1 {
 		damage = 1
 	}
 
 	state.playerHp -= damage
-
-	return state
 }
