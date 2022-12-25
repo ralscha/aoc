@@ -36,22 +36,22 @@ func part1(input string) {
 	// Facing is 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
 	facing := 0
 
-	instrutionIndex := 0
+	instructionIndex := 0
 
-	for instrutionIndex < len(instructions) {
-		instruction := instructions[instrutionIndex]
+	for instructionIndex < len(instructions) {
+		instruction := instructions[instructionIndex]
 		if instruction == 'R' || instruction == 'L' {
 			facing = nextFacing(facing, rune(instruction))
-			instrutionIndex++
+			instructionIndex++
 		} else {
 			numberStr := ""
-			for instrutionIndex < len(instructions) {
-				instruction = instructions[instrutionIndex]
+			for instructionIndex < len(instructions) {
+				instruction = instructions[instructionIndex]
 				if instruction == 'R' || instruction == 'L' {
 					break
 				}
 				numberStr += string(instruction)
-				instrutionIndex++
+				instructionIndex++
 			}
 			number := conv.MustAtoi(numberStr)
 			currentPosition = move(g, currentPosition, facing, number)
@@ -158,21 +158,21 @@ func part2(input string) {
 	// Facing is 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
 	facing := 0
 
-	instrutionIndex := 0
-	for instrutionIndex < len(instructions) {
-		instruction := instructions[instrutionIndex]
+	instructionIndex := 0
+	for instructionIndex < len(instructions) {
+		instruction := instructions[instructionIndex]
 		if instruction == 'R' || instruction == 'L' {
 			facing = nextFacing(facing, rune(instruction))
-			instrutionIndex++
+			instructionIndex++
 		} else {
 			numberStr := ""
-			for instrutionIndex < len(instructions) {
-				instruction = instructions[instrutionIndex]
+			for instructionIndex < len(instructions) {
+				instruction = instructions[instructionIndex]
 				if instruction == 'R' || instruction == 'L' {
 					break
 				}
 				numberStr += string(instruction)
-				instrutionIndex++
+				instructionIndex++
 			}
 			number := conv.MustAtoi(numberStr)
 			currentPosition, facing = move3d(g, currentPosition, facing, number)

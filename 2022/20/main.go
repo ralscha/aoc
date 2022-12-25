@@ -35,11 +35,11 @@ func part1(input string) {
 }
 
 func part2(input string) {
-	decriptionKey := 811589153
+	descriptionKey := 811589153
 	numberStr := conv.SplitNewline(input)
 	var numbers = make([]number, len(numberStr))
 	for ix, n := range numberStr {
-		numbers[ix] = number{value: conv.MustAtoi(n) * decriptionKey, index: ix}
+		numbers[ix] = number{value: conv.MustAtoi(n) * descriptionKey, index: ix}
 	}
 
 	for r := 0; r < 10; r++ {

@@ -21,23 +21,23 @@ func main() {
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	valley, endPos := makeValey(lines)
+	valley, endPos := makeValley(lines)
 	startPos := position{row: 0, col: 1}
-	minutes := valley.findFastetPath(0, startPos, endPos)
+	minutes := valley.findFastestPath(0, startPos, endPos)
 	fmt.Println(minutes)
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	valley, endPos := makeValey(lines)
+	valley, endPos := makeValley(lines)
 	startPos := position{row: 0, col: 1}
-	minutes := valley.findFastetPath(0, startPos, endPos)
-	minutes = valley.findFastetPath(minutes+1, endPos, startPos)
-	minutes = valley.findFastetPath(minutes+1, startPos, endPos)
+	minutes := valley.findFastestPath(0, startPos, endPos)
+	minutes = valley.findFastestPath(minutes+1, endPos, startPos)
+	minutes = valley.findFastestPath(minutes+1, startPos, endPos)
 	fmt.Println(minutes)
 }
 
-func makeValey(lines []string) (*valley, position) {
+func makeValley(lines []string) (*valley, position) {
 	var blizzards []blizzard
 	width, height := len(lines[0]), len(lines)
 	for row, line := range lines {
@@ -155,7 +155,7 @@ func (v *valley) moveExpedition(minute int, pos position, dir int, toPos positio
 	return nextPos, true
 }
 
-func (v *valley) findFastetPath(minute int, fromPos, toPos position) int {
+func (v *valley) findFastestPath(minute int, fromPos, toPos position) int {
 	paths := list.New()
 	paths.PushBack(path{pos: fromPos, minute: minute})
 	existingPaths := make(map[path]bool)

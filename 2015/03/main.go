@@ -19,7 +19,7 @@ func main() {
 }
 
 func part1(input string) {
-	vistedHouses := make(map[string]bool)
+	visitedHouses := make(map[string]bool)
 	x, y := 0, 0
 	for _, dir := range input {
 		switch dir {
@@ -32,14 +32,14 @@ func part1(input string) {
 		case '<':
 			x--
 		}
-		vistedHouses[fmt.Sprintf("%d,%d", x, y)] = true
+		visitedHouses[fmt.Sprintf("%d,%d", x, y)] = true
 	}
 
-	fmt.Println("Number of houses visited:", len(vistedHouses))
+	fmt.Println("Number of houses visited:", len(visitedHouses))
 }
 
 func part2(input string) {
-	vistedHouses := make(map[string]bool)
+	visitedHouses := make(map[string]bool)
 	x, y := 0, 0
 	x2, y2 := 0, 0
 	for i, dir := range input {
@@ -54,7 +54,7 @@ func part2(input string) {
 			case '<':
 				x--
 			}
-			vistedHouses[fmt.Sprintf("%d,%d", x, y)] = true
+			visitedHouses[fmt.Sprintf("%d,%d", x, y)] = true
 		} else {
 			switch dir {
 			case '^':
@@ -66,9 +66,9 @@ func part2(input string) {
 			case '<':
 				x2--
 			}
-			vistedHouses[fmt.Sprintf("%d,%d", x2, y2)] = true
+			visitedHouses[fmt.Sprintf("%d,%d", x2, y2)] = true
 		}
 	}
 
-	fmt.Println("Number of houses visited:", len(vistedHouses))
+	fmt.Println("Number of houses visited:", len(visitedHouses))
 }
