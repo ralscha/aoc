@@ -39,6 +39,18 @@ func NewGrid2D[T any](wrap bool) Grid2D[T] {
 	}
 }
 
+func NewNumberGrid2D(lines []string) Grid2D[int] {
+	g := NewGrid2D[int](false)
+
+	for r, line := range lines {
+		for c, j := range line {
+			g.Set(r, c, int(j-'0'))
+		}
+	}
+
+	return g
+}
+
 func (g *Grid2D[T]) SetMinRow(row int) {
 	g.minRow = row
 }

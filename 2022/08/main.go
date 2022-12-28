@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	grid2 "aoc/internal/grid"
 	"aoc/internal/mathx"
 	"fmt"
 	"log"
@@ -21,7 +22,7 @@ func main() {
 
 func part1(input string) {
 	inputLines := conv.SplitNewline(input)
-	grid := conv.CreateNumberGrid(inputLines)
+	grid := grid2.NewNumberGrid2D(inputLines)
 
 	count := countVisibleTrees(grid)
 	fmt.Println(count)
@@ -29,14 +30,15 @@ func part1(input string) {
 
 func part2(input string) {
 	inputLines := conv.SplitNewline(input)
-	grid := conv.CreateNumberGrid(inputLines)
+	grid := grid2.NewNumberGrid2D(inputLines)
 
-	nRows := len(grid)
-	nColumns := len(grid[0])
+	minCol, maxCol := grid.GetMinMaxCol()
+	minRow, maxRow := grid.GetMinMaxRow()
+
 	scenicScore := 0
-	for r := 0; r < nRows; r++ {
-		for c := 0; c < nColumns; c++ {
-			ss := calculateScenicScore(grid, r, c)
+	for r := minRow; r <= maxRow; r++ {
+		for c := minCol; c <= maxCol; c++ {
+			ss := calculateScenicScore(grid, r, c, maxRow, maxCol)
 			if ss > scenicScore {
 				scenicScore = ss
 			}
@@ -46,19 +48,19 @@ func part2(input string) {
 	fmt.Println(scenicScore)
 }
 
-func countVisibleTrees(grid [][]int) int {
-	nRows := len(grid)
-	nColumns := len(grid[0])
+func countVisibleTrees(grid grid2.Grid2D[int]) int {
+	minCol, maxCol := grid.GetMinMaxCol()
+	minRow, maxRow := grid.GetMinMaxRow()
 	count := 0
 
-	for r := 0; r < nRows; r++ {
-		for c := 0; c < nColumns; c++ {
-			if r == 0 || r == nRows-1 || c == 0 || c == nColumns-1 {
+	for r := minRow; r <= maxRow; r++ {
+		for c := minCol; c <= maxCol; c++ {
+			if r == 0 || r == maxRow || c == 0 || c == maxCol {
 				count++
 				continue
 			}
 
-			treeHeight := grid[r][c]
+			treeHeight, _ := grid.Get(r, c)
 			if isVisible(grid, r, c, treeHeight) {
 				count++
 			}
@@ -68,31 +70,35 @@ func countVisibleTrees(grid [][]int) int {
 	return count
 }
 
-func isVisible(grid [][]int, r, c, treeHeight int) bool {
-	nRows := len(grid)
-	nColumns := len(grid[0])
+func isVisible(grid grid2.Grid2D[int], r, c, treeHeight int) bool {
+	_, maxCol := grid.GetMinMaxCol()
+	_, maxRow := grid.GetMinMaxRow()
 
 	blockingTrees := 0
 	for i := r - 1; i >= 0; i-- {
-		if grid[i][c] >= treeHeight {
+		height, _ := grid.Get(i, c)
+		if height >= treeHeight {
 			blockingTrees++
 			break
 		}
 	}
-	for i := r + 1; i < nRows; i++ {
-		if grid[i][c] >= treeHeight {
+	for i := r + 1; i <= maxRow; i++ {
+		height, _ := grid.Get(i, c)
+		if height >= treeHeight {
 			blockingTrees++
 			break
 		}
 	}
 	for i := c - 1; i >= 0; i-- {
-		if grid[r][i] >= treeHeight {
+		height, _ := grid.Get(r, i)
+		if height >= treeHeight {
 			blockingTrees++
 			break
 		}
 	}
-	for i := c + 1; i < nColumns; i++ {
-		if grid[r][i] >= treeHeight {
+	for i := c + 1; i <= maxCol; i++ {
+		height, _ := grid.Get(r, i)
+		if height >= treeHeight {
 			blockingTrees++
 			break
 		}
@@ -101,26 +107,26 @@ func isVisible(grid [][]int, r, c, treeHeight int) bool {
 	return blockingTrees < 4
 }
 
-func calculateScenicScore(grid [][]int, r, c int) int {
-	nRows := len(grid)
-	nColumns := len(grid[0])
-	treeHeight := grid[r][c]
+func calculateScenicScore(grid grid2.Grid2D[int], r, c, maxRow, maxCol int) int {
+	treeHeight, _ := grid.Get(r, c)
 
 	var scenicScore [4]int
 	for i := r - 1; i >= 0; i-- {
-		if grid[i][c] <= treeHeight {
+		th, _ := grid.Get(i, c)
+		if th <= treeHeight {
 			scenicScore[0]++
-			if grid[i][c] == treeHeight {
+			if th == treeHeight {
 				break
 			}
 		} else {
 			break
 		}
 	}
-	for i := r + 1; i < nRows; i++ {
-		if grid[i][c] <= treeHeight {
+	for i := r + 1; i <= maxRow; i++ {
+		th, _ := grid.Get(i, c)
+		if th <= treeHeight {
 			scenicScore[1]++
-			if grid[i][c] == treeHeight {
+			if th == treeHeight {
 				break
 			}
 		} else {
@@ -128,19 +134,21 @@ func calculateScenicScore(grid [][]int, r, c int) int {
 		}
 	}
 	for i := c - 1; i >= 0; i-- {
-		if grid[r][i] <= treeHeight {
+		th, _ := grid.Get(r, i)
+		if th <= treeHeight {
 			scenicScore[2]++
-			if grid[r][i] == treeHeight {
+			if th == treeHeight {
 				break
 			}
 		} else {
 			break
 		}
 	}
-	for i := c + 1; i < nColumns; i++ {
-		if grid[r][i] <= treeHeight {
+	for i := c + 1; i <= maxCol; i++ {
+		th, _ := grid.Get(r, i)
+		if th <= treeHeight {
 			scenicScore[3]++
-			if grid[r][i] == treeHeight {
+			if th == treeHeight {
 				break
 			}
 		} else {

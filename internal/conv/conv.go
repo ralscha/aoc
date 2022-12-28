@@ -14,21 +14,6 @@ func MustAtoi(s string) int {
 	return i
 }
 
-func CreateNumberGrid(lines []string) [][]int {
-	grid := make([][]int, len(lines))
-	for i := range grid {
-		grid[i] = make([]int, len(lines[i]))
-	}
-
-	for i := range lines {
-		for j := range lines[i] {
-			grid[i][j] = int(lines[i][j] - '0')
-		}
-	}
-
-	return grid
-}
-
 func SplitNewline(s string) []string {
 	splitted := strings.Split(s, "\n")
 	if len(splitted) > 0 && splitted[len(splitted)-1] == "" {
