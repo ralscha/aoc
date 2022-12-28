@@ -1,92 +1,168 @@
 package grid
 
-type Coordinates struct {
-	row, col int
+import "math"
+
+type Coordinate struct {
+	Row, Col int
 }
+
+type Direction struct {
+	Row, Col int
+}
+
+var (
+	DirectionN  = Direction{Row: -1}
+	DirectionS  = Direction{Row: 1}
+	DirectionE  = Direction{Col: 1}
+	DirectionW  = Direction{Col: -1}
+	DirectionNW = Direction{Row: -1, Col: -1}
+	DirectionNE = Direction{Row: -1, Col: 1}
+	DirectionSW = Direction{Row: 1, Col: -1}
+	DirectionSE = Direction{Row: 1, Col: 1}
+)
 
 type Grid2D[T any] struct {
-	grid          map[Coordinates]T
-	width, height int
-	wrap          bool
+	grid           map[Coordinate]T
+	minCol, maxCol int
+	minRow, maxRow int
+	wrap           bool
 }
 
-func NewGrid2D[T any](width, height int, wrap bool) Grid2D[T] {
+func NewGrid2D[T any](wrap bool) Grid2D[T] {
 	return Grid2D[T]{
-		grid:   make(map[Coordinates]T),
-		width:  width,
-		height: height,
+		grid:   make(map[Coordinate]T),
 		wrap:   wrap,
+		maxCol: 0,
+		maxRow: 0,
+		minCol: math.MaxInt,
+		minRow: math.MaxInt,
 	}
+}
+
+func (g *Grid2D[T]) SetMinRow(row int) {
+	g.minRow = row
+}
+
+func (g *Grid2D[T]) SetMinRowCol(row, col int) {
+	g.minRow = row
+	g.minCol = col
+}
+
+func (g *Grid2D[T]) SetMaxRowCol(row, col int) {
+	g.maxRow = row
+	g.maxCol = col
 }
 
 func (g Grid2D[T]) Width() int {
-	return g.width
+	return g.maxCol - g.minCol + 1
 }
 
 func (g Grid2D[T]) Height() int {
-	return g.height
+	return g.maxRow - g.minRow + 1
 }
 
-func (g Grid2D[T]) Get(coord Coordinates) T {
-	return g.grid[coord]
+func (g Grid2D[T]) GetMinMaxCol() (int, int) {
+	return g.minCol, g.maxCol
 }
 
-func (g Grid2D[T]) Set(coord Coordinates, value T) {
-	g.grid[coord] = value
+func (g Grid2D[T]) GetMinMaxRow() (int, int) {
+	return g.minRow, g.maxRow
 }
 
-func (g Grid2D[T]) Move(coord, direction Coordinates) {
-	newCoord := Coordinates{
-		row: coord.row + direction.row,
-		col: coord.col + direction.col,
+func (g Grid2D[T]) Get(row, col int) (T, bool) {
+	val, ok := g.grid[Coordinate{
+		Row: row,
+		Col: col,
+	}]
+	return val, ok
+}
+
+func (g *Grid2D[T]) Set(row, col int, value T) {
+	g.grid[Coordinate{
+		Row: row,
+		Col: col,
+	}] = value
+	g.updateMinMax(row, col)
+}
+
+func (g *Grid2D[T]) updateMinMax(row, col int) {
+	if col < g.minCol {
+		g.minCol = col
 	}
+	if col > g.maxCol {
+		g.maxCol = col
+	}
+	if row < g.minRow {
+		g.minRow = row
+	}
+	if row > g.maxRow {
+		g.maxRow = row
+	}
+}
+
+func (g *Grid2D[T]) Move(row, col int, direction Direction) {
+	newCoord := Coordinate{
+		Row: row + direction.Row,
+		Col: col + direction.Col,
+	}
+
 	if g.wrap {
-		newCoord.row = (newCoord.row + g.height) % g.height
-		newCoord.col = (newCoord.col + g.width) % g.width
+		height := g.maxRow - g.minRow + 1
+		width := g.maxCol - g.minCol + 1
+		newCoord.Row = newCoord.Row % height
+		newCoord.Col = newCoord.Col % width
 	}
 
-	if newCoord.row >= 0 && newCoord.row < g.height && newCoord.col >= 0 && newCoord.col < g.width {
-		g.grid[newCoord] = g.grid[coord]
-		delete(g.grid, coord)
+	if newCoord.Row >= g.minRow && newCoord.Row <= g.maxRow && newCoord.Col >= g.minCol && newCoord.Col <= g.maxCol {
+		oldCoord := Coordinate{
+			Row: row,
+			Col: col,
+		}
+		g.grid[newCoord] = g.grid[oldCoord]
+		delete(g.grid, oldCoord)
 	}
+
+	g.updateMinMax(row, col)
 }
 
-func (g Grid2D[T]) GetNeighbours8(coord Coordinates) []T {
-	var directions = []Coordinates{
-		{row: -1, col: -1},
-		{row: -1, col: 0},
-		{row: -1, col: 1},
-		{row: 0, col: -1},
-		{row: 0, col: 1},
-		{row: 1, col: -1},
-		{row: 1, col: 0},
-		{row: 1, col: 1},
-	}
-	return g.GetNeighbours(coord, directions)
+func (g Grid2D[T]) GetNeighbours8(row, col int) []T {
+	return g.GetNeighbours(row, col, []Direction{
+		DirectionN,
+		DirectionS,
+		DirectionE,
+		DirectionW,
+		DirectionNW,
+		DirectionNE,
+		DirectionSW,
+		DirectionSE,
+	})
 }
 
-func (g Grid2D[T]) GetNeighbours4(coord Coordinates) []T {
-	var directions = []Coordinates{
-		{row: -1, col: 0},
-		{row: 0, col: -1},
-		{row: 0, col: 1},
-		{row: 1, col: 0},
-	}
-	return g.GetNeighbours(coord, directions)
+func (g Grid2D[T]) GetNeighbours4(row, col int) []T {
+	return g.GetNeighbours(row, col, []Direction{
+		DirectionN,
+		DirectionS,
+		DirectionE,
+		DirectionW,
+	})
 }
 
-func (g Grid2D[T]) GetNeighbours(coord Coordinates, directions []Coordinates) []T {
+func (g Grid2D[T]) GetNeighbours(row, col int, directions []Direction) []T {
 	var neighbours []T
 	for _, direction := range directions {
-		neighbourCoord := Coordinates{
-			row: coord.row + direction.row,
-			col: coord.col + direction.col,
+		neighbourCoord := Coordinate{
+			Row: row + direction.Row,
+			Col: col + direction.Col,
 		}
+
 		if g.wrap {
-			neighbourCoord.row = (neighbourCoord.row + g.height) % g.height
-			neighbourCoord.col = (neighbourCoord.col + g.width) % g.width
+			height := g.maxRow - g.minRow + 1
+			width := g.maxCol - g.minCol + 1
+			neighbourCoord.Row = neighbourCoord.Row % height
+			neighbourCoord.Col = neighbourCoord.Col % width
 		}
-		if neighbourCoord.row >= 0 && neighbourCoord.row < g.height && neighbourCoord.col >= 0 && neighbourCoord.col < g.width {
+		if neighbourCoord.Row >= g.minRow && neighbourCoord.Row <= g.maxRow &&
+			neighbourCoord.Col >= g.minCol && neighbourCoord.Col <= g.maxCol {
 			if neighbour, ok := g.grid[neighbourCoord]; ok {
 				neighbours = append(neighbours, neighbour)
 			}
