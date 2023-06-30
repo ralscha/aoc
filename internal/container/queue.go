@@ -30,5 +30,5 @@ func (q Queue[T]) Pop() T {
 	}
 	data := q.q.Front()
 	q.q.Remove(data)
-	return data.Value
+	return data.Value.(T)
 }

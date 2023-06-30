@@ -1,0 +1,105 @@
+package main
+
+import (
+	"aoc/internal/conv"
+	"aoc/internal/download"
+	"fmt"
+	"log"
+	"sort"
+	"strings"
+)
+
+func main() {
+	inputFile := "./2018/04/input.txt"
+	input, err := download.ReadInput(inputFile, 2018, 4)
+	if err != nil {
+		log.Fatalf("reading input failed: %v", err)
+	}
+
+	part1and2(input)
+}
+
+type guard struct {
+	id      int
+	asleep  int
+	minutes [60]int
+}
+
+type guardLog struct {
+	date   string
+	action string
+}
+
+func part1and2(input string) {
+	lines := conv.SplitNewline(input)
+	guardLogs := make([]guardLog, len(lines))
+
+	for i, line := range lines {
+		secondBracket := strings.Index(line, "]") + 1
+		date := line[0:secondBracket]
+		action := line[secondBracket+1:]
+		guardLogs[i] = guardLog{date, action}
+	}
+
+	sort.Slice(guardLogs, func(i, j int) bool {
+		return guardLogs[i].date < guardLogs[j].date
+	})
+
+	guards := make(map[int]*guard)
+	var currentGuard *guard
+	var asleep int
+	for _, gl := range guardLogs {
+		switch gl.action {
+		case "falls asleep":
+			asleep = conv.MustAtoi(gl.date[15:17])
+		case "wakes up":
+			minute := conv.MustAtoi(gl.date[15:17])
+			currentGuard.asleep += minute - asleep + 1
+			for i := asleep; i < minute; i++ {
+				currentGuard.minutes[i]++
+			}
+		default:
+			id := conv.MustAtoi(gl.action[7:strings.Index(gl.action, " begins")])
+			if v, ok := guards[id]; ok {
+				currentGuard = v
+			} else {
+				currentGuard = &guard{id: id}
+				guards[id] = currentGuard
+			}
+		}
+	}
+
+	var maxGuard *guard
+	for _, g := range guards {
+		if maxGuard == nil || g.asleep > maxGuard.asleep {
+			maxGuard = g
+		}
+	}
+
+	var maxMinute int
+	var maxMinuteIndex int
+
+	for i, v := range maxGuard.minutes {
+		if v > maxMinute {
+			maxMinute = v
+			maxMinuteIndex = i
+		}
+	}
+
+	fmt.Println(maxGuard.id * maxMinuteIndex)
+
+	maxGuard = nil
+	maxMinute = 0
+	maxMinuteIndex = 0
+
+	for _, g := range guards {
+		for i, v := range g.minutes {
+			if v > maxMinute {
+				maxMinute = v
+				maxMinuteIndex = i
+				maxGuard = g
+			}
+		}
+	}
+	fmt.Println(maxGuard.id * maxMinuteIndex)
+}

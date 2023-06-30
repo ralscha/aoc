@@ -24,3 +24,7 @@ func (s Set[T]) Contains(data T) bool {
 	_, ok := s.m[data]
 	return ok
 }
+
+func (s Set[T]) Len() int {
+	return len(s.m)
+}
