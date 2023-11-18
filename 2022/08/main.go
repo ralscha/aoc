@@ -4,7 +4,6 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	grid2 "aoc/internal/grid"
-	"aoc/internal/mathx"
 	"fmt"
 	"log"
 )
@@ -156,5 +155,5 @@ func calculateScenicScore(grid grid2.Grid2D[int], r, c, maxRow, maxCol int) int 
 		}
 	}
 
-	return mathx.Max(1, scenicScore[0]) * mathx.Max(1, scenicScore[1]) * mathx.Max(1, scenicScore[2]) * mathx.Max(1, scenicScore[3])
+	return max(1, scenicScore[0]) * max(1, scenicScore[1]) * max(1, scenicScore[2]) * max(1, scenicScore[3])
 }

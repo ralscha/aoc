@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
+	"golang.org/x/exp/slices"
 	"log"
 	"strings"
 )
@@ -35,8 +36,8 @@ func part1(input string) {
 	leastFuel := -1
 	leastPos := -1
 
-	min, max := findMinMax(crabs)
-	for p := min; p <= max; p++ {
+	minCrabs, maxCrabs := findMinMax(crabs)
+	for p := minCrabs; p <= maxCrabs; p++ {
 		fuel := 0
 		for _, c := range crabs {
 			fuel += abs(c - p)
@@ -65,8 +66,8 @@ func part2(input string) {
 	leastFuel := -1
 	leastPos := -1
 
-	min, max := findMinMax(crabs)
-	for p := min; p <= max; p++ {
+	minCrabs, maxCrabs := findMinMax(crabs)
+	for p := minCrabs; p <= maxCrabs; p++ {
 		fuel := 0
 		for _, c := range crabs {
 			diff := abs(c - p)
@@ -89,15 +90,5 @@ func abs(x int) int {
 }
 
 func findMinMax(a []int) (int, int) {
-	min := a[0]
-	max := a[0]
-	for _, value := range a {
-		if value < min {
-			min = value
-		}
-		if value > max {
-			max = value
-		}
-	}
-	return min, max
+	return slices.Min(a), slices.Max(a)
 }

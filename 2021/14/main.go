@@ -4,8 +4,9 @@ import (
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"log"
-	"math"
 	"strings"
 )
 
@@ -53,18 +54,18 @@ func part1(input string) {
 		counts[string(c)]++
 	}
 
-	min := ""
-	max := ""
+	minCounts := ""
+	maxCounts := ""
 	for k, v := range counts {
-		if min == "" || v < counts[min] {
-			min = k
+		if minCounts == "" || v < counts[minCounts] {
+			minCounts = k
 		}
-		if max == "" || v > counts[max] {
-			max = k
+		if maxCounts == "" || v > counts[maxCounts] {
+			maxCounts = k
 		}
 	}
 
-	fmt.Println("Result: ", counts[max]-counts[min])
+	fmt.Println("Result: ", counts[maxCounts]-counts[minCounts])
 }
 
 func part2(input string) {
@@ -103,16 +104,9 @@ func part2(input string) {
 		chars[k[1:]] += v
 	}
 
-	max, min := math.MinInt, math.MaxInt
+	values := maps.Values(chars)
+	maxValue := slices.Max(values)
+	minValue := slices.Min(values)
 
-	for _, v := range chars {
-		if v < min {
-			min = v
-		}
-		if v > max {
-			max = v
-		}
-	}
-
-	fmt.Println("Result: ", (max-min)/2+1)
+	fmt.Println("Result: ", (maxValue-minValue)/2+1)
 }

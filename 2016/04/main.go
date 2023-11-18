@@ -4,8 +4,8 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -50,11 +50,11 @@ func part1(input string) {
 		for _, v := range occurrences {
 			chars = append(chars, *v)
 		}
-		slices.SortFunc(chars, func(i, j char) bool {
+		slices.SortFunc(chars, func(i, j char) int {
 			if i.occurrence == j.occurrence {
-				return i.c < j.c
+				return int(i.c - j.c)
 			}
-			return i.occurrence > j.occurrence
+			return j.occurrence - i.occurrence
 		})
 		computedCheck := ""
 		for i := 0; i < 5; i++ {

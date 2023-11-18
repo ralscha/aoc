@@ -40,6 +40,12 @@ func DownloadInput(year, day int) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("reading sessioncookie failed: %v", err)
 	}
+	if sessionCookie[len(sessionCookie)-1] == '\n' {
+		sessionCookie = sessionCookie[:len(sessionCookie)-1]
+	}
+	if sessionCookie[len(sessionCookie)-1] == '\r' {
+		sessionCookie = sessionCookie[:len(sessionCookie)-1]
+	}
 
 	httpClient := &http.Client{}
 

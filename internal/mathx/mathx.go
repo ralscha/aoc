@@ -37,26 +37,6 @@ func Permutations[T any](input []T) [][]T {
 	return result
 }
 
-func Min[E constraints.Ordered](inputOne E, rest ...E) E {
-	min := inputOne
-	for i := 0; i < len(rest); i++ {
-		if rest[i] < min {
-			min = rest[i]
-		}
-	}
-	return min
-}
-
-func Max[E constraints.Ordered](inputOne E, rest ...E) E {
-	max := inputOne
-	for i := 0; i < len(rest); i++ {
-		if rest[i] > max {
-			max = rest[i]
-		}
-	}
-	return max
-}
-
 func Abs[E constraints.Float | constraints.Integer](input E) E {
 	if input < 0 {
 		return -input

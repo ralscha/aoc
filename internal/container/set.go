@@ -1,12 +1,14 @@
 package container
 
-import "golang.org/x/exp/constraints"
+import (
+	"cmp"
+)
 
-type Set[T constraints.Ordered] struct {
+type Set[T cmp.Ordered] struct {
 	m map[T]struct{}
 }
 
-func NewSet[T constraints.Ordered]() Set[T] {
+func NewSet[T cmp.Ordered]() Set[T] {
 	return Set[T]{
 		m: make(map[T]struct{}),
 	}

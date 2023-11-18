@@ -40,7 +40,7 @@ func part2(input string) {
 	if input[len(input)-1] == '\n' {
 		input = input[:len(input)-1]
 	}
-	min := len(input)
+	minInputLen := len(input)
 	var c uint8
 	for c = 'a'; c <= 'z'; c++ {
 		out := ""
@@ -61,9 +61,9 @@ func part2(input string) {
 				break
 			}
 		}
-		if len(out) < min {
-			min = len(out)
+		if len(out) < minInputLen {
+			minInputLen = len(out)
 		}
 	}
-	fmt.Println(min)
+	fmt.Println(minInputLen)
 }

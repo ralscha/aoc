@@ -1,12 +1,14 @@
 package container
 
-import "golang.org/x/exp/constraints"
+import (
+	"cmp"
+)
 
-type Bag[T constraints.Ordered] struct {
+type Bag[T cmp.Ordered] struct {
 	m map[T]int
 }
 
-func NewBag[T constraints.Ordered]() Bag[T] {
+func NewBag[T cmp.Ordered]() Bag[T] {
 	return Bag[T]{
 		m: make(map[T]int),
 	}

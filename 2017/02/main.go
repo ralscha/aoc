@@ -4,8 +4,8 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
+	"golang.org/x/exp/slices"
 	"log"
-	"math"
 	"strings"
 )
 
@@ -25,18 +25,15 @@ func part1(input string) {
 	sum := 0
 	for _, line := range lines {
 		numbers := strings.Fields(line)
-		min := math.MaxInt32
-		max := 0
-		for _, number := range numbers {
-			n := conv.MustAtoi(number)
-			if n < min {
-				min = n
-			}
-			if n > max {
-				max = n
-			}
-		}
-		sum += max - min
+
+		minNumbers := slices.MinFunc(numbers, func(i, j string) int {
+			return conv.MustAtoi(i) - conv.MustAtoi(j)
+		})
+		maxNumbers := slices.MaxFunc(numbers, func(i, j string) int {
+			return conv.MustAtoi(i) - conv.MustAtoi(j)
+		})
+
+		sum += conv.MustAtoi(maxNumbers) - conv.MustAtoi(minNumbers)
 	}
 	fmt.Println(sum)
 }

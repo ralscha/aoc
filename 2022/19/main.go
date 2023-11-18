@@ -3,7 +3,6 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"aoc/internal/mathx"
 	"fmt"
 	"log"
 	"strings"
@@ -84,9 +83,9 @@ func createBlueprints(lines []string) []blueprint {
 		costClayRobot := cost{ore: conv.MustAtoi(splitted[12])}
 		costObsidianRobot := cost{ore: conv.MustAtoi(splitted[18]), clay: conv.MustAtoi(splitted[21])}
 		costGeoRobot := cost{ore: conv.MustAtoi(splitted[27]), obsidian: conv.MustAtoi(splitted[30])}
-		maxOre := mathx.Max(costOreRobot.ore, costClayRobot.ore, costObsidianRobot.ore, costGeoRobot.ore)
-		maxClay := mathx.Max(costOreRobot.clay, costClayRobot.clay, costObsidianRobot.clay, costGeoRobot.clay)
-		maxObsidian := mathx.Max(costOreRobot.obsidian, costClayRobot.obsidian, costObsidianRobot.obsidian, costGeoRobot.obsidian)
+		maxOre := max(costOreRobot.ore, costClayRobot.ore, costObsidianRobot.ore, costGeoRobot.ore)
+		maxClay := max(costOreRobot.clay, costClayRobot.clay, costObsidianRobot.clay, costGeoRobot.clay)
+		maxObsidian := max(costOreRobot.obsidian, costClayRobot.obsidian, costObsidianRobot.obsidian, costGeoRobot.obsidian)
 		blueprints = append(blueprints, blueprint{id: id, costOreRobot: costOreRobot, costClayRobot: costClayRobot,
 			costObsidianRobot: costObsidianRobot, costGeodeRobot: costGeoRobot,
 			maxOre: maxOre, maxClay: maxClay, maxObsidian: maxObsidian})
