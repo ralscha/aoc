@@ -1,6 +1,7 @@
 package download
 
 import (
+	"aoc/internal/conv"
 	"errors"
 	"fmt"
 	"io"
@@ -8,6 +9,14 @@ import (
 	"net/http"
 	"os"
 )
+
+func ReadInputAuto(fileName string) (string, error) {
+	yearStr := fileName[2:6]
+	monthStr := fileName[7:9]
+	year := conv.MustAtoi(yearStr)
+	month := conv.MustAtoi(monthStr)
+	return ReadInput(fileName, year, month)
+}
 
 func ReadInput(fileName string, year, day int) (string, error) {
 	_, err := os.Stat(fileName)
