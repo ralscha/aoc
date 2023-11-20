@@ -15,10 +15,10 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 	lines := conv.SplitNewline(input)
-	part1(lines)
+	part1and2(lines)
 }
 
-func part1(lines []string) {
+func part1and2(lines []string) {
 	var grid [50][6]bool
 
 	for _, line := range lines {
