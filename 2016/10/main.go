@@ -3,8 +3,8 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"golang.org/x/exp/slices"
 	"log"
+	"slices"
 	"strings"
 )
 

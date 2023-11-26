@@ -5,8 +5,8 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"log"
+	"slices"
 	"sort"
 	"strings"
 )

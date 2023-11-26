@@ -5,8 +5,8 @@ import (
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"log"
+	"slices"
 	"strings"
 )
 
