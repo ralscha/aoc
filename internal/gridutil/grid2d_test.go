@@ -1,4 +1,4 @@
-package grid
+package gridutil
 
 import "testing"
 

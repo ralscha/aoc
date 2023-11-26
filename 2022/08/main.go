@@ -3,14 +3,13 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	grid2 "aoc/internal/grid"
+	grid2 "aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
 
 func main() {
-	inputFile := "./2022/08/input.txt"
-	input, err := download.ReadInput(inputFile, 2022, 8)
+	input, err := download.ReadInput(2022, 8)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

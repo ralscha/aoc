@@ -3,12 +3,12 @@ package main
 import (
 	"aoc/internal/download"
 	"encoding/json"
+	"fmt"
 	"log"
 )
 
 func main() {
-	inputFile := "./2015/12/input.txt"
-	input, err := download.ReadInput(inputFile, 2015, 12)
+	input, err := download.ReadInput(2015, 12)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}
@@ -24,10 +24,10 @@ func part1and2(input string) {
 	}
 
 	total := walk(v)
-	log.Printf("Total: %d", total)
+	fmt.Printf("Total: %d\n", total)
 
 	total = walkIgnoreRed(v)
-	log.Printf("Total: %d", total)
+	fmt.Printf("Total: %d", total)
 
 }
 

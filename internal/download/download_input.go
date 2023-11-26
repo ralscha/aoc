@@ -1,7 +1,6 @@
 package download
 
 import (
-	"aoc/internal/conv"
 	"errors"
 	"fmt"
 	"io"
@@ -10,16 +9,13 @@ import (
 	"os"
 )
 
-func ReadInputAuto(fileName string) (string, error) {
-	yearStr := fileName[2:6]
-	monthStr := fileName[7:9]
-	year := conv.MustAtoi(yearStr)
-	month := conv.MustAtoi(monthStr)
-	return ReadInput(fileName, year, month)
-}
-
-func ReadInput(fileName string, year, day int) (string, error) {
-	_, err := os.Stat(fileName)
+func ReadInput(year, day int) (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	fileName := fmt.Sprintf("%s/%d/%02d/input.txt", dir, year, day)
+	_, err = os.Stat(fileName)
 	if err != nil {
 		if os.IsNotExist(err) {
 			input, err := DownloadInput(year, day)

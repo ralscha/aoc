@@ -23,8 +23,7 @@ var dx = [4]int{0, 0, -1, 1}
 var dy = [4]int{-1, 1, 0, 0}
 
 func main() {
-	inputFile := "./2021/15/input.txt"
-	input, err := download.ReadInput(inputFile, 2021, 15)
+	input, err := download.ReadInput(2021, 15)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

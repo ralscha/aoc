@@ -3,14 +3,13 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"aoc/internal/grid"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
 
 func main() {
-	inputFile := "./2018/03/input.txt"
-	input, err := download.ReadInput(inputFile, 2018, 3)
+	input, err := download.ReadInput(2018, 3)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}
@@ -39,7 +38,7 @@ func part1(input string) {
 		claims[i] = c
 	}
 
-	g := grid.NewGrid2D[int](false)
+	g := gridutil.NewGrid2D[int](false)
 	g.SetMaxRowCol(1000, 1000)
 	for _, c := range claims {
 		for i := c.x; i < c.x+c.width; i++ {
@@ -81,7 +80,7 @@ func part2(input string) {
 		claims[i] = c
 	}
 
-	g := grid.NewGrid2D[int](false)
+	g := gridutil.NewGrid2D[int](false)
 	g.SetMaxRowCol(1000, 1000)
 	for _, c := range claims {
 		for i := c.x; i < c.x+c.width; i++ {

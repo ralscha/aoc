@@ -3,13 +3,13 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"fmt"
 	"log"
 	"strings"
 )
 
 func main() {
-	inputFile := "./2015/16/input.txt"
-	input, err := download.ReadInput(inputFile, 2015, 16)
+	input, err := download.ReadInput(2015, 16)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}
@@ -52,7 +52,7 @@ func part1(input string, sue map[string]int) {
 			}
 		}
 		if match {
-			log.Println("Part 1: ", sueNumber)
+			fmt.Println("Part 1: ", sueNumber)
 		}
 	}
 }
@@ -90,7 +90,7 @@ func part2(input string, sue map[string]int) {
 			}
 		}
 		if match {
-			log.Println("Part 2: ", sueNumber)
+			fmt.Println("Part 2: ", sueNumber)
 		}
 	}
 }

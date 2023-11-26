@@ -21,8 +21,7 @@ var adjmap = make(map[*node][]*node)
 var adjmapString = make(map[string][]string)
 
 func main() {
-	inputFile := "./2021/12/input.txt"
-	input, err := download.ReadInput(inputFile, 2021, 12)
+	input, err := download.ReadInput(2021, 12)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

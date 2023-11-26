@@ -3,15 +3,14 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"aoc/internal/grid"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"strings"
 )
 
 func main() {
-	inputFile := "./2022/14/input.txt"
-	input, err := download.ReadInput(inputFile, 2022, 14)
+	input, err := download.ReadInput(2022, 14)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}
@@ -20,13 +19,13 @@ func main() {
 	part2(input)
 }
 
-type path []grid.Coordinate
+type path []gridutil.Coordinate
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 
 	paths := createPaths(lines)
-	g := grid.NewGrid2D[bool](false)
+	g := gridutil.NewGrid2D[bool](false)
 	g.SetMinRow(0)
 	drawPaths(&g, paths)
 
@@ -48,7 +47,7 @@ func part2(input string) {
 	lines := conv.SplitNewline(input)
 
 	paths := createPaths(lines)
-	g := grid.NewGrid2D[bool](false)
+	g := gridutil.NewGrid2D[bool](false)
 	g.SetMinRow(0)
 	drawPaths(&g, paths)
 
@@ -72,7 +71,7 @@ func part2(input string) {
 
 }
 
-func fall(g grid.Grid2D[bool], row, col int) (bool, int, int) {
+func fall(g gridutil.Grid2D[bool], row, col int) (bool, int, int) {
 	_, maxRow := g.GetMinMaxRow()
 	if row+1 > maxRow {
 		return true, row, col
@@ -107,12 +106,12 @@ func createPaths(lines []string) []path {
 
 	for _, line := range lines {
 		splitted := strings.Split(line, " -> ")
-		var points []grid.Coordinate
+		var points []gridutil.Coordinate
 		for _, s := range splitted {
 			sp := strings.Split(s, ",")
 			col := conv.MustAtoi(sp[0])
 			row := conv.MustAtoi(sp[1])
-			p := grid.Coordinate{Row: row, Col: col}
+			p := gridutil.Coordinate{Row: row, Col: col}
 			points = append(points, p)
 		}
 		paths = append(paths, points)
@@ -120,7 +119,7 @@ func createPaths(lines []string) []path {
 	return paths
 }
 
-func drawPaths(g *grid.Grid2D[bool], paths []path) {
+func drawPaths(g *gridutil.Grid2D[bool], paths []path) {
 	for _, p := range paths {
 		prev := p[0]
 		g.Set(prev.Row, prev.Col, true)

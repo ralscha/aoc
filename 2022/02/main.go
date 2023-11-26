@@ -21,8 +21,7 @@ var rules = []rule{
 }
 
 func main() {
-	inputFile := "./2022/02/input.txt"
-	input, err := download.ReadInput(inputFile, 2022, 2)
+	input, err := download.ReadInput(2022, 2)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

@@ -12,8 +12,7 @@ import (
 )
 
 func main() {
-	inputFile := "./2018/07/input.txt"
-	input, err := download.ReadInput(inputFile, 2018, 7)
+	input, err := download.ReadInput(2018, 7)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

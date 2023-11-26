@@ -16,8 +16,7 @@ type octo struct {
 var grid [][]*octo
 
 func main() {
-	inputFile := "./2021/11/input.txt"
-	input, err := download.ReadInput(inputFile, 2021, 11)
+	input, err := download.ReadInput(2021, 11)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"aoc/internal/grid"
+	"aoc/internal/gridutil"
 	"aoc/internal/mathx"
 	"fmt"
 	"log"
@@ -12,8 +12,7 @@ import (
 )
 
 func main() {
-	inputFile := "./2018/06/input.txt"
-	input, err := download.ReadInput(inputFile, 2018, 6)
+	input, err := download.ReadInput(2018, 6)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}
@@ -23,7 +22,7 @@ func main() {
 
 func part1and2(input string) {
 	lines := conv.SplitNewline(input)
-	places := make([]grid.Coordinate, len(lines))
+	places := make([]gridutil.Coordinate, len(lines))
 
 	minCol, minRow := math.MaxInt32, math.MaxInt32
 	maxCol, maxRow := 0, 0
@@ -32,7 +31,7 @@ func part1and2(input string) {
 		parts := strings.Split(line, ", ")
 		x := conv.MustAtoi(parts[0])
 		y := conv.MustAtoi(parts[1])
-		places[i] = grid.Coordinate{
+		places[i] = gridutil.Coordinate{
 			Row: y,
 			Col: x,
 		}
@@ -88,7 +87,7 @@ func part1and2(input string) {
 	fmt.Println(regionSize)
 }
 
-func findClosest(c, r int, places []grid.Coordinate) int {
+func findClosest(c, r int, places []gridutil.Coordinate) int {
 	for i, p := range places {
 		if p.Row == r && p.Col == c {
 			return i

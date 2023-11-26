@@ -12,8 +12,7 @@ import (
 var crateRegex = regexp.MustCompile(`\[([A-Z])]`)
 
 func main() {
-	inputFile := "./2022/05/input.txt"
-	input, err := download.ReadInput(inputFile, 2022, 5)
+	input, err := download.ReadInput(2022, 5)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

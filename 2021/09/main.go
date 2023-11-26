@@ -15,8 +15,7 @@ type point struct {
 }
 
 func main() {
-	inputFile := "./2021/09/input.txt"
-	input, err := download.ReadInput(inputFile, 2021, 9)
+	input, err := download.ReadInput(2021, 9)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

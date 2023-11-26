@@ -18,8 +18,7 @@ type monkey struct {
 }
 
 func main() {
-	inputFile := "./2022/11/input.txt"
-	input, err := download.ReadInput(inputFile, 2022, 11)
+	input, err := download.ReadInput(2022, 11)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

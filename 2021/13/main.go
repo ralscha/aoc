@@ -19,8 +19,7 @@ type fold struct {
 }
 
 func main() {
-	inputFile := "./2021/13/input.txt"
-	input, err := download.ReadInput(inputFile, 2021, 13)
+	input, err := download.ReadInput(2021, 13)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}

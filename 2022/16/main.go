@@ -12,8 +12,7 @@ import (
 // https://github.com/tymscar/Advent-Of-Code/tree/master/2022/typescript/day16
 
 func main() {
-	inputFile := "./2022/16/input.txt"
-	input, err := download.ReadInput(inputFile, 2022, 16)
+	input, err := download.ReadInput(2022, 16)
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}
