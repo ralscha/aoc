@@ -64,7 +64,7 @@ func DownloadInput(year, day int) (string, error) {
 	cookie.Value = string(sessionCookie)
 	req.AddCookie(cookie)
 
-	req.Header.Add("User-Agent", "github.com/ralscha/go-playground by me@rasc.ch")
+	req.Header.Add("User-Agent", "github.com/ralscha/aoc by me@rasc.ch")
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -80,6 +80,10 @@ func DownloadInput(year, day int) (string, error) {
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if bodyBytes[len(bodyBytes)-1] == '\n' {
+		bodyBytes = bodyBytes[:len(bodyBytes)-1]
 	}
 	return string(bodyBytes), nil
 }

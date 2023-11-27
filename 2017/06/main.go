@@ -13,7 +13,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("reading input failed: %v", err)
 	}
-	input = strings.TrimSuffix(input, "\n")
 	banksSlice := conv.ToIntSlice(strings.Split(input, "\t"))
 	var banks [16]int
 	copy(banks[:], banksSlice)

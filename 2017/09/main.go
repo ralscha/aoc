@@ -4,7 +4,6 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"strings"
 )
 
 func main() {
@@ -16,7 +15,6 @@ func main() {
 }
 
 func part1and2(input string) {
-	input = strings.TrimSuffix(input, "\n")
 	depth := 0
 	score := 0
 	garbage := false
