@@ -20,7 +20,7 @@ func main() {
 func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 	sum := 0
-	sumMult := 0
+	sumPower := 0
 	for _, line := range lines {
 		maxRed := 0
 		maxBlue := 0
@@ -36,29 +36,28 @@ func part1and2(input string) {
 			blue := 0
 			green := 0
 			for _, color := range strings.Split(play, ",") {
-				color = strings.TrimSpace(color)
-				colorSplitted := strings.Split(color, " ")
+				colorSplitted := strings.Split(strings.TrimSpace(color), " ")
 				number := conv.MustAtoi(strings.TrimSpace(colorSplitted[0]))
 				color := strings.TrimSpace(colorSplitted[1])
 				switch color {
 				case "red":
-					red += number
+					red = number
 					if number > maxRed {
 						maxRed = number
 					}
 				case "blue":
-					blue += number
+					blue = number
 					if number > maxBlue {
 						maxBlue = number
 					}
 				case "green":
-					green += number
+					green = number
 					if number > maxGreen {
 						maxGreen = number
 					}
 				}
 			}
-			if red > 12 || green > 13 || blue > 14 {
+			if possible && (red > 12 || green > 13 || blue > 14) {
 				possible = false
 			}
 		}
@@ -67,9 +66,8 @@ func part1and2(input string) {
 			sum += gameNumber
 		}
 
-		maxMult := maxRed * maxBlue * maxGreen
-		sumMult += maxMult
+		sumPower += maxRed * maxBlue * maxGreen
 	}
 	fmt.Println(sum)
-	fmt.Println(sumMult)
+	fmt.Println(sumPower)
 }
