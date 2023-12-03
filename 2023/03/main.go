@@ -17,6 +17,11 @@ func main() {
 	part1and2(input)
 }
 
+type position struct {
+	row int
+	col int
+}
+
 func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 
@@ -31,7 +36,7 @@ func part1and2(input string) {
 	}
 	sum := 0
 
-	starNumbers := make(map[[2]int][]int)
+	starNumbers := make(map[position][]int)
 
 	for row := 0; row < numRows; row++ {
 		for col := 0; col < numCols; col++ {
@@ -48,11 +53,15 @@ func part1and2(input string) {
 				hasSymbolNeighbor := false
 				for i := startCol; i <= endCol; i++ {
 					for _, direction := range directions {
-						newRow := row + direction[0]
-						newCol := i + direction[1]
-						if isValidPosition(newRow, newCol, numRows, numCols) && isSymbol(matrix[newRow][newCol]) {
-							if isStar(matrix[newRow][newCol]) {
-								key := [2]int{newRow, newCol}
+						testRow := row + direction[0]
+						testCol := i + direction[1]
+						if testRow < 0 || testRow >= numRows || testCol < 0 || testCol >= numCols {
+							continue
+						}
+						testRune := matrix[testRow][testCol]
+						if !unicode.IsDigit(testRune) && testRune != '.' {
+							if testRune == '*' {
+								key := position{testRow, testCol}
 								if _, ok := starNumbers[key]; !ok {
 									starNumbers[key] = []int{}
 								}
@@ -83,16 +92,4 @@ func part1and2(input string) {
 
 	fmt.Println(sum)
 	fmt.Println(sumGears)
-}
-
-func isSymbol(char rune) bool {
-	return !unicode.IsDigit(char) && char != '.'
-}
-
-func isStar(char rune) bool {
-	return char == '*'
-}
-
-func isValidPosition(row, col, numRows, numCols int) bool {
-	return row >= 0 && row < numRows && col >= 0 && col < numCols
 }
