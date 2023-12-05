@@ -95,9 +95,9 @@ func part1and2(input string) {
 		for _, rules := range groupRules {
 			appliedRanges := make([]srange, 0)
 			for _, rule := range rules {
-				app, unapp := applyRule(currentRanges, rule)
+				app, notApp := applyRule(currentRanges, rule)
 				appliedRanges = append(appliedRanges, app...)
-				currentRanges = unapp
+				currentRanges = notApp
 			}
 			currentRanges = append(currentRanges, appliedRanges...)
 		}
@@ -136,17 +136,17 @@ func part1and2(input string) {
 
 func applyRule(inputRanges []srange, rule rule) ([]srange, []srange) {
 	appliedRanges := make([]srange, 0)
-	unappliedRanges := make([]srange, 0)
+	notAppliedRanges := make([]srange, 0)
 	for _, inputRange := range inputRanges {
 		if inputRange.end < rule.sourceStart || inputRange.start > rule.sourceEnd {
-			unappliedRanges = append(unappliedRanges, inputRange)
+			notAppliedRanges = append(notAppliedRanges, inputRange)
 		} else if inputRange.start >= rule.sourceStart && inputRange.end <= rule.sourceEnd {
 			appliedRanges = append(appliedRanges, srange{
 				start: rule.destStart + inputRange.start - rule.sourceStart,
 				end:   rule.destStart + inputRange.end - rule.sourceStart,
 			})
 		} else if inputRange.start < rule.sourceStart && inputRange.end <= rule.sourceEnd {
-			unappliedRanges = append(unappliedRanges, srange{
+			notAppliedRanges = append(notAppliedRanges, srange{
 				start: inputRange.start,
 				end:   rule.sourceStart - 1,
 			})
@@ -159,12 +159,12 @@ func applyRule(inputRanges []srange, rule rule) ([]srange, []srange) {
 				start: rule.destStart + inputRange.start - rule.sourceStart,
 				end:   rule.destStart + rule.sourceEnd - rule.sourceStart,
 			})
-			unappliedRanges = append(unappliedRanges, srange{
+			notAppliedRanges = append(notAppliedRanges, srange{
 				start: rule.sourceEnd + 1,
 				end:   inputRange.end,
 			})
 		} else if inputRange.start < rule.sourceStart && inputRange.end > rule.sourceEnd {
-			unappliedRanges = append(unappliedRanges, srange{
+			notAppliedRanges = append(notAppliedRanges, srange{
 				start: inputRange.start,
 				end:   rule.sourceStart - 1,
 			})
@@ -172,13 +172,13 @@ func applyRule(inputRanges []srange, rule rule) ([]srange, []srange) {
 				start: rule.destStart,
 				end:   rule.destStart + rule.sourceEnd - rule.sourceStart,
 			})
-			unappliedRanges = append(unappliedRanges, srange{
+			notAppliedRanges = append(notAppliedRanges, srange{
 				start: rule.sourceEnd + 1,
 				end:   inputRange.end,
 			})
 		}
 	}
-	return appliedRanges, unappliedRanges
+	return appliedRanges, notAppliedRanges
 }
 
 func runSeed(seedStart int, seedLen int, groupRules [][]rule) int {
