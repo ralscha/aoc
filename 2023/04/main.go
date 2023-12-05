@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -21,43 +22,39 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 	totalPoints := 0
+
 	for _, line := range lines {
 		splitted := strings.Split(line, ":")
 		parts := strings.Split(splitted[1], "|")
+		winningNumbers := strings.Fields(parts[0])
+		myNumbers := strings.Fields(parts[1])
+		winningSet := container.NewSet[string]()
 
-		winningStr := strings.Fields(parts[0])
-		winningNumbers := make([]int, len(winningStr))
-		for i, numStr := range winningStr {
-			winningNumbers[i] = conv.MustAtoi(numStr)
+		for _, w := range winningNumbers {
+			winningSet.Add(w)
 		}
 
-		myStr := strings.Fields(parts[1])
-		myNumbers := make([]int, len(myStr))
-		for i, numStr := range myStr {
-			myNumbers[i] = conv.MustAtoi(numStr)
-		}
-
-		points, _ := calcPoints(winningNumbers, myNumbers)
+		points, _ := calcPoints(myNumbers, winningSet)
 		totalPoints += points
 	}
 
-	fmt.Println(totalPoints)
+	println(totalPoints)
 }
 
-func calcPoints(winningNumbers, myNumbers []int) (int, int) {
+func calcPoints(myNumbers []string, winningSet container.Set[string]) (int, int) {
+	points := 0
 	numberOfWinningNumbers := 0
-	for _, num := range myNumbers {
-		for _, winNum := range winningNumbers {
-			if num == winNum {
-				numberOfWinningNumbers++
-				break
+	for _, y := range myNumbers {
+		if winningSet.Contains(y) {
+			if points == 0 {
+				points = 1
+			} else {
+				points *= 2
 			}
+			numberOfWinningNumbers++
 		}
 	}
-	if numberOfWinningNumbers == 0 {
-		return 0, 0
-	}
-	return 1 << (numberOfWinningNumbers - 1), numberOfWinningNumbers
+	return points, numberOfWinningNumbers
 }
 
 func part2(input string) {
@@ -76,19 +73,15 @@ func countScratchcards(lines []string) int {
 			splitted := strings.Split(line, ":")
 			parts := strings.Split(splitted[1], "|")
 
-			winningStr := strings.Fields(parts[0])
-			winningNumbers := make([]int, len(winningStr))
-			for i, numStr := range winningStr {
-				winningNumbers[i] = conv.MustAtoi(numStr)
+			winningNumbers := strings.Fields(parts[0])
+			myNumbers := strings.Fields(parts[1])
+			winningSet := container.NewSet[string]()
+
+			for _, w := range winningNumbers {
+				winningSet.Add(w)
 			}
 
-			myStr := strings.Fields(parts[1])
-			myNumbers := make([]int, len(myStr))
-			for i, numStr := range myStr {
-				myNumbers[i] = conv.MustAtoi(numStr)
-			}
-
-			_, numberOfNextScratchcards := calcPoints(winningNumbers, myNumbers)
+			_, numberOfNextScratchcards := calcPoints(myNumbers, winningSet)
 			cardCache[line] = numberOfNextScratchcards
 		}
 
