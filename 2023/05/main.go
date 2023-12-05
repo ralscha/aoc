@@ -14,8 +14,7 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	part1(input)
-	//part2(input)
+	part1and2(input)
 }
 
 type rule struct {
@@ -24,7 +23,7 @@ type rule struct {
 	sourceEnd   int
 }
 
-func part1(input string) {
+func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 	seedsLine := strings.TrimPrefix(lines[0], "seeds: ")
 	seedNumbers := strings.Split(seedsLine, " ")
