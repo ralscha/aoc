@@ -23,6 +23,11 @@ type rule struct {
 	sourceEnd   int
 }
 
+type srange struct {
+	start int
+	end   int
+}
+
 func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 	seedsLine := strings.TrimPrefix(lines[0], "seeds: ")
@@ -74,6 +79,41 @@ func part1and2(input string) {
 	}
 	fmt.Println(minLocation)
 
+	// optimizied solution for part 2
+	minLocation = -1
+
+	for i := 0; i < len(seeds); i += 2 {
+		seedStart := seeds[i]
+		seedLen := seeds[i+1]
+		r := srange{
+			start: seedStart,
+			end:   seedStart + seedLen - 1,
+		}
+		var currentRanges []srange
+		currentRanges = append(currentRanges, r)
+
+		for _, rules := range groupRules {
+			appliedRanges := make([]srange, 0)
+			for _, rule := range rules {
+				app, unapp := applyRule(currentRanges, rule)
+				appliedRanges = append(appliedRanges, app...)
+				currentRanges = unapp
+			}
+			currentRanges = append(currentRanges, appliedRanges...)
+		}
+
+		if len(currentRanges) > 0 {
+			for _, currentRange := range currentRanges {
+				if minLocation == -1 || currentRange.start < minLocation {
+					minLocation = currentRange.start
+				}
+			}
+		}
+	}
+
+	fmt.Println(minLocation)
+
+	// brute force solution for part 2
 	minLocation = -1
 
 	result := make(chan int)
@@ -92,6 +132,53 @@ func part1and2(input string) {
 	}
 
 	fmt.Println(minLocation)
+}
+
+func applyRule(inputRanges []srange, rule rule) ([]srange, []srange) {
+	appliedRanges := make([]srange, 0)
+	unappliedRanges := make([]srange, 0)
+	for _, inputRange := range inputRanges {
+		if inputRange.end < rule.sourceStart || inputRange.start > rule.sourceEnd {
+			unappliedRanges = append(unappliedRanges, inputRange)
+		} else if inputRange.start >= rule.sourceStart && inputRange.end <= rule.sourceEnd {
+			appliedRanges = append(appliedRanges, srange{
+				start: rule.destStart + inputRange.start - rule.sourceStart,
+				end:   rule.destStart + inputRange.end - rule.sourceStart,
+			})
+		} else if inputRange.start < rule.sourceStart && inputRange.end <= rule.sourceEnd {
+			unappliedRanges = append(unappliedRanges, srange{
+				start: inputRange.start,
+				end:   rule.sourceStart - 1,
+			})
+			appliedRanges = append(appliedRanges, srange{
+				start: rule.destStart,
+				end:   rule.destStart + inputRange.end - rule.sourceStart,
+			})
+		} else if inputRange.start >= rule.sourceStart && inputRange.end > rule.sourceEnd {
+			appliedRanges = append(appliedRanges, srange{
+				start: rule.destStart + inputRange.start - rule.sourceStart,
+				end:   rule.destStart + rule.sourceEnd - rule.sourceStart,
+			})
+			unappliedRanges = append(unappliedRanges, srange{
+				start: rule.sourceEnd + 1,
+				end:   inputRange.end,
+			})
+		} else if inputRange.start < rule.sourceStart && inputRange.end > rule.sourceEnd {
+			unappliedRanges = append(unappliedRanges, srange{
+				start: inputRange.start,
+				end:   rule.sourceStart - 1,
+			})
+			appliedRanges = append(appliedRanges, srange{
+				start: rule.destStart,
+				end:   rule.destStart + rule.sourceEnd - rule.sourceStart,
+			})
+			unappliedRanges = append(unappliedRanges, srange{
+				start: rule.sourceEnd + 1,
+				end:   inputRange.end,
+			})
+		}
+	}
+	return appliedRanges, unappliedRanges
 }
 
 func runSeed(seedStart int, seedLen int, groupRules [][]rule) int {
