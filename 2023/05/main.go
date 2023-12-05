@@ -76,25 +76,40 @@ func part1and2(input string) {
 
 	minLocation = -1
 
+	result := make(chan int)
 	for i := 0; i < len(seeds); i += 2 {
 		seedStart := seeds[i]
 		seedLen := seeds[i+1]
-		for seed := seedStart; seed < seedStart+seedLen; seed++ {
-			current := seed
-			for _, rules := range groupRules {
-				for _, rule := range rules {
-					if current >= rule.sourceStart && current <= rule.sourceEnd {
-						current = rule.destStart + (current - rule.sourceStart)
-						break
-					}
-				}
-			}
-
-			if minLocation == -1 || current < minLocation {
-				minLocation = current
-			}
+		go func() {
+			result <- runSeed(seedStart, seedLen, groupRules)
+		}()
+	}
+	for i := 0; i < len(seeds); i += 2 {
+		locations := <-result
+		if minLocation == -1 || locations < minLocation {
+			minLocation = locations
 		}
 	}
 
 	fmt.Println(minLocation)
+}
+
+func runSeed(seedStart int, seedLen int, groupRules [][]rule) int {
+	minLocation := -1
+	for seed := seedStart; seed < seedStart+seedLen; seed++ {
+		current := seed
+		for _, rules := range groupRules {
+			for _, rule := range rules {
+				if current >= rule.sourceStart && current <= rule.sourceEnd {
+					current = rule.destStart + (current - rule.sourceStart)
+					break
+				}
+			}
+		}
+
+		if minLocation == -1 || current < minLocation {
+			minLocation = current
+		}
+	}
+	return minLocation
 }
