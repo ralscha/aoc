@@ -43,3 +43,18 @@ func Abs[E constraints.Float | constraints.Integer](input E) E {
 	}
 	return input
 }
+
+func Lcm(n []int) int {
+	result := n[0]
+	for i := 1; i < len(n); i++ {
+		result = (result * n[i]) / Gcd(result, n[i])
+	}
+	return result
+}
+
+func Gcd(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}

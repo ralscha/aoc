@@ -121,3 +121,103 @@ func TestPermutations(t *testing.T) {
 		})
 	}
 }
+
+func TestLcm(t *testing.T) {
+	tests := []struct {
+		name string
+		args []int
+		want int
+	}{
+		{
+			name: "lcm 1",
+			args: []int{1},
+			want: 1,
+		},
+		{
+			name: "lcm 2",
+			args: []int{1, 2},
+			want: 2,
+		},
+		{
+			name: "lcm 3",
+			args: []int{1, 2, 3},
+			want: 6,
+		},
+		{
+			name: "lcm 4",
+			args: []int{1, 2, 3, 4},
+			want: 12,
+		},
+		{
+			name: "lcm 5",
+			args: []int{1, 2, 3, 4, 5},
+			want: 60,
+		},
+		{
+			name: "lcm 6",
+			args: []int{1, 2, 3, 4, 5, 6},
+			want: 60,
+		},
+		{
+			name: "lcm 7",
+			args: []int{1, 2, 3, 4, 5, 6, 7},
+			want: 420,
+		},
+		{
+			name: "lcm 8",
+			args: []int{1, 2, 3, 4, 5, 6, 7, 8},
+			want: 840,
+		},
+		{
+			name: "lcm 9",
+			args: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			want: 2520,
+		},
+		{
+			name: "lcm 10",
+			args: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			want: 2520,
+		},
+		{
+			name: "lcm 11",
+			args: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+				11},
+			want: 27720,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Lcm(tt.args); got != tt.want {
+				t.Errorf("Lcm() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGcd(t *testing.T) {
+	tests := []struct {
+		name string
+		args []int
+		want int
+	}{
+		{
+			name: "gcd 2",
+			args: []int{1, 2},
+			want: 1,
+		},
+		{
+			name: "gcd 17 34",
+			args: []int{17, 34},
+			want: 17,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Gcd(tt.args[0], tt.args[1]); got != tt.want {
+				t.Errorf("Gcd() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
