@@ -11,6 +11,27 @@ type point struct {
 	x, y int
 }
 
+type orientation struct {
+	x, y int
+}
+
+var north = orientation{
+	x: 0,
+	y: -1,
+}
+var south = orientation{
+	x: 0,
+	y: 1,
+}
+var east = orientation{
+	x: 1,
+	y: 0,
+}
+var west = orientation{
+	x: -1,
+	y: 0,
+}
+
 func makeGrid(input string) map[point]byte {
 	lines := conv.SplitNewline(input)
 	grid := make(map[point]byte)
@@ -49,32 +70,32 @@ func part1and2(input string) {
 	path := make(map[point]struct{})
 	path[start] = struct{}{}
 
-	var direction point
+	var direction orientation
 	var currentPosition point
 
-	for _, dir := range []point{{0, 1}, {0, -1}, {1, 0}, {-1, 0}} {
+	for _, dir := range []orientation{north, south, east, west} {
 		searchPos := point{start.x + dir.x, start.y + dir.y}
 		tile := grid[searchPos]
-		if dir.x == 0 && dir.y == 1 {
-			if tile == '|' || tile == 'L' || tile == 'J' || tile == 'S' {
+		if dir == south {
+			if tile == '|' || tile == 'L' || tile == 'J' {
 				direction = dir
 				currentPosition = searchPos
 				break
 			}
-		} else if dir.x == 0 && dir.y == -1 {
-			if tile == '|' || tile == 'F' || tile == '7' || tile == 'S' {
+		} else if dir == north {
+			if tile == '|' || tile == 'F' || tile == '7' {
 				direction = dir
 				currentPosition = searchPos
 				break
 			}
-		} else if dir.x == 1 && dir.y == 0 {
-			if tile == '-' || tile == 'L' || tile == 'F' || tile == 'S' {
+		} else if dir == east {
+			if tile == '-' || tile == 'L' || tile == 'F' {
 				direction = dir
 				currentPosition = searchPos
 				break
 			}
-		} else if dir.x == -1 && dir.y == 0 {
-			if tile == '-' || tile == 'J' || tile == '7' || tile == 'S' {
+		} else {
+			if tile == '-' || tile == 'J' || tile == '7' {
 				direction = dir
 				currentPosition = searchPos
 				break
@@ -88,53 +109,53 @@ func part1and2(input string) {
 		tile := grid[currentPosition]
 		if tile == '|' {
 			path[currentPosition] = struct{}{}
-			if direction.x == 0 && direction.y == 1 {
+			if direction == south {
 				currentPosition.y++
-			} else if direction.x == 0 && direction.y == -1 {
+			} else if direction == north {
 				currentPosition.y--
 			}
 		} else if tile == '-' {
 			path[currentPosition] = struct{}{}
-			if direction.x == 1 && direction.y == 0 {
+			if direction == east {
 				currentPosition.x++
-			} else if direction.x == -1 && direction.y == 0 {
+			} else if direction == west {
 				currentPosition.x--
 			}
 		} else if tile == '7' {
 			path[currentPosition] = struct{}{}
-			if direction.x == 1 && direction.y == 0 {
+			if direction == east {
 				currentPosition.y++
-				direction = point{0, 1}
-			} else if direction.x == 0 && direction.y == -1 {
+				direction = south
+			} else if direction == north {
 				currentPosition.x--
-				direction = point{-1, 0}
+				direction = west
 			}
 		} else if tile == 'J' {
 			path[currentPosition] = struct{}{}
-			if direction.x == 1 && direction.y == 0 {
+			if direction == east {
 				currentPosition.y--
-				direction = point{0, -1}
-			} else if direction.x == 0 && direction.y == 1 {
+				direction = north
+			} else if direction == south {
 				currentPosition.x--
-				direction = point{-1, 0}
+				direction = west
 			}
 		} else if tile == 'L' {
 			path[currentPosition] = struct{}{}
-			if direction.x == -1 && direction.y == 0 {
+			if direction == west {
 				currentPosition.y--
-				direction = point{0, -1}
-			} else if direction.x == 0 && direction.y == 1 {
+				direction = north
+			} else if direction == south {
 				currentPosition.x++
-				direction = point{1, 0}
+				direction = east
 			}
 		} else if tile == 'F' {
 			path[currentPosition] = struct{}{}
-			if direction.x == -1 && direction.y == 0 {
+			if direction == west {
 				currentPosition.y++
-				direction = point{0, 1}
-			} else if direction.x == 0 && direction.y == -1 {
+				direction = south
+			} else if direction == north {
 				currentPosition.x++
-				direction = point{1, 0}
+				direction = east
 			}
 		}
 	}
