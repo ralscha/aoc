@@ -88,7 +88,7 @@ func part1and2(input string) {
 				currentPosition = searchPos
 				break
 			}
-		} else if dir == east {
+		} else if dir == west {
 			if tile == '-' || tile == 'L' || tile == 'F' {
 				direction = dir
 				currentPosition = searchPos
