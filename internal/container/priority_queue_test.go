@@ -10,11 +10,11 @@ func TestPriorityQueue(t *testing.T) {
 	if !q.IsEmpty() {
 		t.Errorf("PriorityQueue should be empty")
 	}
-	q.Push(1, 5)
-	q.Push(2, 4)
-	q.Push(3, 6)
-	q.Push(4, 1)
-	q.Push(5, 0)
+	q.Push(1, 1)
+	q.Push(2, 2)
+	q.Push(3, 0)
+	q.Push(4, 5)
+	q.Push(5, 6)
 	if q.Len() != 5 {
 		t.Errorf("PriorityQueue should have size 5")
 	}
