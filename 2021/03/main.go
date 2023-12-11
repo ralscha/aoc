@@ -57,7 +57,7 @@ func part1(input string) {
 	if err != nil {
 		log.Fatalf("ParseInt failed: %s %v", epsilon, err)
 	}
-	fmt.Println("Result: ", gammaNumber*epsilonNumber)
+	fmt.Println(gammaNumber * epsilonNumber)
 	fmt.Println()
 }
 
@@ -98,7 +98,7 @@ func part2(input string) {
 		log.Fatalf("ParseInt failed: %s %v", input2[0], err)
 	}
 
-	fmt.Println("Result: ", oxygen*co2)
+	fmt.Println(oxygen * co2)
 }
 
 func count(lines []string, pos int, one bool) int {

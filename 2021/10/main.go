@@ -56,7 +56,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Result: ", score)
+	fmt.Println(score)
 
 }
 
@@ -110,5 +110,5 @@ func part2(input string) {
 	}
 
 	sort.Ints(scores)
-	fmt.Println("Result: ", scores[len(scores)/2])
+	fmt.Println(scores[len(scores)/2])
 }

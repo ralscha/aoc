@@ -64,7 +64,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Result: ", counts[maxCounts]-counts[minCounts])
+	fmt.Println(counts[maxCounts] - counts[minCounts])
 }
 
 func part2(input string) {
@@ -107,5 +107,5 @@ func part2(input string) {
 	maxValue := slices.Max(values)
 	minValue := slices.Min(values)
 
-	fmt.Println("Result: ", (maxValue-minValue)/2+1)
+	fmt.Println((maxValue-minValue)/2 + 1)
 }

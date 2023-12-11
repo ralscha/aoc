@@ -98,7 +98,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Result: ", sumUnmarked*lastCalledNumber)
+	fmt.Println(sumUnmarked * lastCalledNumber)
 }
 
 func part2(input string) {
@@ -179,7 +179,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Result: ", sumUnmarked*lastCalledNumber)
+	fmt.Println(sumUnmarked * lastCalledNumber)
 }
 
 func checkBingo(cards []card) *card {

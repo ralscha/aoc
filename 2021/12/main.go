@@ -47,7 +47,7 @@ func part1(input string) {
 
 	s, d := "start", "end"
 	count := countAllPathsString(s, d)
-	fmt.Println("Result: ", count)
+	fmt.Println(count)
 }
 
 func part2(input string) {
@@ -101,7 +101,7 @@ func part2(input string) {
 	}
 
 	count := countAllPaths(sn, en)
-	fmt.Println("Result: ", count)
+	fmt.Println(count)
 }
 
 func hasTwo() *node {

@@ -70,7 +70,7 @@ func part1(input string) {
 			queue.PushBack(qi{pos: next, riskLevel: nextRisk})
 		}
 	}
-	fmt.Println("Result: ", shortestAt[target])
+	fmt.Println(shortestAt[target])
 }
 
 func part2(input string) {
@@ -115,7 +115,7 @@ func part2(input string) {
 			heap.Push(&pq, qi{pos: next, riskLevel: nextRisk})
 		}
 	}
-	fmt.Println("Result: ", shortestAt[target])
+	fmt.Println(shortestAt[target])
 }
 
 type PriorityQueue []qi

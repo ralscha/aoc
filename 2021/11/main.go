@@ -68,7 +68,7 @@ func part1(input string) {
 		flashed += flashes
 	}
 
-	fmt.Println("Result: ", flashed)
+	fmt.Println(flashed)
 }
 
 func incrValue(rowIx, colIx int) {

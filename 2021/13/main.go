@@ -83,7 +83,7 @@ func part1(input string) {
 
 	}
 
-	fmt.Println("Result: ", len(grid))
+	fmt.Println(len(grid))
 }
 
 func part2(input string) {
@@ -140,7 +140,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Result: ", len(grid))
+	fmt.Println(len(grid))
 
 	minX := 0
 	minY := 0

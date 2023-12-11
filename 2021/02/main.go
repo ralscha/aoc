@@ -40,7 +40,7 @@ func part1(input string) {
 
 	fmt.Println("Depth: ", depth)
 	fmt.Println("Horizontal Position: ", horizontalPosition)
-	fmt.Println("Result: ", depth*horizontalPosition)
+	fmt.Println(depth * horizontalPosition)
 	fmt.Println()
 }
 
@@ -68,5 +68,5 @@ func part2(input string) {
 	fmt.Println("Depth: ", depth)
 	fmt.Println("Horizontal Position: ", horizontalPosition)
 	fmt.Println("Aim: ", aim)
-	fmt.Println("Result: ", depth*horizontalPosition)
+	fmt.Println(depth * horizontalPosition)
 }

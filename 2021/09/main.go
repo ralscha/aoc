@@ -71,7 +71,7 @@ func part1(input string) {
 		total += lp + 1
 	}
 
-	fmt.Println("Result: ", total)
+	fmt.Println(total)
 }
 
 func part2(input string) {
@@ -104,7 +104,7 @@ func part2(input string) {
 	})
 
 	result := basinSize[0] * basinSize[1] * basinSize[2]
-	fmt.Println("Result: ", result)
+	fmt.Println(result)
 }
 
 func crawl(row, col int, grid [][]int32, visited map[point]struct{}, size int) int {
