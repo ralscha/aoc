@@ -1,9 +1,10 @@
 package main
 
 import (
+	"aoc/internal/container"
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"container/heap"
-	"container/list"
 	"fmt"
 	"log"
 	"strings"
@@ -33,7 +34,7 @@ func main() {
 }
 
 func part1(input string) {
-	lines := strings.Split(input, "\n")
+	lines := conv.SplitNewline(input)
 	grid := make(map[point]int)
 	for x, row := range lines {
 		if row == "" {
@@ -44,33 +45,35 @@ func part1(input string) {
 		}
 	}
 
-	var maxx, maxy = len(lines[0]) - 1, len(lines) - 2
+	var maxx, maxy = len(lines[0]) - 1, len(lines) - 1
 	start := point{0, 0}
 	target := point{maxx, maxy}
 
-	queue := list.New()
-
-	shortestAt := make(map[point]int)
-	queue.PushBack(qi{pos: start, riskLevel: 0})
-	for queue.Len() > 0 {
-		front := queue.Front()
-		head := front.Value.(qi)
-		queue.Remove(front)
-
+	lowestRiskAt := make(map[point]int)
+	pq := container.NewPriorityQueue[point]()
+	pq.Push(start, 0)
+	visited := make(map[point]bool)
+	visited[start] = true
+	for pq.Len() > 0 {
+		head := pq.Pop()
 		for i := 0; i < 4; i++ {
-			next := point{head.pos.x + dx[i], head.pos.y + dy[i]}
-			if next.x > target.x || next.x < 0 || next.y > target.y || next.y < 0 {
+			neighbour := point{head.x + dx[i], head.y + dy[i]}
+			if visited[neighbour] {
 				continue
 			}
-			nextRisk := head.riskLevel + grid[next]
-			if sAt, ok := shortestAt[next]; ok && sAt <= nextRisk {
+			if neighbour.x > target.x || neighbour.x < 0 || neighbour.y > target.y || neighbour.y < 0 {
 				continue
 			}
-			shortestAt[next] = nextRisk
-			queue.PushBack(qi{pos: next, riskLevel: nextRisk})
+			nextRisk := grid[head] + grid[neighbour]
+			if sAt, ok := lowestRiskAt[neighbour]; ok && sAt <= nextRisk {
+				continue
+			}
+			lowestRiskAt[neighbour] = nextRisk
+			pq.Push(neighbour, nextRisk)
+			fmt.Println(neighbour)
 		}
 	}
-	fmt.Println(shortestAt[target])
+	fmt.Println(lowestRiskAt[target])
 }
 
 func part2(input string) {
