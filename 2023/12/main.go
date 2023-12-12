@@ -105,35 +105,35 @@ func part2(input string) {
 	fmt.Println(totalArrangements)
 }
 
-func count(field string, expectedGroups []int, currentPos int, currentPosBlocks int, currentHashLength int) int {
-	key := fmt.Sprintf("%d_%d_%d", currentPos, currentPosBlocks, currentHashLength)
+func count(field string, expectedGroups []int, currentPos int, currentGroupsSize int, currentGroupLength int) int {
+	key := fmt.Sprintf("%d_%d_%d", currentPos, currentGroupsSize, currentGroupLength)
 	if val, ok := cache[key]; ok {
 		return val
 	}
 
 	if currentPos == len(field) {
-		if currentPosBlocks == len(expectedGroups) && currentHashLength == 0 {
+		if currentGroupsSize == len(expectedGroups) && currentGroupLength == 0 {
 			return 1
-		} else if currentPosBlocks == len(expectedGroups)-1 && expectedGroups[currentPosBlocks] == currentHashLength {
+		} else if currentGroupsSize == len(expectedGroups)-1 && expectedGroups[currentGroupsSize] == currentGroupLength {
 			return 1
 		} else {
 			return 0
 		}
 	}
 
-	groupCount := 0
+	c := 0
 	for _, ch := range []byte{'.', '#'} {
 		if field[currentPos] == ch || field[currentPos] == '?' {
-			if ch == '.' && currentHashLength == 0 {
-				groupCount += count(field, expectedGroups, currentPos+1, currentPosBlocks, 0)
-			} else if ch == '.' && currentHashLength > 0 && currentPosBlocks < len(expectedGroups) && expectedGroups[currentPosBlocks] == currentHashLength {
-				groupCount += count(field, expectedGroups, currentPos+1, currentPosBlocks+1, 0)
+			if ch == '.' && currentGroupLength == 0 {
+				c += count(field, expectedGroups, currentPos+1, currentGroupsSize, 0)
+			} else if ch == '.' && currentGroupLength > 0 && currentGroupsSize < len(expectedGroups) && expectedGroups[currentGroupsSize] == currentGroupLength {
+				c += count(field, expectedGroups, currentPos+1, currentGroupsSize+1, 0)
 			} else if ch == '#' {
-				groupCount += count(field, expectedGroups, currentPos+1, currentPosBlocks, currentHashLength+1)
+				c += count(field, expectedGroups, currentPos+1, currentGroupsSize, currentGroupLength+1)
 			}
 		}
 	}
 
-	cache[key] = groupCount
-	return groupCount
+	cache[key] = c
+	return c
 }
