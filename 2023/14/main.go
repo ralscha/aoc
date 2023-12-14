@@ -21,12 +21,12 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 
-	var grid [][]rune
+	var grid [][]byte
 	for _, line := range lines {
-		grid = append(grid, []rune(line))
+		grid = append(grid, []byte(line))
 	}
 
-	tiltGrid(&grid, 0, -1)
+	grid = tiltGrid(grid, 0, -1)
 	totalLoad := calculateLoad(grid)
 	fmt.Println(totalLoad)
 }
@@ -34,9 +34,9 @@ func part1(input string) {
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 
-	var grid [][]rune
+	var grid [][]byte
 	for _, line := range lines {
-		grid = append(grid, []rune(line))
+		grid = append(grid, []byte(line))
 	}
 
 	directions := []struct {
@@ -51,9 +51,9 @@ func part2(input string) {
 	seenStates := make(map[string]int)
 	var cycleLength, cycleStart int
 
-	for cycle := 0; cycle < 1000000000; cycle++ {
+	for cycle := 0; cycle < 1_000_000_000; cycle++ {
 		for _, dir := range directions {
-			tiltGrid(&grid, dir.dx, dir.dy)
+			grid = tiltGrid(grid, dir.dx, dir.dy)
 		}
 
 		gridStr := gridToString(grid)
@@ -66,10 +66,10 @@ func part2(input string) {
 		}
 	}
 
-	remainingCycles := (1000000000-cycleStart)%cycleLength - 1
+	remainingCycles := (1_000_000_000-cycleStart)%cycleLength - 1
 	for cycle := 0; cycle < remainingCycles; cycle++ {
 		for _, dir := range directions {
-			tiltGrid(&grid, dir.dx, dir.dy)
+			grid = tiltGrid(grid, dir.dx, dir.dy)
 		}
 	}
 
@@ -77,44 +77,39 @@ func part2(input string) {
 	fmt.Println(totalLoad)
 }
 
-func tiltGrid(grid *[][]rune, dx, dy int) {
-	height := len(*grid)
-	width := len((*grid)[0])
+func tiltGrid(grid [][]byte, dx, dy int) [][]byte {
+	height := len(grid)
+	width := len(grid[0])
 	moved := true
 
 	for moved {
 		moved = false
-		newGrid := make([][]rune, height)
-		for i := range newGrid {
-			newGrid[i] = make([]rune, width)
-			copy(newGrid[i], (*grid)[i])
-		}
 
 		for y := 0; y < height; y++ {
 			for x := 0; x < width; x++ {
-				if (*grid)[y][x] == 'O' {
+				if grid[y][x] == 'O' {
 					newX, newY := x+dx, y+dy
-					if newX >= 0 && newY >= 0 && newX < width && newY < height && (*grid)[newY][newX] == '.' {
-						newGrid[y][x], newGrid[newY][newX] = '.', 'O'
+					if newX >= 0 && newY >= 0 && newX < width && newY < height && grid[newY][newX] == '.' {
+						grid[y][x], grid[newY][newX] = '.', 'O'
 						moved = true
 					}
 				}
 			}
 		}
-		*grid = newGrid
 	}
+	return grid
 }
 
-func gridToString(grid [][]rune) string {
+func gridToString(grid [][]byte) string {
 	var sb strings.Builder
 	for _, row := range grid {
 		sb.WriteString(string(row))
-		sb.WriteRune('\n')
+		sb.WriteByte('\n')
 	}
 	return sb.String()
 }
 
-func calculateLoad(grid [][]rune) int {
+func calculateLoad(grid [][]byte) int {
 	totalLoad := 0
 	for y, row := range grid {
 		for _, char := range row {
