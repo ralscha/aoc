@@ -103,7 +103,6 @@ func energize(startPos point, startDir direction, grid [][]byte) int {
 				break
 			}
 
-			cycleDetection[currentBeam] = struct{}{}
 			energized[currentBeam.pos] = true
 			tile := grid[currentBeam.pos.y][currentBeam.pos.x]
 
