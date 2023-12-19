@@ -68,11 +68,11 @@ func part1and2(input string) {
 
 	fmt.Println(totalRating)
 
-	total := acceptedCombination(partRanges{
-		'x': partRange{1, 4001},
-		'm': partRange{1, 4001},
-		'a': partRange{1, 4001},
-		's': partRange{1, 4001},
+	total := acceptedCombination(map[byte]partRange{
+		'x': {1, 4001},
+		'm': {1, 4001},
+		'a': {1, 4001},
+		's': {1, 4001},
 	}, "in", workflows)
 
 	fmt.Println(total)
@@ -173,9 +173,7 @@ type partRange struct {
 	start, stop int
 }
 
-type partRanges map[byte]partRange
-
-func acceptedCombination(ranges partRanges, currentWorkflow string, workflows map[string]workflow) int {
+func acceptedCombination(ranges map[byte]partRange, currentWorkflow string, workflows map[string]workflow) int {
 	if currentWorkflow == "A" {
 		return (ranges['x'].stop - ranges['x'].start) *
 			(ranges['m'].stop - ranges['m'].start) *
@@ -185,7 +183,7 @@ func acceptedCombination(ranges partRanges, currentWorkflow string, workflows ma
 		return 0
 	}
 
-	rangesCopy := make(partRanges)
+	rangesCopy := make(map[byte]partRange)
 	for k, v := range ranges {
 		rangesCopy[k] = v
 	}
