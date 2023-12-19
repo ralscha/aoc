@@ -14,7 +14,7 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	part1(input)
+	part1and2(input)
 }
 
 type condition struct {
@@ -37,7 +37,7 @@ type part struct {
 	x, m, a, s int
 }
 
-func part1(input string) {
+func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 
 	workflows := make(map[string]workflow)
@@ -68,6 +68,14 @@ func part1(input string) {
 
 	fmt.Println(totalRating)
 
+	total := acceptedCombination(partRanges{
+		'x': partRange{1, 4001},
+		'm': partRange{1, 4001},
+		'a': partRange{1, 4001},
+		's': partRange{1, 4001},
+	}, "in", workflows)
+
+	fmt.Println(total)
 }
 
 func parseRule(ruleStr string) rule {
@@ -159,4 +167,51 @@ func processPart(part part, workflows map[string]workflow) (bool, int) {
 			return true, part.x + part.m + part.a + part.s
 		}
 	}
+}
+
+type partRange struct {
+	start, stop int
+}
+
+type partRanges map[byte]partRange
+
+func acceptedCombination(ranges partRanges, currentWorkflow string, workflows map[string]workflow) int {
+	if currentWorkflow == "A" {
+		return (ranges['x'].stop - ranges['x'].start) *
+			(ranges['m'].stop - ranges['m'].start) *
+			(ranges['a'].stop - ranges['a'].start) *
+			(ranges['s'].stop - ranges['s'].start)
+	} else if currentWorkflow == "R" {
+		return 0
+	}
+
+	rangesCopy := make(partRanges)
+	for k, v := range ranges {
+		rangesCopy[k] = v
+	}
+
+	workflow := workflows[currentWorkflow]
+
+	total := 0
+
+	for _, rule := range workflow.rules {
+		if rule.condition.compare == 0 {
+			total += acceptedCombination(rangesCopy, rule.target, workflows)
+			break
+		}
+
+		var destRange, afterRange partRange
+		if rule.condition.compare == '>' {
+			destRange = partRange{rule.condition.value + 1, rangesCopy[rule.condition.attribute].stop}
+			afterRange = partRange{rangesCopy[rule.condition.attribute].start, rule.condition.value + 1}
+		} else {
+			destRange = partRange{rangesCopy[rule.condition.attribute].start, rule.condition.value}
+			afterRange = partRange{rule.condition.value, rangesCopy[rule.condition.attribute].stop}
+		}
+
+		rangesCopy[rule.condition.attribute] = destRange
+		total += acceptedCombination(rangesCopy, rule.target, workflows)
+		rangesCopy[rule.condition.attribute] = afterRange
+	}
+	return total
 }
