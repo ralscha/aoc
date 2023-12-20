@@ -16,7 +16,7 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	part1(input)
+	part1and2(input)
 }
 
 var modules map[string]module
@@ -116,7 +116,7 @@ func (c *conjunction) name() string {
 	return c.moduleName
 }
 
-func part1(input string) {
+func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 
 	modules = make(map[string]module)
@@ -168,12 +168,6 @@ func part1(input string) {
 		for len(pulseQueue) > 0 {
 			pulse := pulseQueue[0]
 			pulseQueue = pulseQueue[1:]
-
-			/*
-				if pulse.receiver == "kc" && pulse.pulse == 1 {
-					fmt.Println(pulse.caller, cycleCount)
-				}
-			*/
 
 			receiver := modules[pulse.receiver]
 			if pulse.pulse == 0 {
@@ -247,11 +241,6 @@ outer:
 			}
 
 			receiver := modules[pulse.receiver]
-			if pulse.pulse == 0 {
-				lowPulseSent++
-			} else {
-				highPulseSent++
-			}
 			if receiver != nil {
 				receiver.receive(pulse.caller, pulse.pulse)
 			}
