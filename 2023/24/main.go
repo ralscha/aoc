@@ -4,7 +4,9 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
+	"github.com/aclements/go-z3/z3"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -14,7 +16,7 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	part1(input)
+	part1and2(input)
 }
 
 type vector struct {
@@ -25,7 +27,7 @@ type hailstone struct {
 	position, velocity vector
 }
 
-func part1(input string) {
+func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 	var hailstones []hailstone
 
@@ -76,4 +78,41 @@ func part1(input string) {
 	}
 
 	fmt.Println(intersections)
+
+	config := z3.NewContextConfig()
+	ctx := z3.NewContext(config)
+	solver := z3.NewSolver(ctx)
+
+	x := ctx.IntConst("x")
+	y := ctx.IntConst("y")
+	z := ctx.IntConst("z")
+	vx := ctx.IntConst("vx")
+	vy := ctx.IntConst("vy")
+	vz := ctx.IntConst("vz")
+
+	for i, hs := range hailstones[:3] {
+		a := ctx.FromInt(int64(hs.position.x), ctx.IntSort()).(z3.Int)
+		va := ctx.FromInt(int64(hs.velocity.x), ctx.IntSort()).(z3.Int)
+		b := ctx.FromInt(int64(hs.position.y), ctx.IntSort()).(z3.Int)
+		vb := ctx.FromInt(int64(hs.velocity.y), ctx.IntSort()).(z3.Int)
+		c := ctx.FromInt(int64(hs.position.z), ctx.IntSort()).(z3.Int)
+		vc := ctx.FromInt(int64(hs.velocity.z), ctx.IntSort()).(z3.Int)
+
+		t := ctx.IntConst("t" + strconv.Itoa(i))
+		solver.Assert(t.GT(ctx.FromInt(0, ctx.IntSort()).(z3.Int)))
+		solver.Assert(x.Add(vx.Mul(t)).Eq(a.Add(va.Mul(t))))
+		solver.Assert(y.Add(vy.Mul(t)).Eq(b.Add(vb.Mul(t))))
+		solver.Assert(z.Add(vz.Mul(t)).Eq(c.Add(vc.Mul(t))))
+	}
+
+	ok, err := solver.Check()
+	if err != nil {
+		panic(err)
+	}
+	if ok {
+		fmt.Println(solver.Model().Eval(x.Add(y).Add(z), true))
+	} else {
+		fmt.Println("Failed to solve!")
+	}
+
 }
