@@ -29,3 +29,12 @@ func ToIntSlice(s []string) []int {
 	}
 	return result
 }
+
+func ToIntSliceComma(s string) []int {
+	splitted := strings.Split(s, ",")
+	result := make([]int, len(splitted))
+	for i, v := range splitted {
+		result[i] = MustAtoi(v)
+	}
+	return result
+}
