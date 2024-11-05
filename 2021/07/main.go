@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/mathx"
 	"bufio"
 	"fmt"
 	"log"
@@ -39,7 +40,7 @@ func part1(input string) {
 	for p := minCrabs; p <= maxCrabs; p++ {
 		fuel := 0
 		for _, c := range crabs {
-			fuel += abs(c - p)
+			fuel += mathx.Abs(c - p)
 		}
 		if fuel < leastFuel || leastFuel == -1 {
 			leastFuel = fuel
@@ -69,7 +70,7 @@ func part2(input string) {
 	for p := minCrabs; p <= maxCrabs; p++ {
 		fuel := 0
 		for _, c := range crabs {
-			diff := abs(c - p)
+			diff := mathx.Abs(c - p)
 			fuel += diff * (diff + 1) / 2
 		}
 		if fuel < leastFuel || leastFuel == -1 {
@@ -79,13 +80,6 @@ func part2(input string) {
 	}
 
 	fmt.Println(leastPos, leastFuel)
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 func findMinMax(a []int) (int, int) {

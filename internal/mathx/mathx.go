@@ -30,7 +30,7 @@ func Permutations[T any](input []T) [][]T {
 		remaining := make([]T, 0, len(input)-1)
 		remaining = append(remaining, input[:i]...)
 		remaining = append(remaining, input[i+1:]...)
-		for _, p := range Permutations(remaining) {
+		for _, p := range Permutations[T](remaining) {
 			result = append(result, append([]T{v}, p...))
 		}
 	}
@@ -57,4 +57,8 @@ func Gcd(a, b int) int {
 		a, b = b, a%b
 	}
 	return a
+}
+
+func MannhattanDistance(x1, y1, x2, y2 int) int {
+	return Abs(x1-x2) + Abs(y1-y2)
 }
