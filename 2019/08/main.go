@@ -62,7 +62,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Result 1:", result)
+	fmt.Println("Part 1:", result)
 
 }
 
@@ -104,7 +104,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Result 2:")
+	fmt.Println("Part 2:")
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
 			if image[i][j] == 0 {

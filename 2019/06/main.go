@@ -35,7 +35,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Result 1:", count)
+	fmt.Println("Part 1:", count)
 }
 
 func part2(input string) {
@@ -60,7 +60,7 @@ func part2(input string) {
 	for i, y := range you {
 		for j, s := range san {
 			if y == s {
-				fmt.Println("Result 2:", i+j-2)
+				fmt.Println("Part 2:", i+j-2)
 				return
 			}
 		}

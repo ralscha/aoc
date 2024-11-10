@@ -32,7 +32,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Result 1:", count)
+	fmt.Println("Part 1:", count)
 }
 
 func isValidPassword(pw int) bool {
@@ -63,7 +63,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Result 1:", count)
+	fmt.Println("Part 1:", count)
 }
 
 func isValidPassword2(pw int) bool {
