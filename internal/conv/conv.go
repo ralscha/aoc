@@ -14,6 +14,14 @@ func MustAtoi(s string) int {
 	return i
 }
 
+func MustAtoi64(s string) int64 {
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		log.Fatalf("converting to int64 failed: %v", err)
+	}
+	return i
+}
+
 func SplitNewline(s string) []string {
 	splitted := strings.Split(s, "\n")
 	if len(splitted) > 0 && splitted[len(splitted)-1] == "" {
@@ -35,6 +43,15 @@ func ToIntSliceComma(s string) []int {
 	result := make([]int, len(splitted))
 	for i, v := range splitted {
 		result[i] = MustAtoi(v)
+	}
+	return result
+}
+
+func ToInt64SliceComma(s string) []int64 {
+	splitted := strings.Split(s, ",")
+	result := make([]int64, len(splitted))
+	for i, v := range splitted {
+		result[i] = MustAtoi64(v)
 	}
 	return result
 }
