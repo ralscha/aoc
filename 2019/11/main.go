@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	grid2 "aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -14,13 +15,15 @@ func main() {
 	}
 
 	part1(input)
-	// part2(input)
+	part2(input)
 }
 
 type intCodeComputer struct {
 	memory       map[int64]int64
 	ip           int64
 	relativeBase int64
+	input        int64
+	halted       bool
 }
 
 func newIntcodeComputer(program []int64) *intCodeComputer {
@@ -75,7 +78,7 @@ func (comp *intCodeComputer) getAddress(mode int64, offset int64) int64 {
 	}
 }
 
-func (comp *intCodeComputer) Run(input int64) (int64, bool) {
+func (comp *intCodeComputer) run() int64 {
 	for {
 		opcode, modes := decodeInstruction(comp.getValue(comp.ip))
 
@@ -94,12 +97,12 @@ func (comp *intCodeComputer) Run(input int64) (int64, bool) {
 			comp.ip += 4
 		case 3: // Input
 			dst := comp.getAddress(modes[0], 1)
-			comp.setValue(dst, input)
+			comp.setValue(dst, comp.input)
 			comp.ip += 2
 		case 4: // Output
 			a := comp.getParameter(modes[0], 1)
 			comp.ip += 2
-			return a, false
+			return a
 		case 5: // Jump-if-true
 			a := comp.getParameter(modes[0], 1)
 			b := comp.getParameter(modes[1], 2)
@@ -141,7 +144,8 @@ func (comp *intCodeComputer) Run(input int64) (int64, bool) {
 			comp.relativeBase += a
 			comp.ip += 2
 		case 99: // Halt
-			return 0, true
+			comp.halted = true
+			return 0
 		default:
 			log.Fatalf("Unknown opcode: %d", opcode)
 		}
@@ -151,9 +155,91 @@ func (comp *intCodeComputer) Run(input int64) (int64, bool) {
 func part1(input string) {
 	code := conv.ToInt64SliceComma(input)
 	computer := newIntcodeComputer(code)
-	output, halted := computer.Run(1)
-	if !halted {
-		log.Fatalf("Computer did not halt")
+
+	direction := grid2.DirectionN
+	grid := grid2.NewGrid2D[int](false)
+	currentPos := grid2.Coordinate{Row: 0, Col: 0}
+
+	for !computer.halted {
+		color, _ := grid.GetWithCoordinate(currentPos)
+		computer.input = int64(color)
+
+		output := computer.run()
+		if computer.halted {
+			break
+		}
+		turnDirection := computer.run()
+		if computer.halted {
+			break
+		}
+
+		grid.SetWithCoordinate(currentPos, int(output))
+		if turnDirection == 0 {
+			direction = grid2.TurnLeft(direction)
+		} else {
+			direction = grid2.TurnRight(direction)
+		}
+		currentPos = grid2.Coordinate{
+			Row: currentPos.Row + direction.Row,
+			Col: currentPos.Col + direction.Col,
+		}
 	}
-	fmt.Println("Result 1:", output)
+
+	fmt.Println("Result 1", grid.Count())
+}
+
+func part2(input string) {
+	code := conv.ToInt64SliceComma(input)
+	computer := newIntcodeComputer(code)
+
+	direction := grid2.DirectionN
+	grid := grid2.NewGrid2D[int](false)
+	currentPos := grid2.Coordinate{Row: 0, Col: 0}
+
+	for !computer.halted {
+		color, ok := grid.GetWithCoordinate(currentPos)
+
+		// always start with white
+		if !ok {
+			color = 1
+		}
+		computer.input = int64(color)
+
+		output := computer.run()
+		if computer.halted {
+			break
+		}
+		turnDirection := computer.run()
+		if computer.halted {
+			break
+		}
+
+		grid.SetWithCoordinate(currentPos, int(output))
+		if turnDirection == 0 {
+			direction = grid2.TurnLeft(direction)
+		} else {
+			direction = grid2.TurnRight(direction)
+		}
+		currentPos = grid2.Coordinate{
+			Row: currentPos.Row + direction.Row,
+			Col: currentPos.Col + direction.Col,
+		}
+	}
+
+	minCol, maxCol := grid.GetMinMaxCol()
+	minRow, maxRow := grid.GetMinMaxRow()
+
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			color, ok := grid.Get(row, col)
+			if !ok || color == 0 {
+				fmt.Print(" ")
+			} else {
+				fmt.Print("O")
+			}
+		}
+		fmt.Println()
+	}
+
+	fmt.Println("Result 2", grid.Count())
 }

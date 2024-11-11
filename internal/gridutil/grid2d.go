@@ -1,6 +1,8 @@
 package gridutil
 
-import "math"
+import (
+	"math"
+)
 
 type Coordinate struct {
 	Row, Col int
@@ -21,14 +23,42 @@ var (
 	DirectionSE = Direction{Row: 1, Col: 1}
 )
 
-type Grid2D[T any] struct {
+type Grid2D[T comparable] struct {
 	grid           map[Coordinate]T
 	minCol, maxCol int
 	minRow, maxRow int
 	wrap           bool
 }
 
-func NewGrid2D[T any](wrap bool) Grid2D[T] {
+func TurnLeft(direction Direction) Direction {
+	switch direction {
+	case DirectionN:
+		return DirectionW
+	case DirectionW:
+		return DirectionS
+	case DirectionS:
+		return DirectionE
+	case DirectionE:
+		return DirectionN
+	}
+	return direction
+}
+
+func TurnRight(direction Direction) Direction {
+	switch direction {
+	case DirectionN:
+		return DirectionE
+	case DirectionE:
+		return DirectionS
+	case DirectionS:
+		return DirectionW
+	case DirectionW:
+		return DirectionN
+	}
+	return direction
+}
+
+func NewGrid2D[T comparable](wrap bool) Grid2D[T] {
 	return Grid2D[T]{
 		grid:   make(map[Coordinate]T),
 		wrap:   wrap,
@@ -89,12 +119,22 @@ func (g Grid2D[T]) Get(row, col int) (T, bool) {
 	return val, ok
 }
 
+func (g Grid2D[T]) GetWithCoordinate(coord Coordinate) (T, bool) {
+	val, ok := g.grid[coord]
+	return val, ok
+}
+
 func (g *Grid2D[T]) Set(row, col int, value T) {
 	g.grid[Coordinate{
 		Row: row,
 		Col: col,
 	}] = value
 	g.updateMinMax(row, col)
+}
+
+func (g *Grid2D[T]) SetWithCoordinate(coord Coordinate, value T) {
+	g.grid[coord] = value
+	g.updateMinMax(coord.Row, coord.Col)
 }
 
 func (g *Grid2D[T]) updateMinMax(row, col int) {
@@ -112,7 +152,7 @@ func (g *Grid2D[T]) updateMinMax(row, col int) {
 	}
 }
 
-func (g *Grid2D[T]) Move(row, col int, direction Direction) {
+func (g *Grid2D[T]) Move(row, col int, direction Direction) (int, int) {
 	newCoord := Coordinate{
 		Row: row + direction.Row,
 		Col: col + direction.Col,
@@ -135,6 +175,8 @@ func (g *Grid2D[T]) Move(row, col int, direction Direction) {
 	}
 
 	g.updateMinMax(row, col)
+
+	return newCoord.Row, newCoord.Col
 }
 
 func (g Grid2D[T]) GetNeighbours8(row, col int) []T {
@@ -181,4 +223,8 @@ func (g Grid2D[T]) GetNeighbours(row, col int, directions []Direction) []T {
 		}
 	}
 	return neighbours
+}
+
+func (g *Grid2D[T]) Count() int {
+	return len(g.grid)
 }
