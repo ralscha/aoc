@@ -62,3 +62,12 @@ func Gcd(a, b int) int {
 func MannhattanDistance(x1, y1, x2, y2 int) int {
 	return Abs(x1-x2) + Abs(y1-y2)
 }
+
+func AllNonZero(periods []int) bool {
+	for _, p := range periods {
+		if p == 0 {
+			return false
+		}
+	}
+	return true
+}
