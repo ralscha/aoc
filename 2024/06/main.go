@@ -21,7 +21,11 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 	grid := grid2.NewCharGrid2D(lines)
+	visited := guardRoute(grid)
+	fmt.Println("Part 1", len(visited))
+}
 
+func guardRoute(grid grid2.Grid2D[rune]) map[grid2.Coordinate]bool {
 	start := grid2.Coordinate{}
 	direction := grid2.DirectionN
 
@@ -56,13 +60,14 @@ outerLoop:
 			visited[currentPos] = true
 		}
 	}
-
-	fmt.Println("Part 1", len(visited))
+	return visited
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 	grid := grid2.NewCharGrid2D(lines)
+
+	originalRoute := guardRoute(grid)
 
 	start := grid2.Coordinate{}
 	direction := grid2.DirectionN
@@ -81,6 +86,9 @@ outerLoop:
 	var possibleObstructions []grid2.Coordinate
 	for row := range grid.Height() {
 		for col := range grid.Width() {
+			if _, ok := originalRoute[grid2.Coordinate{Col: col, Row: row}]; !ok {
+				continue
+			}
 			cell, _ := grid.Get(row, col)
 			if cell == '.' && !(col == start.Col && row == start.Row) {
 				possibleObstructions = append(possibleObstructions, grid2.Coordinate{Col: col, Row: row})

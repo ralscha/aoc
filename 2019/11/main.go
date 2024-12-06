@@ -161,7 +161,7 @@ func part1(input string) {
 	currentPos := grid2.Coordinate{Row: 0, Col: 0}
 
 	for !computer.halted {
-		color, _ := grid.GetWithCoordinate(currentPos)
+		color, _ := grid.GetC(currentPos)
 		computer.input = int64(color)
 
 		output := computer.run()
@@ -173,7 +173,7 @@ func part1(input string) {
 			break
 		}
 
-		grid.SetWithCoordinate(currentPos, int(output))
+		grid.SetC(currentPos, int(output))
 		if turnDirection == 0 {
 			direction = grid2.TurnLeft(direction)
 		} else {
@@ -197,7 +197,7 @@ func part2(input string) {
 	currentPos := grid2.Coordinate{Row: 0, Col: 0}
 
 	for !computer.halted {
-		color, ok := grid.GetWithCoordinate(currentPos)
+		color, ok := grid.GetC(currentPos)
 
 		// always start with white
 		if !ok {
@@ -214,7 +214,7 @@ func part2(input string) {
 			break
 		}
 
-		grid.SetWithCoordinate(currentPos, int(output))
+		grid.SetC(currentPos, int(output))
 		if turnDirection == 0 {
 			direction = grid2.TurnLeft(direction)
 		} else {

@@ -21,6 +21,24 @@ var (
 	DirectionNE = Direction{Row: -1, Col: 1}
 	DirectionSW = Direction{Row: 1, Col: -1}
 	DirectionSE = Direction{Row: 1, Col: 1}
+
+	directions8 = []Direction{
+		DirectionN,
+		DirectionS,
+		DirectionE,
+		DirectionW,
+		DirectionNW,
+		DirectionNE,
+		DirectionSW,
+		DirectionSE,
+	}
+
+	directions4 = []Direction{
+		DirectionN,
+		DirectionS,
+		DirectionE,
+		DirectionW,
+	}
 )
 
 type Grid2D[T comparable] struct {
@@ -107,12 +125,21 @@ func (g *Grid2D[T]) SetMaxRowCol(row, col int) {
 	g.maxCol = col
 }
 
+func (g *Grid2D[T]) SetMaxRowColC(coord Coordinate) {
+	g.maxRow = coord.Row
+	g.maxCol = coord.Col
+}
+
 func (g Grid2D[T]) Width() int {
 	return g.maxCol - g.minCol + 1
 }
 
 func (g Grid2D[T]) Height() int {
 	return g.maxRow - g.minRow + 1
+}
+
+func (g *Grid2D[T]) Count() int {
+	return len(g.grid)
 }
 
 func (g Grid2D[T]) GetMinMaxCol() (int, int) {
@@ -131,7 +158,7 @@ func (g Grid2D[T]) Get(row, col int) (T, bool) {
 	return val, ok
 }
 
-func (g Grid2D[T]) GetWithCoordinate(coord Coordinate) (T, bool) {
+func (g Grid2D[T]) GetC(coord Coordinate) (T, bool) {
 	val, ok := g.grid[coord]
 	return val, ok
 }
@@ -144,7 +171,7 @@ func (g *Grid2D[T]) Set(row, col int, value T) {
 	g.updateMinMax(row, col)
 }
 
-func (g *Grid2D[T]) SetWithCoordinate(coord Coordinate, value T) {
+func (g *Grid2D[T]) SetC(coord Coordinate, value T) {
 	g.grid[coord] = value
 	g.updateMinMax(coord.Row, coord.Col)
 }
@@ -165,9 +192,13 @@ func (g *Grid2D[T]) updateMinMax(row, col int) {
 }
 
 func (g *Grid2D[T]) Peek(row, col int, direction Direction) (T, bool) {
+	return g.PeekC(Coordinate{Row: row, Col: col}, direction)
+}
+
+func (g *Grid2D[T]) PeekC(coord Coordinate, direction Direction) (T, bool) {
 	newCoord := Coordinate{
-		Row: row + direction.Row,
-		Col: col + direction.Col,
+		Row: coord.Row + direction.Row,
+		Col: coord.Col + direction.Col,
 	}
 
 	if newCoord.Row >= g.minRow && newCoord.Row <= g.maxRow && newCoord.Col >= g.minCol && newCoord.Col <= g.maxCol {
@@ -182,66 +213,37 @@ func (g *Grid2D[T]) Peek(row, col int, direction Direction) (T, bool) {
 func (g Grid2D[T]) Copy() Grid2D[T] {
 	newGrid := NewGrid2D[T](g.wrap)
 	for coord, val := range g.grid {
-		newGrid.SetWithCoordinate(coord, val)
+		newGrid.SetC(coord, val)
 	}
 	return newGrid
 }
 
-func (g *Grid2D[T]) Move(row, col int, direction Direction) (int, int) {
-	newCoord := Coordinate{
-		Row: row + direction.Row,
-		Col: col + direction.Col,
-	}
-
-	if g.wrap {
-		height := g.maxRow - g.minRow + 1
-		width := g.maxCol - g.minCol + 1
-		newCoord.Row = newCoord.Row % height
-		newCoord.Col = newCoord.Col % width
-	}
-
-	if newCoord.Row >= g.minRow && newCoord.Row <= g.maxRow && newCoord.Col >= g.minCol && newCoord.Col <= g.maxCol {
-		oldCoord := Coordinate{
-			Row: row,
-			Col: col,
-		}
-		g.grid[newCoord] = g.grid[oldCoord]
-		delete(g.grid, oldCoord)
-	}
-
-	g.updateMinMax(row, col)
-
-	return newCoord.Row, newCoord.Col
+func (g Grid2D[T]) GetNeighbours8(row, col int) []T {
+	return g.GetNeighboursC(Coordinate{Row: row, Col: col}, directions8)
 }
 
-func (g Grid2D[T]) GetNeighbours8(row, col int) []T {
-	return g.GetNeighbours(row, col, []Direction{
-		DirectionN,
-		DirectionS,
-		DirectionE,
-		DirectionW,
-		DirectionNW,
-		DirectionNE,
-		DirectionSW,
-		DirectionSE,
-	})
+func (g Grid2D[T]) GetNeighbours8C(coord Coordinate) []T {
+	return g.GetNeighboursC(coord, directions8)
 }
 
 func (g Grid2D[T]) GetNeighbours4(row, col int) []T {
-	return g.GetNeighbours(row, col, []Direction{
-		DirectionN,
-		DirectionS,
-		DirectionE,
-		DirectionW,
-	})
+	return g.GetNeighboursC(Coordinate{Row: row, Col: col}, directions4)
+}
+
+func (g Grid2D[T]) GetNeighbours4C(coord Coordinate) []T {
+	return g.GetNeighboursC(coord, directions4)
 }
 
 func (g Grid2D[T]) GetNeighbours(row, col int, directions []Direction) []T {
+	return g.GetNeighboursC(Coordinate{Row: row, Col: col}, directions)
+}
+
+func (g Grid2D[T]) GetNeighboursC(coord Coordinate, directions []Direction) []T {
 	var neighbours []T
 	for _, direction := range directions {
 		neighbourCoord := Coordinate{
-			Row: row + direction.Row,
-			Col: col + direction.Col,
+			Row: coord.Row + direction.Row,
+			Col: coord.Col + direction.Col,
 		}
 
 		if g.wrap {
@@ -258,8 +260,4 @@ func (g Grid2D[T]) GetNeighbours(row, col int, directions []Direction) []T {
 		}
 	}
 	return neighbours
-}
-
-func (g *Grid2D[T]) Count() int {
-	return len(g.grid)
 }
