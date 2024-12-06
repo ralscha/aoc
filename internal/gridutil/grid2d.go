@@ -81,6 +81,18 @@ func NewNumberGrid2D(lines []string) Grid2D[int] {
 	return g
 }
 
+func NewCharGrid2D(lines []string) Grid2D[rune] {
+	g := NewGrid2D[rune](false)
+
+	for r, line := range lines {
+		for c, j := range line {
+			g.Set(r, c, j)
+		}
+	}
+
+	return g
+}
+
 func (g *Grid2D[T]) SetMinRow(row int) {
 	g.minRow = row
 }
@@ -150,6 +162,29 @@ func (g *Grid2D[T]) updateMinMax(row, col int) {
 	if row > g.maxRow {
 		g.maxRow = row
 	}
+}
+
+func (g *Grid2D[T]) Peek(row, col int, direction Direction) (T, bool) {
+	newCoord := Coordinate{
+		Row: row + direction.Row,
+		Col: col + direction.Col,
+	}
+
+	if newCoord.Row >= g.minRow && newCoord.Row <= g.maxRow && newCoord.Col >= g.minCol && newCoord.Col <= g.maxCol {
+		if val, ok := g.grid[newCoord]; ok {
+			return val, false
+		}
+	}
+	var zero T
+	return zero, true
+}
+
+func (g Grid2D[T]) Copy() Grid2D[T] {
+	newGrid := NewGrid2D[T](g.wrap)
+	for coord, val := range g.grid {
+		newGrid.SetWithCoordinate(coord, val)
+	}
+	return newGrid
 }
 
 func (g *Grid2D[T]) Move(row, col int, direction Direction) (int, int) {
