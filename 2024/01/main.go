@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/mathx"
@@ -50,19 +51,14 @@ func part2(input string) {
 		rightList = append(rightList, conv.MustAtoi(fields[1]))
 	}
 
+	bag := container.NewBag[int]()
+	for _, n := range rightList {
+		bag.Add(n)
+	}
+
 	totalSimilarity := 0
-	for i := 0; i < len(leftList); i++ {
-		totalSimilarity += count(rightList, leftList[i]) * leftList[i]
+	for _, n := range leftList {
+		totalSimilarity += bag.Count(n) * n
 	}
 	fmt.Println("Part 2", totalSimilarity)
-}
-
-func count(list []int, target int) int {
-	count := 0
-	for _, n := range list {
-		if n == target {
-			count++
-		}
-	}
-	return count
 }

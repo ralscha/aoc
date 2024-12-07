@@ -1,9 +1,10 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	grid2 "aoc/internal/gridutil"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -20,78 +21,76 @@ func main() {
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	grid := grid2.NewCharGrid2D(lines)
+	grid := gridutil.NewCharGrid2D(lines)
 	visited := guardRoute(grid)
-	fmt.Println("Part 1", len(visited))
+	fmt.Println("Part 1", visited.Len())
 }
 
-func guardRoute(grid grid2.Grid2D[rune]) map[grid2.Coordinate]bool {
-	start := grid2.Coordinate{}
-	direction := grid2.DirectionN
+func guardRoute(grid gridutil.Grid2D[rune]) *container.Set[gridutil.Coordinate] {
+	start := gridutil.Coordinate{}
+	direction := gridutil.Direction{Col: 0, Row: -1} // North
 
 outerLoop:
 	for row := range grid.Height() {
 		for col := range grid.Width() {
-			cell, _ := grid.Get(row, col)
-			if cell == '^' {
-				start = grid2.Coordinate{Col: col, Row: row}
+			if val, _ := grid.Get(row, col); val == '^' {
+				start = gridutil.Coordinate{Col: col, Row: row}
 				break outerLoop
 			}
 		}
 	}
 
-	visited := make(map[grid2.Coordinate]bool)
-	visited[start] = true
+	visited := container.NewSet[gridutil.Coordinate]()
+	visited.Add(start)
 
 	currentPos := start
 	for {
-		nextCell, outside := grid.Peek(currentPos.Row, currentPos.Col, direction)
+		nextCell, outside := grid.PeekC(currentPos, direction)
 		if outside {
 			break
 		}
 
 		if nextCell == '#' {
-			direction = grid2.TurnRight(direction)
+			direction = gridutil.TurnRight(direction)
 		} else {
-			currentPos = grid2.Coordinate{
-				Row: currentPos.Row + direction.Row,
+			currentPos = gridutil.Coordinate{
 				Col: currentPos.Col + direction.Col,
+				Row: currentPos.Row + direction.Row,
 			}
-			visited[currentPos] = true
+			visited.Add(currentPos)
 		}
 	}
-	return visited
+	return &visited
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	grid := grid2.NewCharGrid2D(lines)
+	grid := gridutil.NewCharGrid2D(lines)
 
 	originalRoute := guardRoute(grid)
 
-	start := grid2.Coordinate{}
-	direction := grid2.DirectionN
+	start := gridutil.Coordinate{}
+	direction := gridutil.Direction{Col: 0, Row: -1} // North
 
 outerLoop:
 	for row := range grid.Height() {
 		for col := range grid.Width() {
-			cell, _ := grid.Get(row, col)
-			if cell == '^' {
-				start = grid2.Coordinate{Col: col, Row: row}
+			if val, _ := grid.Get(row, col); val == '^' {
+				start = gridutil.Coordinate{Col: col, Row: row}
 				break outerLoop
 			}
 		}
 	}
 
-	var possibleObstructions []grid2.Coordinate
+	var possibleObstructions []gridutil.Coordinate
 	for row := range grid.Height() {
 		for col := range grid.Width() {
-			if _, ok := originalRoute[grid2.Coordinate{Col: col, Row: row}]; !ok {
+			pos := gridutil.Coordinate{Col: col, Row: row}
+			if !originalRoute.Contains(pos) {
 				continue
 			}
-			cell, _ := grid.Get(row, col)
-			if cell == '.' && !(col == start.Col && row == start.Row) {
-				possibleObstructions = append(possibleObstructions, grid2.Coordinate{Col: col, Row: row})
+			if val, _ := grid.GetC(pos); val == '.' && pos != start {
+				possibleObstructions = append(possibleObstructions, pos)
 			}
 		}
 	}
@@ -107,35 +106,35 @@ outerLoop:
 }
 
 type coordinateWithDirection struct {
-	coord     grid2.Coordinate
-	direction grid2.Direction
+	coord     gridutil.Coordinate
+	direction gridutil.Direction
 }
 
-func causesLoop(grid grid2.Grid2D[rune], start grid2.Coordinate, direction grid2.Direction, obstruction grid2.Coordinate) bool {
+func causesLoop(grid gridutil.Grid2D[rune], start gridutil.Coordinate, direction gridutil.Direction, obstruction gridutil.Coordinate) bool {
 	modifiedGrid := grid.Copy()
-	modifiedGrid.Set(obstruction.Row, obstruction.Col, '#')
+	modifiedGrid.SetC(obstruction, '#')
 
-	visited := make(map[coordinateWithDirection]bool)
+	visited := container.NewSet[coordinateWithDirection]()
 	currentPos := coordinateWithDirection{coord: start, direction: direction}
-	visited[currentPos] = true
+	visited.Add(currentPos)
 
 	for {
-		nextCell, outside := modifiedGrid.Peek(currentPos.coord.Row, currentPos.coord.Col, currentPos.direction)
+		nextCell, outside := modifiedGrid.PeekC(currentPos.coord, currentPos.direction)
 		if outside {
 			break
 		}
 
 		if nextCell == '#' {
-			currentPos.direction = grid2.TurnRight(currentPos.direction)
+			currentPos.direction = gridutil.TurnRight(currentPos.direction)
 		} else {
-			currentPos.coord = grid2.Coordinate{
-				Row: currentPos.coord.Row + currentPos.direction.Row,
+			currentPos.coord = gridutil.Coordinate{
 				Col: currentPos.coord.Col + currentPos.direction.Col,
+				Row: currentPos.coord.Row + currentPos.direction.Row,
 			}
-			if visited[currentPos] {
+			if visited.Contains(currentPos) {
 				return true
 			}
-			visited[currentPos] = true
+			visited.Add(currentPos)
 		}
 	}
 

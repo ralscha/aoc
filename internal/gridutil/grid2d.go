@@ -16,10 +16,10 @@ type Direction struct {
 
 var (
 	// Predefined cardinal directions
-	DirectionN = Direction{Row: -1}      // North: Move up one row
-	DirectionS = Direction{Row: 1}       // South: Move down one row
-	DirectionE = Direction{Col: 1}       // East: Move right one column
-	DirectionW = Direction{Col: -1}      // West: Move left one column
+	DirectionN  = Direction{Row: -1}          // North: Move up one row
+	DirectionS  = Direction{Row: 1}           // South: Move down one row
+	DirectionE  = Direction{Col: 1}           // East: Move right one column
+	DirectionW  = Direction{Col: -1}          // West: Move left one column
 	DirectionNW = Direction{Row: -1, Col: -1} // Northwest: Move up and left
 	DirectionNE = Direction{Row: -1, Col: 1}  // Northeast: Move up and right
 	DirectionSW = Direction{Row: 1, Col: -1}  // Southwest: Move down and left
@@ -53,6 +53,11 @@ type Grid2D[T comparable] struct {
 	minCol, maxCol int
 	minRow, maxRow int
 	wrap           bool
+}
+
+// Get8Directions returns a slice containing all 8 possible directions (cardinal and diagonal).
+func Get8Directions() []Direction {
+	return directions8
 }
 
 // TurnLeft returns a new direction after rotating the given direction 90 degrees counterclockwise.

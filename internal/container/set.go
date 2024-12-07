@@ -1,18 +1,14 @@
 package container
 
-import (
-	"cmp"
-)
-
 // Set implements a collection of unique ordered elements.
 // Each element can only appear once in the set.
-type Set[T cmp.Ordered] struct {
+type Set[T comparable] struct {
 	m map[T]struct{}
 }
 
 // NewSet creates and returns a new empty set.
 // The type parameter T must satisfy the cmp.Ordered constraint.
-func NewSet[T cmp.Ordered]() Set[T] {
+func NewSet[T comparable]() Set[T] {
 	return Set[T]{
 		m: make(map[T]struct{}),
 	}

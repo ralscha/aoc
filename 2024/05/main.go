@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -73,22 +74,24 @@ func parseInput(input string) ([]rule, [][]int) {
 	return rules, updates
 }
 
-func violatesRule(first, second int, pagesBefore map[int][]int) bool {
-	for _, dep := range pagesBefore[first] {
-		if dep == second {
-			return true
-		}
+func violatesRule(first, second int, pagesBefore map[int]*container.Set[int]) bool {
+	if set, exists := pagesBefore[first]; exists && set.Contains(second) {
+		return true
 	}
 	return false
 }
 
 func reorderUpdate(update []int, rules []rule) []int {
 	// which pages (values) must come before this page (key)
-	pagesBefore := make(map[int][]int)
+	pagesBefore := make(map[int]*container.Set[int])
 
 	for _, r := range rules {
 		if slices.Contains(update, r.before) && slices.Contains(update, r.after) {
-			pagesBefore[r.after] = append(pagesBefore[r.after], r.before)
+			if _, exists := pagesBefore[r.after]; !exists {
+				set := container.NewSet[int]()
+				pagesBefore[r.after] = &set
+			}
+			pagesBefore[r.after].Add(r.before)
 		}
 	}
 

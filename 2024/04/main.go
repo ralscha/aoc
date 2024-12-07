@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -17,25 +18,18 @@ func main() {
 	part2(input)
 }
 
-func countWord(grid [][]rune, word string) int {
-	rows := len(grid)
-	cols := len(grid[0])
-	wordLen := len(word)
+func countWord(grid gridutil.Grid2D[rune], word string) int {
 	count := 0
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
 
-	for r := 0; r < rows; r++ {
-		for c := 0; c < cols; c++ {
-			for _, dir := range [][2]int{
-				{0, 1},
-				{1, 0},
-				{1, 1},
-				{1, -1},
-				{0, -1},
-				{-1, 0},
-				{-1, -1},
-				{-1, 1},
-			} {
-				if isWordAt(grid, word, r, c, dir[0], dir[1], wordLen) {
+	directions := gridutil.Get8Directions()
+
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			pos := gridutil.Coordinate{Col: col, Row: row}
+			for _, dir := range directions {
+				if isWordAt(grid, word, pos, dir) {
 					count++
 				}
 			}
@@ -45,42 +39,37 @@ func countWord(grid [][]rune, word string) int {
 	return count
 }
 
-func isWordAt(grid [][]rune, word string, startRow, startCol, rowDir, colDir, wordLen int) bool {
-	rows := len(grid)
-	cols := len(grid[0])
-
-	for i := 0; i < wordLen; i++ {
-		r := startRow + i*rowDir
-		c := startCol + i*colDir
-		if r < 0 || r >= rows || c < 0 || c >= cols || grid[r][c] != rune(word[i]) {
+func isWordAt(grid gridutil.Grid2D[rune], word string, start gridutil.Coordinate, dir gridutil.Direction) bool {
+	pos := start
+	for _, char := range word {
+		val, ok := grid.GetC(pos)
+		if !ok || val != char {
 			return false
 		}
+		pos.Col += dir.Col
+		pos.Row += dir.Row
 	}
-
 	return true
 }
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 
-	grid := make([][]rune, len(lines))
-	for i, line := range lines {
-		grid[i] = []rune(line)
-	}
-
+	grid := gridutil.NewCharGrid2D(lines)
 	word := "XMAS"
 	result := countWord(grid, word)
 	fmt.Println("Part 1", result)
 }
 
-func countCrossMAS(grid [][]rune) int {
-	rows := len(grid)
-	cols := len(grid[0])
+func countCrossMAS(grid gridutil.Grid2D[rune]) int {
 	count := 0
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
 
-	for r := 0; r < rows; r++ {
-		for c := 0; c < cols; c++ {
-			if isCrossMAS(grid, r, c) {
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			pos := gridutil.Coordinate{Col: col, Row: row}
+			if isCrossMAS(grid, pos) {
 				count++
 			}
 		}
@@ -89,58 +78,40 @@ func countCrossMAS(grid [][]rune) int {
 	return count
 }
 
-func isCrossMAS(grid [][]rune, startRow, startCol int) bool {
-	rows := len(grid)
-	cols := len(grid[0])
-
-	if startRow-1 < 0 || startRow+1 >= rows || startCol-1 < 0 || startCol+1 >= cols {
+func isCrossMAS(grid gridutil.Grid2D[rune], center gridutil.Coordinate) bool {
+	// Check center is 'A'
+	centerVal, ok := grid.GetC(center)
+	if !ok || centerVal != 'A' {
 		return false
 	}
 
-	if grid[startRow][startCol] != 'A' {
+	// Get diagonal positions
+	topLeft := gridutil.Coordinate{Col: center.Col - 1, Row: center.Row - 1}
+	topRight := gridutil.Coordinate{Col: center.Col + 1, Row: center.Row - 1}
+	bottomLeft := gridutil.Coordinate{Col: center.Col - 1, Row: center.Row + 1}
+	bottomRight := gridutil.Coordinate{Col: center.Col + 1, Row: center.Row + 1}
+
+	// Get values at diagonal positions
+	tl, oktl := grid.GetC(topLeft)
+	tr, oktr := grid.GetC(topRight)
+	bl, okbl := grid.GetC(bottomLeft)
+	br, okbr := grid.GetC(bottomRight)
+
+	if !oktl || !oktr || !okbl || !okbr {
 		return false
 	}
 
-	isXMAS1 := grid[startRow-1][startCol-1] == 'M' &&
-		grid[startRow-1][startCol+1] == 'S' &&
-		grid[startRow+1][startCol-1] == 'M' &&
-		grid[startRow+1][startCol+1] == 'S'
-	if isXMAS1 {
-		return true
-	}
-
-	isXMAS2 := grid[startRow-1][startCol-1] == 'S' &&
-		grid[startRow-1][startCol+1] == 'M' &&
-		grid[startRow+1][startCol-1] == 'S' &&
-		grid[startRow+1][startCol+1] == 'M'
-	if isXMAS2 {
-		return true
-	}
-
-	ixXMAS3 := grid[startRow-1][startCol-1] == 'S' &&
-		grid[startRow-1][startCol+1] == 'S' &&
-		grid[startRow+1][startCol-1] == 'M' &&
-		grid[startRow+1][startCol+1] == 'M'
-	if ixXMAS3 {
-		return true
-	}
-
-	ixXMAS4 := grid[startRow-1][startCol-1] == 'M' &&
-		grid[startRow-1][startCol+1] == 'M' &&
-		grid[startRow+1][startCol-1] == 'S' &&
-		grid[startRow+1][startCol+1] == 'S'
-
-	return ixXMAS4
+	// Check all possible valid patterns
+	return (tl == 'M' && tr == 'S' && bl == 'M' && br == 'S') || // Pattern 1
+		(tl == 'S' && tr == 'M' && bl == 'S' && br == 'M') || // Pattern 2
+		(tl == 'S' && tr == 'S' && bl == 'M' && br == 'M') || // Pattern 3
+		(tl == 'M' && tr == 'M' && bl == 'S' && br == 'S') // Pattern 4
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 
-	grid := make([][]rune, len(lines))
-	for i, line := range lines {
-		grid[i] = []rune(line)
-	}
-
+	grid := gridutil.NewCharGrid2D(lines)
 	result := countCrossMAS(grid)
 	fmt.Println("Part 2", result)
 }

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -30,12 +29,8 @@ func part1(input string) {
 		matches := re.FindAllStringSubmatch(line, -1)
 
 		for _, match := range matches {
-			aStr, bStr := match[1], match[2]
-			a, errA := strconv.Atoi(aStr)
-			b, errB := strconv.Atoi(bStr)
-			if errA != nil || errB != nil {
-				continue
-			}
+			a := conv.MustAtoi(match[1])
+			b := conv.MustAtoi(match[2])
 			total += a * b
 		}
 	}
@@ -66,11 +61,9 @@ func part2(input string) {
 			}
 
 			if mulMatch := mulRegex.FindStringSubmatch(match); mulMatch != nil && mulEnabled {
-				a, errA := strconv.Atoi(mulMatch[1])
-				b, errB := strconv.Atoi(mulMatch[2])
-				if errA == nil && errB == nil {
-					total += a * b
-				}
+				a := conv.MustAtoi(mulMatch[1])
+				b := conv.MustAtoi(mulMatch[2])
+				total += a * b
 			}
 		}
 	}
