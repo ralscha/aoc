@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"strings"
@@ -18,7 +19,8 @@ func main() {
 }
 
 func part1and2(lines []string) {
-	var grid [50][6]bool
+	grid := gridutil.NewGrid2D[bool](false)
+	grid.SetMaxRowCol(5, 49) // 6 rows (0-5), 50 columns (0-49)
 
 	for _, line := range lines {
 		spaceIndex := strings.Index(line, " ")
@@ -31,7 +33,7 @@ func part1and2(lines []string) {
 			row := conv.MustAtoi(rect[xIndex+1:])
 			for y := 0; y < row; y++ {
 				for x := 0; x < col; x++ {
-					grid[x][y] = true
+					grid.Set(y, x, true)
 				}
 			}
 		case "rotate":
@@ -41,32 +43,39 @@ func part1and2(lines []string) {
 			axis := rotate[0 : equalsIndex-2]
 			index := conv.MustAtoi(rotate[equalsIndex+1 : byIndex])
 			amount := conv.MustAtoi(rotate[byIndex+4:])
+
+			// Create a copy of the grid for rotation
+			gridCopy := grid.Copy()
+
 			switch axis {
 			case "row":
-				gridCopy := grid
 				for x := 0; x < 50; x++ {
-					grid[(x+amount)%50][index] = gridCopy[x][index]
+					val, _ := gridCopy.Get(index, x)
+					grid.Set(index, (x+amount)%50, val)
 				}
 			case "column":
-				gridCopy := grid
 				for y := 0; y < 6; y++ {
-					grid[index][(y+amount)%6] = gridCopy[index][y]
+					val, _ := gridCopy.Get(y, index)
+					grid.Set((y+amount)%6, index, val)
 				}
 			}
 		}
 	}
+
+	// Count lit pixels
 	count := 0
-	for x := 0; x < 50; x++ {
-		for y := 0; y < 6; y++ {
-			if grid[x][y] {
+	for y := 0; y < 6; y++ {
+		for x := 0; x < 50; x++ {
+			if val, _ := grid.Get(y, x); val {
 				count++
 			}
 		}
 	}
 
+	// Display the grid
 	for y := 0; y < 6; y++ {
 		for x := 0; x < 50; x++ {
-			if grid[x][y] {
+			if val, _ := grid.Get(y, x); val {
 				fmt.Print("#")
 			} else {
 				fmt.Print(" ")
@@ -75,5 +84,5 @@ func part1and2(lines []string) {
 		fmt.Println()
 	}
 
-	fmt.Println(count)
+	fmt.Println("Part 1", count)
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -20,8 +21,8 @@ func main() {
 }
 
 type char struct {
-	c          rune
-	occurrence int
+	c     rune
+	count int
 }
 
 func part1(input string) {
@@ -33,28 +34,26 @@ func part1(input string) {
 		check := line[bracket+1 : len(line)-1]
 
 		lastDash := strings.LastIndex(line, "-")
-		occurrences := make(map[rune]*char)
+		bag := container.NewBag[rune]()
 		for _, r := range line[:lastDash] {
 			if r == '-' {
 				continue
 			}
-			if v, ok := occurrences[r]; ok {
-				v.occurrence++
-			} else {
-				occurrences[r] = &char{r, 1}
-			}
+			bag.Add(r)
 		}
 
+		// Convert bag counts to sortable slice
 		var chars []char
-		for _, v := range occurrences {
-			chars = append(chars, *v)
+		for r, count := range bag.Values() {
+			chars = append(chars, char{r, count})
 		}
 		slices.SortFunc(chars, func(i, j char) int {
-			if i.occurrence == j.occurrence {
+			if i.count == j.count {
 				return int(i.c - j.c)
 			}
-			return j.occurrence - i.occurrence
+			return j.count - i.count
 		})
+
 		computedCheck := ""
 		for i := 0; i < 5; i++ {
 			computedCheck += string(chars[i].c)
@@ -65,7 +64,7 @@ func part1(input string) {
 			sum += sectorID
 		}
 	}
-	fmt.Println(sum)
+	fmt.Println("Part 1", sum)
 }
 
 func part2(input string) {
@@ -84,7 +83,7 @@ func part2(input string) {
 			decrypted += string(rune((int(r)-'a'+sectorID)%26 + 'a'))
 		}
 		if strings.Contains(decrypted, "north") {
-			fmt.Println(decrypted, sectorID)
+			fmt.Println("Part 2", decrypted, sectorID)
 		}
 	}
 }

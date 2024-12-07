@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"log"
@@ -18,20 +19,19 @@ func main() {
 }
 
 func part1and2(lines []string) {
-
-	bots := make(map[int][]int)
+	bots := make(map[int]*container.Queue[int])
 	outputs := make(map[int]int)
 
+	// Initialize queues for each bot
 	for _, line := range lines {
 		if strings.HasPrefix(line, "value") {
 			splitted := strings.Split(line, " ")
 			value := conv.MustAtoi(splitted[1])
 			bot := conv.MustAtoi(splitted[5])
 			if _, ok := bots[bot]; !ok {
-				bots[bot] = []int{value}
-			} else {
-				bots[bot] = append(bots[bot], value)
+				bots[bot] = container.NewQueue[int]()
 			}
+			bots[bot].Push(value)
 		}
 	}
 
@@ -43,34 +43,41 @@ func part1and2(lines []string) {
 			if strings.HasPrefix(line, "bot") {
 				splitted := strings.Split(line, " ")
 				bot := conv.MustAtoi(splitted[1])
-				payload := bots[bot]
-				if len(payload) != 2 {
-					continue
-				}
-				low := conv.MustAtoi(splitted[6])
-				high := conv.MustAtoi(splitted[11])
-				if _, ok := bots[bot]; !ok {
+				if _, ok := bots[bot]; !ok || bots[bot].Len() != 2 {
 					continue
 				}
 
-				if (payload[0] == 17 && payload[1] == 61) || (payload[0] == 61 && payload[1] == 17) {
+				// Get both values from the queue
+				values := []int{bots[bot].Pop(), bots[bot].Pop()}
+				if (values[0] == 17 && values[1] == 61) || (values[0] == 61 && values[1] == 17) {
 					log.Printf("Part 1: %v", bot)
 					part1Solved = true
 					if part2Solved {
 						return
 					}
 				}
+
+				low := conv.MustAtoi(splitted[6])
+				high := conv.MustAtoi(splitted[11])
+				minVal, maxVal := slices.Min(values), slices.Max(values)
+
 				if splitted[5] == "output" {
-					outputs[low] = slices.Min(payload)
+					outputs[low] = minVal
 				} else {
-					bots[low] = append(bots[low], slices.Min(payload))
+					if _, ok := bots[low]; !ok {
+						bots[low] = container.NewQueue[int]()
+					}
+					bots[low].Push(minVal)
 				}
+
 				if splitted[10] == "output" {
-					outputs[high] = slices.Max(payload)
+					outputs[high] = maxVal
 				} else {
-					bots[high] = append(bots[high], slices.Max(payload))
+					if _, ok := bots[high]; !ok {
+						bots[high] = container.NewQueue[int]()
+					}
+					bots[high].Push(maxVal)
 				}
-				bots[bot] = []int{}
 
 				if outputs[0] != 0 && outputs[1] != 0 && outputs[2] != 0 {
 					log.Printf("Part 2: %v", outputs[0]*outputs[1]*outputs[2])

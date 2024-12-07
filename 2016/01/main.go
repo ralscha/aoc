@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"aoc/internal/mathx"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"strings"
@@ -30,30 +30,21 @@ func part1(input string) {
 		instructions = append(instructions, ins)
 	}
 
-	direction := 0
-	x, y := 0, 0
+	pos := gridutil.Coordinate{Col: 0, Row: 0}
+	dir := gridutil.DirectionN // Start facing north
 
 	for _, ins := range instructions {
 		if ins[0] == 'R' {
-			direction = (direction + 1) % 4
+			dir = gridutil.TurnRight(dir)
 		} else {
-			direction = (direction + 3) % 4
+			dir = gridutil.TurnLeft(dir)
 		}
-		steps := ins[1:]
-		switch direction {
-		case 0:
-			y += conv.MustAtoi(steps)
-		case 1:
-			x += conv.MustAtoi(steps)
-		case 2:
-			y -= conv.MustAtoi(steps)
-		case 3:
-			x -= conv.MustAtoi(steps)
-		}
-
+		steps := conv.MustAtoi(ins[1:])
+		pos.Col += dir.Col * steps
+		pos.Row += dir.Row * steps
 	}
 
-	fmt.Printf("Part 1: %d\n", mathx.Abs(x)+mathx.Abs(y))
+	fmt.Println("Part 1", abs(pos.Row)+abs(pos.Col))
 }
 
 func part2(input string) {
@@ -67,43 +58,41 @@ func part2(input string) {
 		instructions = append(instructions, ins)
 	}
 
-	direction := 0
-	x, y := 0, 0
-	firstVisitedX := 0
-	firstVisitedY := 0
-	visited := make(map[string]bool)
+	pos := gridutil.Coordinate{Row: 0, Col: 0}
+	dir := gridutil.DirectionN // Start facing north
+	visited := make(map[gridutil.Coordinate]bool)
+	firstVisited := gridutil.Coordinate{}
+	foundFirst := false
 
 	for _, ins := range instructions {
 		if ins[0] == 'R' {
-			direction = (direction + 1) % 4
+			dir = gridutil.TurnRight(dir)
 		} else {
-			direction = (direction + 3) % 4
+			dir = gridutil.TurnLeft(dir)
 		}
-		steps := ins[1:]
+		steps := conv.MustAtoi(ins[1:])
 
-		for i := 0; i < conv.MustAtoi(steps); i++ {
-			switch direction {
-			case 0:
-				y++
-			case 1:
-				x++
-			case 2:
-				y--
-			case 3:
-				x--
-			}
+		for i := 0; i < steps; i++ {
+			pos.Col += dir.Col
+			pos.Row += dir.Row
 
-			if firstVisitedX == 0 && firstVisitedY == 0 {
-				key := fmt.Sprintf("%d,%d", x, y)
-				if !visited[key] {
-					visited[key] = true
+			if !foundFirst {
+				if visited[pos] {
+					firstVisited = pos
+					foundFirst = true
 				} else {
-					firstVisitedX = x
-					firstVisitedY = y
+					visited[pos] = true
 				}
 			}
 		}
 	}
 
-	fmt.Printf("Part 2: %d\n", mathx.Abs(firstVisitedX)+mathx.Abs(firstVisitedY))
+	fmt.Println("Part 2", abs(firstVisited.Row)+abs(firstVisited.Col))
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
