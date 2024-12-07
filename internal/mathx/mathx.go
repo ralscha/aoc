@@ -1,6 +1,9 @@
 package mathx
 
-import "golang.org/x/exp/constraints"
+import (
+	"golang.org/x/exp/constraints"
+	"math"
+)
 
 // Combinations generates all possible non-empty combinations of elements from the input slice.
 // It returns a slice containing all possible subsets of the input slice, excluding the empty set.
@@ -54,42 +57,14 @@ func Permutations[T any](input []T) [][]T {
 // Returns nil if n <= 0 or if values is empty.
 // For example, with n=2 and values=[1,2], it returns [[1,1], [1,2], [2,1], [2,2]].
 func CartesianProductSelf[T any](n int, values []T) [][]T {
-	if n <= 0 || len(values) == 0 {
-		return nil
+	if n == 0 {
+		return [][]T{{}}
 	}
-
-	result := make([][]T, 0, pow(len(values), n))
-	current := make([]T, n)
-
-	var generate func(pos int)
-	generate = func(pos int) {
-		if pos == n {
-			combo := make([]T, n)
-			copy(combo, current)
-			result = append(result, combo)
-			return
+	result := make([][]T, 0)
+	for _, v := range values {
+		for _, p := range CartesianProductSelf[T](n-1, values) {
+			result = append(result, append([]T{v}, p...))
 		}
-
-		for i := 0; i < len(values); i++ {
-			current[pos] = values[i]
-			generate(pos + 1)
-		}
-	}
-
-	generate(0)
-	return result
-}
-
-// pow calculates the result of raising base to the power of exp using binary exponentiation.
-// This is an internal helper function used by CartesianProductSelf.
-func pow(base, exp int) int {
-	result := 1
-	for exp > 0 {
-		if exp&1 == 1 {
-			result *= base
-		}
-		exp >>= 1
-		base *= base
 	}
 	return result
 }
@@ -109,9 +84,12 @@ func Abs[E constraints.Float | constraints.Integer](input E) E {
 // The function assumes the input slice has at least one element.
 // For example: Lcm([4,6]) returns 12.
 func Lcm(n []int) int {
+	if len(n) == 0 {
+		return 0
+	}
 	result := n[0]
 	for i := 1; i < len(n); i++ {
-		result = (result * n[i]) / Gcd(result, n[i])
+		result = result * n[i] / Gcd(result, n[i])
 	}
 	return result
 }
@@ -131,4 +109,21 @@ func Gcd(a, b int) int {
 // For example: MannhattanDistance(1,1,4,5) returns 7.
 func MannhattanDistance(x1, y1, x2, y2 int) int {
 	return Abs(x1-x2) + Abs(y1-y2)
+}
+
+// Factors returns all factors of a number n
+func Factors(n int) []int {
+	if n == 1 {
+		return []int{1}
+	}
+	factors := []int{1, n}
+	for i := 2; i <= int(math.Sqrt(float64(n))); i++ {
+		if n%i == 0 {
+			factors = append(factors, i)
+			if i != n/i {
+				factors = append(factors, n/i)
+			}
+		}
+	}
+	return factors
 }

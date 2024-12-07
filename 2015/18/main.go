@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -19,36 +20,41 @@ func main() {
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	grid := make([][]bool, len(lines))
-	for i := range grid {
-		grid[i] = make([]bool, len(lines[i]))
-	}
+	grid := gridutil.NewGrid2D[bool](false)
 	for i, line := range lines {
 		for j, c := range line {
 			if c == '#' {
-				grid[i][j] = true
+				grid.Set(i, j, true)
 			}
 		}
 	}
 
 	rounds := 100
 	for i := 0; i < rounds; i++ {
-		newGrid := make([][]bool, len(grid))
-		for i := range grid {
-			newGrid[i] = make([]bool, len(grid[i]))
-			for j := range grid[i] {
-				newGrid[i][j] = grid[i][j]
-				neighbors := countNeighborsOn(grid, i, j)
-				if grid[i][j] {
-					if neighbors != 2 && neighbors != 3 {
-						newGrid[i][j] = false
+		newGrid := grid.Copy()
+		minRow, maxRow := grid.GetMinMaxRow()
+		minCol, maxCol := grid.GetMinMaxCol()
+
+		for row := minRow; row <= maxRow; row++ {
+			for col := minCol; col <= maxCol; col++ {
+				isOn, _ := grid.Get(row, col)
+				neighbors := grid.GetNeighbours8(row, col)
+				neighborsOn := 0
+				for _, n := range neighbors {
+					if n {
+						neighborsOn++
 					}
-				} else if neighbors == 3 {
-					newGrid[i][j] = true
+				}
+
+				if isOn {
+					if neighborsOn != 2 && neighborsOn != 3 {
+						newGrid.Set(row, col, false)
+					}
+				} else if neighborsOn == 3 {
+					newGrid.Set(row, col, true)
 				}
 			}
 		}
-
 		grid = newGrid
 	}
 
@@ -57,14 +63,11 @@ func part1(input string) {
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	grid := make([][]bool, len(lines))
-	for i := range grid {
-		grid[i] = make([]bool, len(lines[i]))
-	}
+	grid := gridutil.NewGrid2D[bool](false)
 	for i, line := range lines {
 		for j, c := range line {
 			if c == '#' {
-				grid[i][j] = true
+				grid.Set(i, j, true)
 			}
 		}
 	}
@@ -73,63 +76,54 @@ func part2(input string) {
 
 	rounds := 100
 	for i := 0; i < rounds; i++ {
-		newGrid := make([][]bool, len(grid))
-		for i := range grid {
-			newGrid[i] = make([]bool, len(grid[i]))
-			for j := range grid[i] {
-				newGrid[i][j] = grid[i][j]
-				neighbors := countNeighborsOn(grid, i, j)
-				if grid[i][j] {
-					if neighbors != 2 && neighbors != 3 {
-						newGrid[i][j] = false
+		newGrid := grid.Copy()
+		minRow, maxRow := grid.GetMinMaxRow()
+		minCol, maxCol := grid.GetMinMaxCol()
+
+		for row := minRow; row <= maxRow; row++ {
+			for col := minCol; col <= maxCol; col++ {
+				isOn, _ := grid.Get(row, col)
+				neighbors := grid.GetNeighbours8(row, col)
+				neighborsOn := 0
+				for _, n := range neighbors {
+					if n {
+						neighborsOn++
 					}
-				} else if neighbors == 3 {
-					newGrid[i][j] = true
+				}
+
+				if isOn {
+					if neighborsOn != 2 && neighborsOn != 3 {
+						newGrid.Set(row, col, false)
+					}
+				} else if neighborsOn == 3 {
+					newGrid.Set(row, col, true)
 				}
 			}
 		}
 
 		turnOnCorners(newGrid)
-
 		grid = newGrid
 	}
 
 	fmt.Println(countOn(grid))
 }
 
-func turnOnCorners(newGrid [][]bool) {
-	newGrid[0][0] = true
-	newGrid[0][len(newGrid[0])-1] = true
-	newGrid[len(newGrid)-1][0] = true
-	newGrid[len(newGrid)-1][len(newGrid[0])-1] = true
+func turnOnCorners(grid gridutil.Grid2D[bool]) {
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+	grid.Set(minRow, minCol, true)
+	grid.Set(minRow, maxCol, true)
+	grid.Set(maxRow, minCol, true)
+	grid.Set(maxRow, maxCol, true)
 }
 
-func countNeighborsOn(grid [][]bool, r, c int) int {
+func countOn(grid gridutil.Grid2D[bool]) int {
 	count := 0
-	for i := -1; i <= 1; i++ {
-		for j := -1; j <= 1; j++ {
-			if i == 0 && j == 0 {
-				continue
-			}
-			if r+i < 0 || r+i >= len(grid) {
-				continue
-			}
-			if c+j < 0 || c+j >= len(grid[0]) {
-				continue
-			}
-			if grid[r+i][c+j] {
-				count++
-			}
-		}
-	}
-	return count
-}
-
-func countOn(grid [][]bool) int {
-	count := 0
-	for _, row := range grid {
-		for _, c := range row {
-			if c {
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			if isOn, _ := grid.Get(row, col); isOn {
 				count++
 			}
 		}

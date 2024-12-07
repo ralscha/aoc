@@ -139,7 +139,7 @@ func TestCartesianProductSelf(t *testing.T) {
 			name:   "invalid n",
 			n:      0,
 			values: []int{1, 2},
-			want:   nil,
+			want:   [][]int{{}},
 		},
 		{
 			name:   "single value n=1",

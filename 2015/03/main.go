@@ -1,7 +1,9 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -14,60 +16,54 @@ func main() {
 
 	part1(input)
 	part2(input)
-
 }
 
 func part1(input string) {
-	visitedHouses := make(map[string]bool)
-	x, y := 0, 0
+	visitedHouses := container.NewSet[string]()
+	pos := gridutil.Coordinate{0, 0}
+	visitedHouses.Add(fmt.Sprintf("%d,%d", pos.Row, pos.Col))
+
 	for _, dir := range input {
 		switch dir {
 		case '^':
-			y++
+			pos.Row--
 		case 'v':
-			y--
+			pos.Row++
 		case '>':
-			x++
+			pos.Col++
 		case '<':
-			x--
+			pos.Col--
 		}
-		visitedHouses[fmt.Sprintf("%d,%d", x, y)] = true
+		visitedHouses.Add(fmt.Sprintf("%d,%d", pos.Row, pos.Col))
 	}
 
-	fmt.Println("Number of houses visited:", len(visitedHouses))
+	fmt.Println("Number of houses visited:", visitedHouses.Len())
 }
 
 func part2(input string) {
-	visitedHouses := make(map[string]bool)
-	x, y := 0, 0
-	x2, y2 := 0, 0
+	visitedHouses := container.NewSet[string]()
+	santa := gridutil.Coordinate{0, 0}
+	roboSanta := gridutil.Coordinate{0, 0}
+	visitedHouses.Add(fmt.Sprintf("%d,%d", santa.Row, santa.Col))
+
 	for i, dir := range input {
-		if i%2 == 0 {
-			switch dir {
-			case '^':
-				y++
-			case 'v':
-				y--
-			case '>':
-				x++
-			case '<':
-				x--
-			}
-			visitedHouses[fmt.Sprintf("%d,%d", x, y)] = true
-		} else {
-			switch dir {
-			case '^':
-				y2++
-			case 'v':
-				y2--
-			case '>':
-				x2++
-			case '<':
-				x2--
-			}
-			visitedHouses[fmt.Sprintf("%d,%d", x2, y2)] = true
+		pos := &santa
+		if i%2 == 1 {
+			pos = &roboSanta
 		}
+
+		switch dir {
+		case '^':
+			pos.Row--
+		case 'v':
+			pos.Row++
+		case '>':
+			pos.Col++
+		case '<':
+			pos.Col--
+		}
+		visitedHouses.Add(fmt.Sprintf("%d,%d", pos.Row, pos.Col))
 	}
 
-	fmt.Println("Number of houses visited:", len(visitedHouses))
+	fmt.Println("Number of houses visited:", visitedHouses.Len())
 }
