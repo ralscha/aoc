@@ -4,6 +4,7 @@ import (
 	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"fmt"
 	"log"
 	"slices"
 	"strings"
@@ -29,7 +30,8 @@ func part1and2(lines []string) {
 			value := conv.MustAtoi(splitted[1])
 			bot := conv.MustAtoi(splitted[5])
 			if _, ok := bots[bot]; !ok {
-				bots[bot] = container.NewQueue[int]()
+				queue := container.NewQueue[int]()
+				bots[bot] = &queue
 			}
 			bots[bot].Push(value)
 		}
@@ -50,7 +52,7 @@ func part1and2(lines []string) {
 				// Get both values from the queue
 				values := []int{bots[bot].Pop(), bots[bot].Pop()}
 				if (values[0] == 17 && values[1] == 61) || (values[0] == 61 && values[1] == 17) {
-					log.Printf("Part 1: %v", bot)
+					fmt.Println("Part 1", bot)
 					part1Solved = true
 					if part2Solved {
 						return
@@ -65,7 +67,8 @@ func part1and2(lines []string) {
 					outputs[low] = minVal
 				} else {
 					if _, ok := bots[low]; !ok {
-						bots[low] = container.NewQueue[int]()
+						queue := container.NewQueue[int]()
+						bots[low] = &queue
 					}
 					bots[low].Push(minVal)
 				}
@@ -74,13 +77,14 @@ func part1and2(lines []string) {
 					outputs[high] = maxVal
 				} else {
 					if _, ok := bots[high]; !ok {
-						bots[high] = container.NewQueue[int]()
+						queue := container.NewQueue[int]()
+						bots[high] = &queue
 					}
 					bots[high].Push(maxVal)
 				}
 
 				if outputs[0] != 0 && outputs[1] != 0 && outputs[2] != 0 {
-					log.Printf("Part 2: %v", outputs[0]*outputs[1]*outputs[2])
+					fmt.Println("Part 2", outputs[0]*outputs[1]*outputs[2])
 					part2Solved = true
 					if part1Solved {
 						return

@@ -7,7 +7,7 @@ type Set[T comparable] struct {
 }
 
 // NewSet creates and returns a new empty set.
-// The type parameter T must satisfy the cmp.Ordered constraint.
+// The type parameter T must satisfy the comparable constraint.
 func NewSet[T comparable]() Set[T] {
 	return Set[T]{
 		m: make(map[T]struct{}),

@@ -1,18 +1,14 @@
 package container
 
-import (
-	"cmp"
-)
-
 // Bag represents a multiset data structure that can store multiple occurrences of ordered elements.
 // It maintains a count for each unique element, allowing duplicates to be tracked efficiently.
-type Bag[T cmp.Ordered] struct {
+type Bag[T comparable] struct {
 	m map[T]int
 }
 
 // NewBag creates and returns a new empty Bag instance.
-// The type parameter T must satisfy the cmp.Ordered constraint.
-func NewBag[T cmp.Ordered]() Bag[T] {
+// The type parameter T must satisfy the comparable constraint.
+func NewBag[T comparable]() Bag[T] {
 	return Bag[T]{
 		m: make(map[T]int),
 	}
