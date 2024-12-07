@@ -19,7 +19,7 @@ func main() {
 	part2(input)
 }
 
-func compute(operands []int, operators []string) int {
+func compute(operands []int, operators []string, target int) int {
 	result := operands[0]
 	for i, op := range operators {
 		switch op {
@@ -29,6 +29,9 @@ func compute(operands []int, operators []string) int {
 			result *= operands[i+1]
 		case "||":
 			result = conv.MustAtoi(fmt.Sprintf("%d%d", result, operands[i+1]))
+		}
+		if result > target {
+			break
 		}
 	}
 	return result
@@ -44,7 +47,7 @@ func equalsToTarget(target int, numbers []int, includeConcat bool) bool {
 	}
 	combinations := mathx.CartesianProductSelf(n, operators)
 	for _, operators := range combinations {
-		if compute(numbers, operators) == target {
+		if compute(numbers, operators, target) == target {
 			return true
 		}
 	}
