@@ -122,6 +122,63 @@ func TestPermutations(t *testing.T) {
 	}
 }
 
+func TestCartesianProductSelf(t *testing.T) {
+	tests := []struct {
+		name   string
+		n      int
+		values []int
+		want   [][]int
+	}{
+		{
+			name:   "empty input",
+			n:      1,
+			values: []int{},
+			want:   nil,
+		},
+		{
+			name:   "invalid n",
+			n:      0,
+			values: []int{1, 2},
+			want:   nil,
+		},
+		{
+			name:   "single value n=1",
+			n:      1,
+			values: []int{1},
+			want:   [][]int{{1}},
+		},
+		{
+			name:   "multiple values n=1",
+			n:      1,
+			values: []int{1, 2},
+			want:   [][]int{{1}, {2}},
+		},
+		{
+			name:   "multiple values n=2",
+			n:      2,
+			values: []int{1, 2},
+			want:   [][]int{{1, 1}, {1, 2}, {2, 1}, {2, 2}},
+		},
+		{
+			name:   "multiple values n=3",
+			n:      3,
+			values: []int{1, 2},
+			want: [][]int{
+				{1, 1, 1}, {1, 1, 2}, {1, 2, 1}, {1, 2, 2},
+				{2, 1, 1}, {2, 1, 2}, {2, 2, 1}, {2, 2, 2},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CartesianProductSelf(tt.n, tt.values); !equal(got, tt.want) {
+				t.Errorf("CartesianProductSelf() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestLcm(t *testing.T) {
 	tests := []struct {
 		name string

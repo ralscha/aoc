@@ -4,10 +4,14 @@ import (
 	"container/heap"
 )
 
+// PriorityQueue implements a priority queue data structure where elements are dequeued
+// based on their priority value. Lower priority values are dequeued first.
 type PriorityQueue[T any] struct {
 	pq *priorityQueue[T]
 }
 
+// NewPriorityQueue creates and returns a new empty priority queue.
+// The type parameter T can be any type.
 func NewPriorityQueue[T any]() PriorityQueue[T] {
 	var pq priorityQueue[T]
 	heap.Init(&pq)
@@ -16,14 +20,18 @@ func NewPriorityQueue[T any]() PriorityQueue[T] {
 	}
 }
 
+// IsEmpty returns true if the priority queue contains no elements.
 func (q PriorityQueue[T]) IsEmpty() bool {
 	return q.pq.Len() == 0
 }
 
+// Len returns the number of elements in the priority queue.
 func (pq PriorityQueue[T]) Len() int {
 	return pq.pq.Len()
 }
 
+// Push adds a new element to the priority queue with the given priority.
+// Lower priority values are dequeued first.
 func (pq PriorityQueue[T]) Push(value T, priority int) {
 	heap.Push(pq.pq, &item[T]{
 		value:    value,
@@ -31,6 +39,8 @@ func (pq PriorityQueue[T]) Push(value T, priority int) {
 	})
 }
 
+// Pop removes and returns the element with the lowest priority value from the queue.
+// Panics if the queue is empty.
 func (pq PriorityQueue[T]) Pop() T {
 	item := heap.Pop(pq.pq).(*item[T])
 	return item.value

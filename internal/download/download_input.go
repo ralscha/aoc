@@ -9,6 +9,15 @@ import (
 	"os"
 )
 
+// ReadInput retrieves the input for a specific Advent of Code puzzle.
+// It first checks if the input exists locally in a file, and if not, downloads it.
+// The input is saved to a file in the format: {current_dir}/{year}/{day}/input.txt
+//
+// Parameters:
+//   - year: The year of the Advent of Code puzzle
+//   - day: The day of the puzzle (1-25)
+//
+// Returns the puzzle input as a string and any error encountered.
 func ReadInput(year, day int) (string, error) {
 	dir, err := os.Getwd()
 	if err != nil {
@@ -39,8 +48,16 @@ func ReadInput(year, day int) (string, error) {
 	}
 }
 
+// DownloadInput downloads the input for a specific Advent of Code puzzle from the website.
+// It requires a session cookie stored in a file named "sessioncookie" in the current directory.
+//
+// Parameters:
+//   - year: The year of the Advent of Code puzzle
+//   - day: The day of the puzzle (1-25)
+//
+// Returns the downloaded puzzle input as a string and any error encountered.
+// The function will trim any trailing newlines from the downloaded content.
 func DownloadInput(year, day int) (string, error) {
-
 	sessionCookie, err := os.ReadFile("./sessioncookie")
 	if err != nil {
 		return "", fmt.Errorf("reading sessioncookie failed: %v", err)
