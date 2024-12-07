@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -32,12 +33,12 @@ func part1(lines []string) {
 
 func isValid(line string) bool {
 	words := strings.Split(line, " ")
-	seen := make(map[string]bool)
+	seen := container.NewSet[string]()
 	for _, word := range words {
-		if seen[word] {
+		if seen.Contains(word) {
 			return false
 		}
-		seen[word] = true
+		seen.Add(word)
 	}
 	return true
 }
@@ -54,15 +55,15 @@ func part2(lines []string) {
 
 func isValid2(line string) bool {
 	words := strings.Split(line, " ")
-	seen := make(map[string]bool)
+	seen := container.NewSet[string]()
 	for _, word := range words {
 		chars := strings.Split(word, "")
 		slices.Sort(chars)
 		word = strings.Join(chars, "")
-		if seen[word] {
+		if seen.Contains(word) {
 			return false
 		}
-		seen[word] = true
+		seen.Add(word)
 	}
 	return true
 }
