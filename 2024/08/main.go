@@ -33,7 +33,7 @@ func main() {
 	fmt.Println("Part 2:", findAntinodes(antennas, maxRows, maxCols, true).Len())
 }
 
-func findAntinodes(antennas map[rune][]gridutil.Coordinate, rows, cols int, part2 bool) container.Set[gridutil.Coordinate] {
+func findAntinodes(antennas map[rune][]gridutil.Coordinate, rows, cols int, part2 bool) *container.Set[gridutil.Coordinate] {
 	points := container.NewSet[gridutil.Coordinate]()
 
 	for _, pairs := range antennas {

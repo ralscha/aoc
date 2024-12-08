@@ -60,7 +60,7 @@ outerLoop:
 			visited.Add(currentPos)
 		}
 	}
-	return &visited
+	return visited
 }
 
 func part2(input string) {

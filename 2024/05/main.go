@@ -88,8 +88,7 @@ func reorderUpdate(update []int, rules []rule) []int {
 	for _, r := range rules {
 		if slices.Contains(update, r.before) && slices.Contains(update, r.after) {
 			if _, exists := pagesBefore[r.after]; !exists {
-				set := container.NewSet[int]()
-				pagesBefore[r.after] = &set
+				pagesBefore[r.after] = container.NewSet[int]()
 			}
 			pagesBefore[r.after].Add(r.before)
 		}
