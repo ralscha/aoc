@@ -5,7 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -26,9 +26,8 @@ func main() {
 			totalCalories += calories
 		}
 	}
-
-	sort.Slice(elves, func(i, j int) bool {
-		return elves[i] > elves[j]
+	slices.SortFunc(elves, func(a, b int) int {
+		return b - a
 	})
 
 	fmt.Println("Part 1", elves[0])

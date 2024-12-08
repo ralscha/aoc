@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"sort"
+	"slices"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func part1(input string) {
 	for _, o := range indicesInRightOrder {
 		sum += o
 	}
-	fmt.Println(sum)
+	fmt.Println("Part 2", sum)
 }
 
 func part2(input string) {
@@ -59,8 +59,8 @@ func part2(input string) {
 	end := []any{[]any{6.0}}
 	packages = append(packages, end)
 
-	sort.Slice(packages, func(i, j int) bool {
-		return compare(packages[i], packages[j]) == -1
+	slices.SortFunc(packages, func(a, b []any) int {
+		return compare(a, b)
 	})
 
 	startIndex := 0
@@ -73,7 +73,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println(startIndex * endIndex)
+	fmt.Println("Part 2", startIndex*endIndex)
 }
 
 func parseAndCheck(line1, line2 string) bool {

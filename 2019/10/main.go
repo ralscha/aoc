@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"sort"
+	"slices"
 )
 
 func main() {
@@ -120,10 +120,8 @@ func part2(input string) {
 	}
 
 	for _, points := range byAngle {
-		sort.Slice(points, func(i, j int) bool {
-			di := mathx.Abs(points[i].Col-maxAsteroid.Col) + mathx.Abs(points[i].Row-maxAsteroid.Row)
-			dj := mathx.Abs(points[j].Col-maxAsteroid.Col) + mathx.Abs(points[j].Row-maxAsteroid.Row)
-			return di < dj
+		slices.SortFunc(points, func(a, b gridutil.Coordinate) int {
+			return mathx.Abs(a.Col-maxAsteroid.Col) + mathx.Abs(a.Row-maxAsteroid.Row) - mathx.Abs(b.Col-maxAsteroid.Col) + mathx.Abs(b.Row-maxAsteroid.Row)
 		})
 	}
 
@@ -131,7 +129,7 @@ func part2(input string) {
 	for angle := range byAngle {
 		angles = append(angles, angle)
 	}
-	sort.Float64s(angles)
+	slices.Sort(angles)
 
 	count := 0
 	for len(byAngle) > 0 {

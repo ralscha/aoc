@@ -1,7 +1,7 @@
 package container
 
 import (
-	"sort"
+	"slices"
 	"testing"
 )
 
@@ -76,7 +76,7 @@ func TestSetBasicOperations(t *testing.T) {
 func TestSetValues(t *testing.T) {
 	s := NewSet[int]()
 	numbers := []int{1, 2, 3, 4, 5}
-	
+
 	for _, n := range numbers {
 		s.Add(n)
 	}
@@ -87,7 +87,7 @@ func TestSetValues(t *testing.T) {
 	}
 
 	// Sort both slices for comparison since map iteration order is random
-	sort.Ints(values)
+	slices.Sort(values)
 	if !equalSlices(values, numbers) {
 		t.Errorf("Expected values %v, got %v", numbers, values)
 	}
@@ -104,8 +104,8 @@ func TestSetValues(t *testing.T) {
 		t.Errorf("Expected %d values, got %d", len(strings), len(strValues))
 	}
 
-	sort.Strings(strValues)
-	sort.Strings(strings)
+	slices.Sort(strValues)
+	slices.Sort(strings)
 	if !equalStringSlices(strValues, strings) {
 		t.Errorf("Expected values %v, got %v", strings, strValues)
 	}
@@ -114,7 +114,7 @@ func TestSetValues(t *testing.T) {
 func TestSetClear(t *testing.T) {
 	s := NewSet[int]()
 	numbers := []int{1, 2, 3, 4, 5}
-	
+
 	for _, n := range numbers {
 		s.Add(n)
 	}
@@ -139,7 +139,7 @@ func TestSetClear(t *testing.T) {
 func TestSetAddAll(t *testing.T) {
 	s := NewSet[int]()
 	numbers := []int{1, 2, 3, 4, 5}
-	
+
 	s.AddAll(numbers)
 	if s.Len() != len(numbers) {
 		t.Errorf("Expected length %d, got %d", len(numbers), s.Len())
@@ -223,8 +223,8 @@ func TestSetUnion(t *testing.T) {
 
 			result := s1.Union(s2)
 			values := result.Values()
-			sort.Ints(values)
-			sort.Ints(tt.expected)
+			slices.Sort(values)
+			slices.Sort(tt.expected)
 
 			if !equalSlices(values, tt.expected) {
 				t.Errorf("Expected %v, got %v", tt.expected, values)
@@ -238,12 +238,12 @@ func TestSetUnion(t *testing.T) {
 		s2 := NewSet[string]()
 		s1.AddAll([]string{"a", "b", "c"})
 		s2.AddAll([]string{"b", "c", "d"})
-		
+
 		result := s1.Union(s2)
 		values := result.Values()
-		sort.Strings(values)
+		slices.Sort(values)
 		expected := []string{"a", "b", "c", "d"}
-		
+
 		if !equalStringSlices(values, expected) {
 			t.Errorf("Expected %v, got %v", expected, values)
 		}
@@ -304,8 +304,8 @@ func TestSetIntersection(t *testing.T) {
 
 			result := s1.Intersection(s2)
 			values := result.Values()
-			sort.Ints(values)
-			sort.Ints(tt.expected)
+			slices.Sort(values)
+			slices.Sort(tt.expected)
 
 			if !equalSlices(values, tt.expected) {
 				t.Errorf("Expected %v, got %v", tt.expected, values)
@@ -319,12 +319,12 @@ func TestSetIntersection(t *testing.T) {
 		s2 := NewSet[string]()
 		s1.AddAll([]string{"a", "b", "c"})
 		s2.AddAll([]string{"b", "c", "d"})
-		
+
 		result := s1.Intersection(s2)
 		values := result.Values()
-		sort.Strings(values)
+		slices.Sort(values)
 		expected := []string{"b", "c"}
-		
+
 		if !equalStringSlices(values, expected) {
 			t.Errorf("Expected %v, got %v", expected, values)
 		}
@@ -391,8 +391,8 @@ func TestSetDifference(t *testing.T) {
 
 			result := s1.Difference(s2)
 			values := result.Values()
-			sort.Ints(values)
-			sort.Ints(tt.expected)
+			slices.Sort(values)
+			slices.Sort(tt.expected)
 
 			if !equalSlices(values, tt.expected) {
 				t.Errorf("Expected %v, got %v", tt.expected, values)
@@ -406,12 +406,12 @@ func TestSetDifference(t *testing.T) {
 		s2 := NewSet[string]()
 		s1.AddAll([]string{"a", "b", "c"})
 		s2.AddAll([]string{"b", "c", "d"})
-		
+
 		result := s1.Difference(s2)
 		values := result.Values()
-		sort.Strings(values)
+		slices.Sort(values)
 		expected := []string{"a"}
-		
+
 		if !equalStringSlices(values, expected) {
 			t.Errorf("Expected %v, got %v", expected, values)
 		}
@@ -430,7 +430,7 @@ func TestChainedOperations(t *testing.T) {
 	// Test chaining Union and Intersection
 	result := s1.Union(s2).Intersection(s3)
 	values := result.Values()
-	sort.Ints(values)
+	slices.Sort(values)
 	expected := []int{5, 6}
 	if !equalSlices(values, expected) {
 		t.Errorf("Expected %v, got %v", expected, values)
@@ -439,7 +439,7 @@ func TestChainedOperations(t *testing.T) {
 	// Test chaining Union and Difference
 	result = s1.Union(s2).Difference(s3)
 	values = result.Values()
-	sort.Ints(values)
+	slices.Sort(values)
 	expected = []int{1, 2, 3, 4}
 	if !equalSlices(values, expected) {
 		t.Errorf("Expected %v, got %v", expected, values)

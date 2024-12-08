@@ -5,7 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -26,8 +26,8 @@ func part1and2(input string) {
 		ints := convToInts(line)
 		bricks = append(bricks, brick{ints[0], ints[1], ints[2], ints[3], ints[4], ints[5]})
 	}
-	sort.Slice(bricks, func(i, j int) bool {
-		return bricks[i].z1 < bricks[j].z1
+	slices.SortFunc(bricks, func(a, b brick) int {
+		return a.z1 - b.z1
 	})
 	_, fallen := drop(bricks)
 	p1 := 0
@@ -41,8 +41,8 @@ func part1and2(input string) {
 			p2 += falls
 		}
 	}
-	fmt.Println(p1)
-	fmt.Println(p2)
+	fmt.Println("Part 1", p1)
+	fmt.Println("Part 2", p2)
 }
 
 type brick struct {

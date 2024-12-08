@@ -5,7 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -45,8 +45,8 @@ func part2(input string) {
 	replacements, molecule := convertInput(lines)
 	targetMolecule := "e"
 
-	sort.Slice(replacements, func(i, j int) bool {
-		return len(replacements[i].to) > len(replacements[j].to)
+	slices.SortFunc(replacements, func(a, b replacement) int {
+		return len(a.to) - len(b.to)
 	})
 
 	steps := 0

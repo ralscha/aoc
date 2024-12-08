@@ -6,7 +6,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -41,8 +41,8 @@ func part1and2(input string) {
 		guardLogs[i] = guardLog{date, action}
 	}
 
-	sort.Slice(guardLogs, func(i, j int) bool {
-		return guardLogs[i].date < guardLogs[j].date
+	slices.SortFunc(guardLogs, func(a, b guardLog) int {
+		return strings.Compare(a.date, b.date)
 	})
 
 	guards := make(map[int]*guard)
