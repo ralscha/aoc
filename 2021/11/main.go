@@ -68,7 +68,7 @@ func part1(input string) {
 		flashed += flashes
 	}
 
-	fmt.Println(flashed)
+	fmt.Println("Part 1", flashed)
 }
 
 func incrValue(rowIx, colIx int) {
@@ -146,7 +146,7 @@ func part2(input string) {
 			}
 		}
 		if flashes == 100 {
-			fmt.Println("Round: ", round)
+			fmt.Println("Part 2", round)
 			break
 		}
 		round++
