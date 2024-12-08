@@ -44,7 +44,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println(len(eco))
+	fmt.Println("Part 1", len(eco))
 }
 
 func part2(input string) {
@@ -74,5 +74,5 @@ func part2(input string) {
 	for _, f := range eco {
 		total += f
 	}
-	fmt.Println(total)
+	fmt.Println("Part 2", total)
 }
