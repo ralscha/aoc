@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"slices"
-	"sort"
 	"strings"
 )
 
@@ -47,7 +46,7 @@ func part1(input string) {
 		}
 	}
 
-	sort.Strings(readyJobs)
+	slices.Sort(readyJobs)
 
 	jobOrder := ""
 	doneJobs := container.NewSet[string]()
@@ -77,11 +76,11 @@ func part1(input string) {
 				readyJobs = append(readyJobs, job)
 			}
 		}
-		sort.Strings(readyJobs)
+		slices.Sort(readyJobs)
 
 	}
 
-	fmt.Println(jobOrder)
+	fmt.Println("Part 1", jobOrder)
 }
 
 type worker struct {
@@ -115,7 +114,7 @@ func part2(input string) {
 		}
 	}
 
-	sort.Strings(readyJobs)
+	slices.Sort(readyJobs)
 	doneJobs := container.NewSet[string]()
 
 	noOfWorkers := 5
@@ -165,7 +164,7 @@ func part2(input string) {
 					readyJobs = append(readyJobs, job)
 				}
 			}
-			sort.Strings(readyJobs)
+			slices.Sort(readyJobs)
 		}
 
 		for i, worker := range workers {
@@ -187,5 +186,5 @@ func part2(input string) {
 		seconds++
 	}
 
-	fmt.Println(seconds - 1)
+	fmt.Println("Part 2", seconds-1)
 }
