@@ -98,7 +98,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println(sumUnmarked * lastCalledNumber)
+	fmt.Println("Part 1", sumUnmarked*lastCalledNumber)
 }
 
 func part2(input string) {
@@ -165,10 +165,7 @@ func part2(input string) {
 			lastCalledNumber = d
 		}
 	}
-	fmt.Println(bingoCards)
 	lastBingoCard := cards[bingoCards[len(bingoCards)-1]]
-	fmt.Println(lastBingoCard)
-	fmt.Println(lastCalledNumber)
 
 	sumUnmarked := 0
 	for _, row := range lastBingoCard {
@@ -179,7 +176,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println(sumUnmarked * lastCalledNumber)
+	fmt.Println("Part 2", sumUnmarked*lastCalledNumber)
 }
 
 func checkBingo(cards []card) *card {
