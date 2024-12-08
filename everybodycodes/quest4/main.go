@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"slices"
-	"sort"
 	"strings"
 )
 
@@ -66,7 +65,7 @@ func partIII() {
 	nails := conv.ToIntSlice(lines)
 	sortedNails := make([]int, len(nails))
 	copy(sortedNails, nails)
-	sort.Ints(sortedNails)
+	slices.Sort(sortedNails)
 
 	medianHeight := sortedNails[len(sortedNails)/2]
 
