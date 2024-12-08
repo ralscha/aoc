@@ -8,6 +8,32 @@ import (
 	"strings"
 )
 
+type player struct {
+	position int
+	score    int
+}
+
+type gameState struct {
+	players [2]player
+	turn    int
+}
+
+type diceRoll struct {
+	sum   int
+	count int
+}
+
+// Pre-calculated possible sums of three dice rolls in quantum game
+var quantumRolls = []diceRoll{
+	{3, 1}, // 1,1,1
+	{4, 3}, // 1,1,2 1,2,1 2,1,1
+	{5, 6}, // 1,1,3 1,2,2 1,3,1 2,1,2 2,2,1 3,1,1
+	{6, 7}, // 1,2,3 1,3,2 2,1,3 2,2,2 2,3,1 3,1,2 3,2,1
+	{7, 6}, // 1,3,3 2,2,3 2,3,2 3,1,3 3,2,2 3,3,1
+	{8, 3}, // 2,3,3 3,2,3 3,3,2
+	{9, 1}, // 3,3,3
+}
+
 func main() {
 	input, err := download.ReadInput(2021, 21)
 	if err != nil {
@@ -19,63 +45,83 @@ func main() {
 }
 
 func part1(input string) {
-	lines := conv.SplitNewline(input)
-	splitted1 := strings.Fields(lines[0])
-	splitted2 := strings.Fields(lines[1])
-	var playerPos [2]int
-	playerPos[0] = conv.MustAtoi(splitted1[4])
-	playerPos[1] = conv.MustAtoi(splitted2[4])
-	var score [2]int
+	p1, p2 := parseStartPositions(input)
+	game := gameState{
+		players: [2]player{{position: p1}, {position: p2}},
+	}
 
 	rolls := 0
-	currentPlayer := 0
-	for score[0] < 1000 && score[1] < 1000 {
-		round := 3*rolls + 6
-		rolls += 3
-		newPos := playerPos[currentPlayer] + round
-		newPos = newPos % 10
-		if newPos == 0 {
-			newPos = 10
+	die := 1
+
+	for game.players[0].score < 1000 && game.players[1].score < 1000 {
+		// Roll three times and sum
+		sum := 0
+		for i := 0; i < 3; i++ {
+			sum += die
+			die = die%100 + 1
 		}
-		playerPos[currentPlayer] = newPos
-		score[currentPlayer] += playerPos[currentPlayer]
-		currentPlayer = (currentPlayer + 1) % 2
+		rolls += 3
+
+		// Move current player
+		currentPlayer := &game.players[game.turn]
+		currentPlayer.position = ((currentPlayer.position + sum - 1) % 10) + 1
+		currentPlayer.score += currentPlayer.position
+
+		// Switch turns
+		game.turn = 1 - game.turn
 	}
-	fmt.Println(min(score[0], score[1]) * rolls)
+
+	losingScore := min(game.players[0].score, game.players[1].score)
+	fmt.Println("Part 1", losingScore*rolls)
 }
 
 func part2(input string) {
+	p1, p2 := parseStartPositions(input)
+	wins := playQuantumGame(player{position: p1}, player{position: p2}, true)
+	fmt.Println("Part 2", max(wins[0], wins[1]))
+}
+
+func parseStartPositions(input string) (int, int) {
 	lines := conv.SplitNewline(input)
-	splitted1 := strings.Fields(lines[0])
-	splitted2 := strings.Fields(lines[1])
-	var playerPos [2]int
-	playerPos[0] = conv.MustAtoi(splitted1[4])
-	playerPos[1] = conv.MustAtoi(splitted2[4])
-
-	score1, score2 := play2(playerPos[0], playerPos[1], 0, 0)
-
-	fmt.Println(max(score1, score2))
+	p1 := conv.MustAtoi(strings.Fields(lines[0])[4])
+	p2 := conv.MustAtoi(strings.Fields(lines[1])[4])
+	return p1, p2
 }
 
-type sum struct {
-	move int
-	n    int
-}
-
-func play2(pos1, pos2, score1, score2 int) (int, int) {
-	if score2 >= 21 {
-		return 0, 1
+func playQuantumGame(p1, p2 player, p1Turn bool) [2]int64 {
+	// Base case: if either player has won
+	if p2.score >= 21 {
+		return [2]int64{0, 1}
+	}
+	if p1.score >= 21 {
+		return [2]int64{1, 0}
 	}
 
-	wins1, wins2 := 0, 0
-	for _, p := range []sum{{3, 1}, {4, 3}, {5, 6}, {6, 7}, {7, 6}, {8, 3}, {9, 1}} {
-		move, n := p.move, p.n
-		pos1_ := (pos1 + move) % 10
-		if pos1_ == 0 {
-			pos1_ = 10
+	// Track total wins for each player across all universes
+	totalWins := [2]int64{0, 0}
+
+	// Try each possible roll sum
+	for _, roll := range quantumRolls {
+		var nextP1, nextP2 player
+		if p1Turn {
+			// Move p1
+			nextP1.position = ((p1.position + roll.sum - 1) % 10) + 1
+			nextP1.score = p1.score + nextP1.position
+			nextP2 = p2
+		} else {
+			// Move p2
+			nextP1 = p1
+			nextP2.position = ((p2.position + roll.sum - 1) % 10) + 1
+			nextP2.score = p2.score + nextP2.position
 		}
-		w2, w1 := play2(pos2, pos1_, score2, score1+pos1_)
-		wins1, wins2 = wins1+n*w1, wins2+n*w2
+
+		// Recursively play out this universe
+		wins := playQuantumGame(nextP1, nextP2, !p1Turn)
+
+		// Add wins from this universe (multiplied by number of ways to get this roll)
+		totalWins[0] += wins[0] * int64(roll.count)
+		totalWins[1] += wins[1] * int64(roll.count)
 	}
-	return wins1, wins2
+
+	return totalWins
 }
