@@ -21,8 +21,8 @@ func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 	binaryInput := hexToBinary(lines[0])
 	_, value, versionSum := parsePackets(binaryInput, 0)
-	fmt.Println(versionSum)
-	fmt.Println(value)
+	fmt.Println("Part 1", versionSum)
+	fmt.Println("Part 2", value)
 }
 
 func hexToBinary(hexStr string) string {
