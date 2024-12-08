@@ -1,12 +1,19 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"strings"
 )
+
+type cuboid struct {
+	min, max gridutil.Coordinate3D
+	state    bool // true for on, false for off
+}
 
 func main() {
 	input, err := download.ReadInput(2021, 22)
@@ -18,133 +25,126 @@ func main() {
 	part2(input)
 }
 
-type cube struct {
-	x, y, z int
-}
-
 func part1(input string) {
-	lines := conv.SplitNewline(input)
+	steps := parseInput(input)
+	cubes := container.NewSet[gridutil.Coordinate3D]()
 
-	cubes := make(map[cube]bool)
-	for _, line := range lines {
-		fields := strings.Fields(line)
-		command := fields[0]
-		xzy := strings.Split(fields[1], ",")
-		xPart := strings.Split(xzy[0], "=")
-		yPart := strings.Split(xzy[1], "=")
-		zPart := strings.Split(xzy[2], "=")
+	// Process only steps within -50..50 region
+	for _, step := range steps {
+		if !isInInitRegion(step) {
+			continue
+		}
 
-		xPart = strings.Split(xPart[1], "..")
-		fromX := conv.MustAtoi(xPart[0])
-		toX := conv.MustAtoi(xPart[1])
-
-		yPart = strings.Split(yPart[1], "..")
-		fromY := conv.MustAtoi(yPart[0])
-		toY := conv.MustAtoi(yPart[1])
-
-		zPart = strings.Split(zPart[1], "..")
-		fromZ := conv.MustAtoi(zPart[0])
-		toZ := conv.MustAtoi(zPart[1])
-
-		turnOn := command == "on"
-		for x := fromX; x <= toX; x++ {
-			if x < -50 || x > 50 {
-				continue
-			}
-			for y := fromY; y <= toY; y++ {
-				if y < -50 || y > 50 {
-					continue
-				}
-				for z := fromZ; z <= toZ; z++ {
-					if z < -50 || z > 50 {
-						continue
+		for x := step.min.X; x <= step.max.X; x++ {
+			for y := step.min.Y; y <= step.max.Y; y++ {
+				for z := step.min.Z; z <= step.max.Z; z++ {
+					pos := gridutil.Coordinate3D{X: x, Y: y, Z: z}
+					if step.state {
+						cubes.Add(pos)
+					} else {
+						cubes.Remove(pos)
 					}
-					cubes[cube{x, y, z}] = turnOn
 				}
 			}
 		}
 	}
 
-	count := 0
-	for _, on := range cubes {
-		if on {
-			count++
-		}
-	}
-	fmt.Println(count)
+	fmt.Println("Part 1", cubes.Len())
 }
 
 func part2(input string) {
-	lines := conv.SplitNewline(input)
+	steps := parseInput(input)
+	var regions []cuboid
 
-	var cuboids []cuboid
-	for _, line := range lines {
-		cuboid := cuboid{}
-		fields := strings.Fields(line)
-		command := fields[0]
-		if command == "on" {
-			cuboid.state = 1
-		} else {
-			cuboid.state = -1
+	for _, step := range steps {
+		var newRegions []cuboid
+
+		// If turning on, add this cuboid
+		if step.state {
+			newRegions = append(newRegions, step)
 		}
-		xzy := strings.Split(fields[1], ",")
-		xPart := strings.Split(xzy[0], "=")
-		yPart := strings.Split(xzy[1], "=")
-		zPart := strings.Split(xzy[2], "=")
 
-		xPart = strings.Split(xPart[1], "..")
-		yPart = strings.Split(yPart[1], "..")
-		zPart = strings.Split(zPart[1], "..")
-		cuboid.xmin, cuboid.xmax = conv.MustAtoi(xPart[0]), conv.MustAtoi(xPart[1])
-		cuboid.ymin, cuboid.ymax = conv.MustAtoi(yPart[0]), conv.MustAtoi(yPart[1])
-		cuboid.zmin, cuboid.zmax = conv.MustAtoi(zPart[0]), conv.MustAtoi(zPart[1])
-		cuboids = append(cuboids, cuboid)
-	}
-
-	var cores []cuboid
-	for _, cu := range cuboids {
-		var toAdd []cuboid
-		if cu.state == 1 {
-			toAdd = append(toAdd, cu)
-		}
-		for _, core := range cores {
-			inter := intersection(cu, core)
-			if inter != nil {
-				toAdd = append(toAdd, *inter)
+		// Add intersections with all previous regions
+		for _, region := range regions {
+			if intersection := intersectCuboids(step, region); intersection != nil {
+				// Add intersection with opposite state to cancel out overlap
+				intersection.state = !region.state
+				newRegions = append(newRegions, *intersection)
 			}
 		}
-		cores = append(cores, toAdd...)
+
+		regions = append(regions, newRegions...)
 	}
 
-	count := 0
-	for _, c := range cores {
-		count += c.state * (c.xmax - c.xmin + 1) * (c.ymax - c.ymin + 1) * (c.zmax - c.zmin + 1)
+	// Len total cubes that are on
+	total := int64(0)
+	for _, region := range regions {
+		volume := cuboidVolume(region)
+		if region.state {
+			total += volume
+		} else {
+			total -= volume
+		}
 	}
-	fmt.Println(count)
+
+	fmt.Println("Part 2", total)
 }
 
-type cuboid struct {
-	state int
-	xmin  int
-	xmax  int
-	ymin  int
-	ymax  int
-	zmin  int
-	zmax  int
+func parseInput(input string) []cuboid {
+	lines := conv.SplitNewline(input)
+	var steps []cuboid
+
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		state := fields[0] == "on"
+
+		// Parse coordinates
+		coords := make([]int, 6) // [xmin, xmax, ymin, ymax, zmin, zmax]
+		parts := strings.Split(fields[1], ",")
+		for i, part := range parts {
+			nums := strings.Split(strings.Split(part, "=")[1], "..")
+			coords[i*2] = conv.MustAtoi(nums[0])
+			coords[i*2+1] = conv.MustAtoi(nums[1])
+		}
+
+		steps = append(steps, cuboid{
+			min:   gridutil.Coordinate3D{X: coords[0], Y: coords[2], Z: coords[4]},
+			max:   gridutil.Coordinate3D{X: coords[1], Y: coords[3], Z: coords[5]},
+			state: state,
+		})
+	}
+
+	return steps
 }
 
-func intersection(s, t cuboid) *cuboid {
-	n := cuboid{
-		state: -t.state,
-		xmin:  max(s.xmin, t.xmin),
-		xmax:  min(s.xmax, t.xmax),
-		ymin:  max(s.ymin, t.ymin),
-		ymax:  min(s.ymax, t.ymax),
-		zmin:  max(s.zmin, t.zmin),
-		zmax:  min(s.zmax, t.zmax),
+func isInInitRegion(c cuboid) bool {
+	return c.min.X >= -50 && c.max.X <= 50 &&
+		c.min.Y >= -50 && c.max.Y <= 50 &&
+		c.min.Z >= -50 && c.max.Z <= 50
+}
+
+func intersectCuboids(a, b cuboid) *cuboid {
+	minValue := gridutil.Coordinate3D{
+		X: max(a.min.X, b.min.X),
+		Y: max(a.min.Y, b.min.Y),
+		Z: max(a.min.Z, b.min.Z),
 	}
-	if n.xmin > n.xmax || n.ymin > n.ymax || n.zmin > n.zmax {
+	maxValue := gridutil.Coordinate3D{
+		X: min(a.max.X, b.max.X),
+		Y: min(a.max.Y, b.max.Y),
+		Z: min(a.max.Z, b.max.Z),
+	}
+
+	// Check if there is no intersection
+	if minValue.X > maxValue.X || minValue.Y > maxValue.Y || minValue.Z > maxValue.Z {
 		return nil
 	}
-	return &n
+
+	return &cuboid{min: minValue, max: maxValue}
+}
+
+func cuboidVolume(c cuboid) int64 {
+	return int64(c.max.X-c.min.X+1) *
+		int64(c.max.Y-c.min.Y+1) *
+		int64(c.max.Z-c.min.Z+1)
 }
