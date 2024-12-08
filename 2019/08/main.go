@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"math"
@@ -22,22 +23,19 @@ func part1(input string) {
 	width := 25
 	height := 6
 
-	layers := make([][][]int, 0)
-	layer := make([][]int, 0)
-	row := make([]int, 0)
+	layers := make([]gridutil.Grid2D[int], 0)
+	currentLayer := gridutil.NewGrid2D[int](false)
+
 	for i, digit := range digits {
-		if i%width == 0 && i != 0 {
-			layer = append(layer, row)
-			row = make([]int, 0)
-			if len(layer) == height {
-				layers = append(layers, layer)
-				layer = make([][]int, 0)
-			}
+		row := i / width % height
+		col := i % width
+		if i > 0 && i%(width*height) == 0 {
+			layers = append(layers, currentLayer)
+			currentLayer = gridutil.NewGrid2D[int](false)
 		}
-		row = append(row, int(digit-'0'))
+		currentLayer.Set(row, col, int(digit-'0'))
 	}
-	layer = append(layer, row)
-	layers = append(layers, layer)
+	layers = append(layers, currentLayer)
 
 	minZeros := math.MaxInt
 	result := 0
@@ -45,8 +43,9 @@ func part1(input string) {
 		zeros := 0
 		ones := 0
 		twos := 0
-		for _, row := range layer {
-			for _, digit := range row {
+		for row := 0; row < height; row++ {
+			for col := 0; col < width; col++ {
+				digit, _ := layer.Get(row, col)
 				if digit == 0 {
 					zeros++
 				} else if digit == 1 {
@@ -63,7 +62,6 @@ func part1(input string) {
 	}
 
 	fmt.Println("Part 1:", result)
-
 }
 
 func part2(input string) {
@@ -71,33 +69,27 @@ func part2(input string) {
 	width := 25
 	height := 6
 
-	layers := make([][][]int, 0)
-	layer := make([][]int, 0)
-	row := make([]int, 0)
+	layers := make([]gridutil.Grid2D[int], 0)
+	currentLayer := gridutil.NewGrid2D[int](false)
+
 	for i, digit := range digits {
-		if i%width == 0 && i != 0 {
-			layer = append(layer, row)
-			row = make([]int, 0)
-			if len(layer) == height {
-				layers = append(layers, layer)
-				layer = make([][]int, 0)
-			}
+		row := i / width % height
+		col := i % width
+		if i > 0 && i%(width*height) == 0 {
+			layers = append(layers, currentLayer)
+			currentLayer = gridutil.NewGrid2D[int](false)
 		}
-		row = append(row, int(digit-'0'))
+		currentLayer.Set(row, col, int(digit-'0'))
 	}
-	layer = append(layer, row)
-	layers = append(layers, layer)
+	layers = append(layers, currentLayer)
 
-	image := make([][]int, height)
-	for i := 0; i < height; i++ {
-		image[i] = make([]int, width)
-	}
-
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
+	finalImage := gridutil.NewGrid2D[int](false)
+	for row := 0; row < height; row++ {
+		for col := 0; col < width; col++ {
 			for _, layer := range layers {
-				if layer[i][j] != 2 {
-					image[i][j] = layer[i][j]
+				pixel, _ := layer.Get(row, col)
+				if pixel != 2 { // not transparent
+					finalImage.Set(row, col, pixel)
 					break
 				}
 			}
@@ -105,9 +97,10 @@ func part2(input string) {
 	}
 
 	fmt.Println("Part 2:")
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
-			if image[i][j] == 0 {
+	for row := 0; row < height; row++ {
+		for col := 0; col < width; col++ {
+			pixel, _ := finalImage.Get(row, col)
+			if pixel == 0 {
 				fmt.Print(" ")
 			} else {
 				fmt.Print("X")

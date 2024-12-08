@@ -3,9 +3,9 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/stringutil"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 )
 
@@ -36,18 +36,19 @@ func part1(input string) {
 }
 
 func isValidPassword(pw int) bool {
-	pwStr := strconv.Itoa(pw)
-	hasDouble := false
+	pwStr := fmt.Sprintf("%d", pw)
+	if !stringutil.HasRepeatedChar(pwStr) {
+		return false
+	}
+	
+	// Check if digits are non-decreasing
 	for i := 0; i < len(pwStr)-1; i++ {
 		if pwStr[i] > pwStr[i+1] {
 			return false
 		}
-		if pwStr[i] == pwStr[i+1] {
-			hasDouble = true
-		}
 	}
 
-	return hasDouble
+	return true
 }
 
 func part2(input string) {
@@ -63,11 +64,11 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Part 1:", count)
+	fmt.Println("Part 2:", count)
 }
 
 func isValidPassword2(pw int) bool {
-	pwStr := strconv.Itoa(pw)
+	pwStr := fmt.Sprintf("%d", pw)
 	hasExactDouble := false
 	groupSize := 1
 

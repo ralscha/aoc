@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -46,23 +47,37 @@ func part2(input string) {
 		orbits[split[1]] = split[0]
 	}
 
-	you := make([]string, 0)
-	san := make([]string, 0)
+	youPath := container.NewSet[string]()
+	sanPath := container.NewSet[string]()
 
+	// Build path from YOU to COM
 	for k := "YOU"; k != "COM"; k = orbits[k] {
-		you = append(you, k)
+		youPath.Add(k)
 	}
 
+	// Build path from SAN to COM
 	for k := "SAN"; k != "COM"; k = orbits[k] {
-		san = append(san, k)
+		sanPath.Add(k)
 	}
 
-	for i, y := range you {
-		for j, s := range san {
-			if y == s {
-				fmt.Println("Part 2:", i+j-2)
-				return
+	// Find first common ancestor
+	minTransfers := len(orbits)
+	for k := "YOU"; k != "COM"; k = orbits[k] {
+		if sanPath.Contains(k) {
+			youSteps := 0
+			for temp := "YOU"; temp != k; temp = orbits[temp] {
+				youSteps++
+			}
+			sanSteps := 0
+			for temp := "SAN"; temp != k; temp = orbits[temp] {
+				sanSteps++
+			}
+			transfers := youSteps + sanSteps - 2 // subtract 2 because we don't count YOU and SAN
+			if transfers < minTransfers {
+				minTransfers = transfers
 			}
 		}
 	}
+
+	fmt.Println("Part 2:", minTransfers)
 }
