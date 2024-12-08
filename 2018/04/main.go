@@ -66,10 +66,9 @@ func part1and2(input string) {
 			if v, ok := guards[id]; ok {
 				currentGuard = v
 			} else {
-				bag := container.NewBag[int]()
 				currentGuard = &guard{
 					id:      id,
-					minutes: &bag,
+					minutes: container.NewBag[int](),
 				}
 				guards[id] = currentGuard
 			}
@@ -98,7 +97,7 @@ func part1and2(input string) {
 		}
 	}
 
-	fmt.Println(maxGuard.id * maxMinuteIndex)
+	fmt.Println("Part 1", maxGuard.id*maxMinuteIndex)
 
 	maxGuard = nil
 	maxMinuteCount = 0
@@ -117,5 +116,5 @@ func part1and2(input string) {
 	if maxGuard == nil {
 		log.Fatalf("no max guard found")
 	}
-	fmt.Println(maxGuard.id * maxMinuteIndex)
+	fmt.Println("Part 2", maxGuard.id*maxMinuteIndex)
 }
