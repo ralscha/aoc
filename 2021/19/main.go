@@ -131,7 +131,7 @@ func part1and2(input string) {
 			}
 		}
 	}
-	fmt.Println(len(allAligned))
+	fmt.Println("Part 1", len(allAligned))
 
 	var dists []int
 	for _, a := range distancesFromScan0 {
@@ -139,5 +139,5 @@ func part1and2(input string) {
 			dists = append(dists, mathx.Abs(a[0]-b[0])+mathx.Abs(a[1]-b[1])+mathx.Abs(a[2]-b[2]))
 		}
 	}
-	fmt.Println(slices.Max(dists))
+	fmt.Println("Part 2", slices.Max(dists))
 }

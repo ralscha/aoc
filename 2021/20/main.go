@@ -1,12 +1,20 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
-	"math"
 )
+
+type image struct {
+	lit            *container.Set[gridutil.Coordinate]
+	minRow, maxRow int
+	minCol, maxCol int
+	infiniteIsLit  bool
+}
 
 func main() {
 	input, err := download.ReadInput(2021, 20)
@@ -18,108 +26,114 @@ func main() {
 	part1and2(input, 50)
 }
 
-type point struct {
-	row, col int
-}
-
 func part1and2(input string, steps int) {
 	lines := conv.SplitNewline(input)
 
-	imageEnhancementAlgorithm := make([]byte, 0, len(lines[0]))
-	for _, c := range lines[0] {
-		imageEnhancementAlgorithm = append(imageEnhancementAlgorithm, byte(c))
+	// Parse enhancement algorithm
+	algorithm := make([]bool, len(lines[0]))
+	for i, c := range lines[0] {
+		algorithm[i] = c == '#'
 	}
-	infiniteSpaceStaysOff := imageEnhancementAlgorithm[0] == '.'
 
-	inputImage := make(map[point]byte)
+	// Parse initial image
+	img := newImage()
 	for row, line := range lines[2:] {
 		for col, c := range line {
-			inputImage[point{row, col}] = byte(c)
+			if c == '#' {
+				coord := gridutil.Coordinate{Row: row, Col: col}
+				img.lit.Add(coord)
+				img.updateBounds(coord)
+			}
 		}
 	}
 
-	enhancedImage := inputImage
-	for n := 0; n < steps; n++ {
-		infiniteSpaceIsOn := n%2 == 1
-		enhancedImage = enhance(enhancedImage, imageEnhancementAlgorithm, infiniteSpaceStaysOff, infiniteSpaceIsOn)
+	// Enhance image specified number of times
+	for i := 0; i < steps; i++ {
+		img = enhance(img, algorithm)
 	}
 
-	count := 0
-	for _, v := range enhancedImage {
-		if v == '#' {
-			count++
-		}
-	}
-	fmt.Println(count)
+	fmt.Println("Lit pixels:", img.lit.Len())
 }
 
-func minMax(input map[point]byte) (int, int, int, int) {
-	maxRow, maxCol := math.MinInt64, math.MinInt64
-	minRow, minCol := math.MaxInt64, math.MaxInt64
-	for p := range input {
-		maxRow = max(maxRow, p.row)
-		maxCol = max(maxCol, p.col)
-		minRow = min(minRow, p.row)
-		minCol = min(minCol, p.col)
+func newImage() *image {
+	return &image{
+		lit:           container.NewSet[gridutil.Coordinate](),
+		minRow:        0,
+		maxRow:        0,
+		minCol:        0,
+		maxCol:        0,
+		infiniteIsLit: false,
 	}
-	return minRow, minCol, maxRow, maxCol
 }
 
-func enhance(input map[point]byte, algorithm []byte, infiniteSpaceStaysOff, infiniteSpaceIsOn bool) map[point]byte {
-
-	minRow, minCol, maxRow, maxCol := minMax(input)
-
-	var infChar byte = '.'
-	if !infiniteSpaceStaysOff && infiniteSpaceIsOn {
-		infChar = '#'
+func (img *image) updateBounds(p gridutil.Coordinate) {
+	if p.Row < img.minRow {
+		img.minRow = p.Row
 	}
-
-	for c := minCol - 3; c <= maxCol+3; c++ {
-		input[point{minRow - 1, c}] = infChar
-		input[point{minRow - 2, c}] = infChar
-		input[point{minRow - 3, c}] = infChar
-		input[point{maxRow + 1, c}] = infChar
-		input[point{maxRow + 2, c}] = infChar
-		input[point{maxRow + 3, c}] = infChar
+	if p.Row > img.maxRow {
+		img.maxRow = p.Row
 	}
-
-	for r := minRow - 3; r <= maxRow+3; r++ {
-		input[point{r, minCol - 1}] = infChar
-		input[point{r, minCol - 2}] = infChar
-		input[point{r, minCol - 3}] = infChar
-		input[point{r, maxCol + 1}] = infChar
-		input[point{r, maxCol + 2}] = infChar
-		input[point{r, maxCol + 3}] = infChar
+	if p.Col < img.minCol {
+		img.minCol = p.Col
 	}
-
-	enhancedImage := map[point]byte{}
-	for r := minRow - 2; r <= maxRow+2; r++ {
-		for c := minCol - 2; c <= maxCol+2; c++ {
-			p := point{r, c}
-			enhancedImage[p] = enhancePixel(input, p, algorithm)
-		}
+	if p.Col > img.maxCol {
+		img.maxCol = p.Col
 	}
-	return enhancedImage
 }
 
-func enhancePixel(input map[point]byte, p point, algorithm []byte) byte {
-	pixelValue := 0
-	for _, d := range []point{
-		{-1, -1},
-		{-1, 0},
-		{-1, 1},
-		{0, -1},
-		{0, 0},
-		{0, 1},
-		{1, -1},
-		{1, 0},
-		{1, 1},
-	} {
-		n := point{p.row + d.row, p.col + d.col}
-		pixelValue <<= 1
-		if input[n] == '#' {
-			pixelValue |= 1
+func (img *image) isLit(p gridutil.Coordinate) bool {
+	// If point is within known bounds, check the set
+	if p.Row >= img.minRow && p.Row <= img.maxRow &&
+		p.Col >= img.minCol && p.Col <= img.maxCol {
+		return img.lit.Contains(p)
+	}
+	// Otherwise, return the infinite space state
+	return img.infiniteIsLit
+}
+
+func enhance(img *image, algorithm []bool) *image {
+	newImg := newImage()
+
+	// Expand bounds by 1 in each direction
+	minRow := img.minRow - 1
+	maxRow := img.maxRow + 1
+	minCol := img.minCol - 1
+	maxCol := img.maxCol + 1
+
+	// Process each pixel in the expanded area
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			coord := gridutil.Coordinate{Row: row, Col: col}
+			if shouldBeLit(img, coord, algorithm) {
+				newImg.lit.Add(coord)
+				newImg.updateBounds(coord)
+			}
 		}
 	}
-	return algorithm[pixelValue]
+
+	// Update infinite space state
+	if img.infiniteIsLit {
+		newImg.infiniteIsLit = algorithm[511] // All 9 bits set
+	} else {
+		newImg.infiniteIsLit = algorithm[0] // All 9 bits clear
+	}
+
+	return newImg
+}
+
+func shouldBeLit(img *image, p gridutil.Coordinate, algorithm []bool) bool {
+	index := 0
+	for row := -1; row <= 1; row++ {
+		for col := -1; col <= 1; col++ {
+			neighbor := gridutil.Coordinate{
+				Row: p.Row + row,
+				Col: p.Col + col,
+			}
+			index <<= 1
+			if img.isLit(neighbor) {
+				index |= 1
+			}
+		}
+	}
+	return algorithm[index]
 }
