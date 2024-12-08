@@ -1,18 +1,14 @@
 package main
 
 import (
+	"aoc/internal/container"
+	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
-	"sort"
-	"strings"
+	"slices"
 )
-
-type point struct {
-	row int
-	col int
-}
 
 func main() {
 	input, err := download.ReadInput(2021, 9)
@@ -25,39 +21,31 @@ func main() {
 }
 
 func part1(input string) {
-	var grid [][]int32
+	lines := conv.SplitNewline(input)
+	grid := gridutil.NewGrid2D[int](false)
 
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
-		fmt.Println(line)
-		var lg []int32
-		for _, c := range line {
-			lg = append(lg, c-'0')
+	// Build grid
+	for row, line := range lines {
+		for col, c := range line {
+			grid.Set(row, col, int(c-'0'))
 		}
-		grid = append(grid, lg)
 	}
 
-	var lowPoints []int32
-	for row := 0; row < len(grid); row++ {
-		for col := 0; col < len(grid[row]); col++ {
-			currentValue := grid[row][col]
+	var lowPoints []int
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			currentValue, _ := grid.Get(row, col)
 			isLower := true
-			//up
-			if row > 0 {
-				isLower = isLower && currentValue < grid[row-1][col]
-			}
-			//down
-			if row < len(grid)-1 {
-				isLower = isLower && currentValue < grid[row+1][col]
-			}
-			//left
-			if col > 0 {
-				isLower = isLower && currentValue < grid[row][col-1]
-			}
-			//right
-			if col < len(grid[row])-1 {
-				isLower = isLower && currentValue < grid[row][col+1]
+
+			neighbors := grid.GetNeighbours4C(gridutil.Coordinate{Row: row, Col: col})
+			for _, neighbor := range neighbors {
+				if currentValue >= neighbor {
+					isLower = false
+					break
+				}
 			}
 
 			if isLower {
@@ -66,99 +54,91 @@ func part1(input string) {
 		}
 	}
 
-	var total int32
+	total := 0
 	for _, lp := range lowPoints {
 		total += lp + 1
 	}
 
-	fmt.Println(total)
+	fmt.Println("Part 1", total)
 }
 
 func part2(input string) {
-	var grid [][]int32
+	lines := conv.SplitNewline(input)
+	grid := gridutil.NewGrid2D[int](false)
 
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
-		var lg []int32
-		for _, c := range line {
-			lg = append(lg, c-'0')
+	// Build grid
+	for row, line := range lines {
+		for col, c := range line {
+			grid.Set(row, col, int(c-'0'))
 		}
-		grid = append(grid, lg)
 	}
 
-	var basinSize []int
-	for row := 0; row < len(grid); row++ {
-		for col := 0; col < len(grid[row]); col++ {
-			islp := isLowPoint(row, col, grid)
-			if islp {
-				size := crawl(row, col, grid, map[point]struct{}{}, 1)
+	var basinSizes []int
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			coord := gridutil.Coordinate{Row: row, Col: col}
+			if isLowPoint(grid, coord) {
+				size := findBasinSize(grid, coord)
 				if size > 0 {
-					basinSize = append(basinSize, size)
+					basinSizes = append(basinSizes, size)
 				}
 			}
 		}
 	}
-	sort.Slice(basinSize, func(i, j int) bool {
-		return basinSize[i] > basinSize[j]
-	})
 
-	result := basinSize[0] * basinSize[1] * basinSize[2]
-	fmt.Println(result)
+	slices.SortFunc(basinSizes, func(i, j int) int {
+		return j - i
+	})
+	result := basinSizes[0] * basinSizes[1] * basinSizes[2]
+	fmt.Println("Part 2", result)
 }
 
-func crawl(row, col int, grid [][]int32, visited map[point]struct{}, size int) int {
-	key := point{row: row, col: col}
-	if _, ok := visited[key]; ok {
-		return size - 1
-	} else {
-		visited[key] = struct{}{}
+func isLowPoint(grid gridutil.Grid2D[int], coord gridutil.Coordinate) bool {
+	currentValue, _ := grid.GetC(coord)
+	neighbors := grid.GetNeighbours4C(coord)
+
+	for _, neighbor := range neighbors {
+		if currentValue >= neighbor {
+			return false
+		}
+	}
+	return true
+}
+
+func findBasinSize(grid gridutil.Grid2D[int], start gridutil.Coordinate) int {
+	visited := container.NewSet[gridutil.Coordinate]()
+	return crawl(grid, start, visited)
+}
+
+func crawl(grid gridutil.Grid2D[int], coord gridutil.Coordinate, visited container.Set[gridutil.Coordinate]) int {
+	if visited.Contains(coord) {
+		return 0
 	}
 
-	if grid[row][col] == 9 {
-		return size - 1
+	value, ok := grid.GetC(coord)
+	if !ok || value == 9 {
+		return 0
 	}
 
-	if row > 0 {
-		up := row - 1
-		size = crawl(up, col, grid, visited, size+1)
-	}
+	visited.Add(coord)
+	size := 1
 
-	if row < len(grid)-1 {
-		down := row + 1
-		size = crawl(down, col, grid, visited, size+1)
-	}
-
-	if col > 0 {
-		left := col - 1
-		size = crawl(row, left, grid, visited, size+1)
-	}
-
-	if col < len(grid[row])-1 {
-		right := col + 1
-		size = crawl(row, right, grid, visited, size+1)
+	// Get valid neighbors (up, down, left, right)
+	for _, dir := range []gridutil.Direction{
+		{Row: -1, Col: 0}, // up
+		{Row: 1, Col: 0},  // down
+		{Row: 0, Col: -1}, // left
+		{Row: 0, Col: 1},  // right
+	} {
+		next := gridutil.Coordinate{
+			Row: coord.Row + dir.Row,
+			Col: coord.Col + dir.Col,
+		}
+		size += crawl(grid, next, visited)
 	}
 
 	return size
-}
-
-func isLowPoint(row, col int, grid [][]int32) bool {
-	currentValue := grid[row][col]
-	//up
-	if row > 0 && currentValue >= grid[row-1][col] {
-		return false
-	}
-	//down
-	if row < len(grid)-1 && currentValue >= grid[row+1][col] {
-		return false
-	}
-	//left
-	if col > 0 && currentValue >= grid[row][col-1] {
-		return false
-	}
-	//right
-	if col < len(grid[row])-1 && currentValue >= grid[row][col+1] {
-		return false
-	}
-	return true
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	grid2 "aoc/internal/gridutil"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"strings"
@@ -21,18 +21,18 @@ func main() {
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	grid := grid2.NewGrid2D[int](false)
+	grid := gridutil.NewGrid2D[int](false)
 
 	for _, line := range lines {
 		splitted := strings.Split(line, " -> ")
 		startSplitted := strings.Split(splitted[0], ",")
 		endSplitted := strings.Split(splitted[1], ",")
 
-		start := grid2.Coordinate{
+		start := gridutil.Coordinate{
 			Col: conv.MustAtoi(startSplitted[0]),
 			Row: conv.MustAtoi(startSplitted[1]),
 		}
-		end := grid2.Coordinate{
+		end := gridutil.Coordinate{
 			Col: conv.MustAtoi(endSplitted[0]),
 			Row: conv.MustAtoi(endSplitted[1]),
 		}
@@ -74,18 +74,18 @@ func part1(input string) {
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	grid := grid2.NewGrid2D[int](false)
+	grid := gridutil.NewGrid2D[int](false)
 
 	for _, line := range lines {
 		splitted := strings.Split(line, " -> ")
 		startSplitted := strings.Split(splitted[0], ",")
 		endSplitted := strings.Split(splitted[1], ",")
 
-		start := grid2.Coordinate{
+		start := gridutil.Coordinate{
 			Col: conv.MustAtoi(startSplitted[0]),
 			Row: conv.MustAtoi(startSplitted[1]),
 		}
-		end := grid2.Coordinate{
+		end := gridutil.Coordinate{
 			Col: conv.MustAtoi(endSplitted[0]),
 			Row: conv.MustAtoi(endSplitted[1]),
 		}
