@@ -133,7 +133,7 @@ func part1and2(input string) {
 		}
 		lines = append(lines, parsed)
 	}
-	fmt.Println(magnitude(reduce(add, lines)))
+	fmt.Println("Part 1", magnitude(reduce(add, lines)))
 
 	var maxMagnitude float64 = 0
 	for i := 0; i < len(lines); i++ {
@@ -146,5 +146,5 @@ func part1and2(input string) {
 			}
 		}
 	}
-	fmt.Println(maxMagnitude)
+	fmt.Println("Part 2", maxMagnitude)
 }
