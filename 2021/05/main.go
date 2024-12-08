@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
+	grid2 "aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"strings"
@@ -20,108 +20,128 @@ func main() {
 }
 
 func part1(input string) {
-	var grid [1000][1000]int
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
+	lines := conv.SplitNewline(input)
+	grid := grid2.NewGrid2D[int](false)
 
+	for _, line := range lines {
 		splitted := strings.Split(line, " -> ")
-
 		startSplitted := strings.Split(splitted[0], ",")
 		endSplitted := strings.Split(splitted[1], ",")
-		startX := conv.MustAtoi(startSplitted[0])
-		startY := conv.MustAtoi(startSplitted[1])
-		endX := conv.MustAtoi(endSplitted[0])
-		endY := conv.MustAtoi(endSplitted[1])
 
-		if startX == endX {
-			start, end := startY, endY
-			if start > end {
-				start, end = end, start
+		start := grid2.Coordinate{
+			Col: conv.MustAtoi(startSplitted[0]),
+			Row: conv.MustAtoi(startSplitted[1]),
+		}
+		end := grid2.Coordinate{
+			Col: conv.MustAtoi(endSplitted[0]),
+			Row: conv.MustAtoi(endSplitted[1]),
+		}
+
+		if start.Col == end.Col {
+			startY, endY := start.Row, end.Row
+			if startY > endY {
+				startY, endY = endY, startY
 			}
-			for y := start; y <= end; y++ {
-				grid[y][startX] += 1
+			for y := startY; y <= endY; y++ {
+				val, _ := grid.Get(y, start.Col)
+				grid.Set(y, start.Col, val+1)
 			}
-		} else if startY == endY {
-			start, end := startX, endX
-			if start > end {
-				start, end = end, start
+		} else if start.Row == end.Row {
+			startX, endX := start.Col, end.Col
+			if startX > endX {
+				startX, endX = endX, startX
 			}
-			for x := start; x <= end; x++ {
-				grid[startY][x] += 1
+			for x := startX; x <= endX; x++ {
+				val, _ := grid.Get(start.Row, x)
+				grid.Set(start.Row, x, val+1)
 			}
 		}
 	}
 
 	count := 0
-	for x := 0; x < len(grid); x++ {
-		for y := 0; y < len(grid[x]); y++ {
-			if grid[x][y] >= 2 {
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			if val, ok := grid.Get(row, col); ok && val >= 2 {
 				count++
 			}
 		}
 	}
 
-	fmt.Println(count)
+	fmt.Println("Part 1", count)
 }
 
 func part2(input string) {
-	var grid [1000][1000]int
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
+	lines := conv.SplitNewline(input)
+	grid := grid2.NewGrid2D[int](false)
 
+	for _, line := range lines {
 		splitted := strings.Split(line, " -> ")
-
 		startSplitted := strings.Split(splitted[0], ",")
 		endSplitted := strings.Split(splitted[1], ",")
-		startX := conv.MustAtoi(startSplitted[0])
-		startY := conv.MustAtoi(startSplitted[1])
-		endX := conv.MustAtoi(endSplitted[0])
-		endY := conv.MustAtoi(endSplitted[1])
 
-		if startX == endX {
-			start, end := startY, endY
-			if start > end {
-				start, end = end, start
+		start := grid2.Coordinate{
+			Col: conv.MustAtoi(startSplitted[0]),
+			Row: conv.MustAtoi(startSplitted[1]),
+		}
+		end := grid2.Coordinate{
+			Col: conv.MustAtoi(endSplitted[0]),
+			Row: conv.MustAtoi(endSplitted[1]),
+		}
+
+		if start.Col == end.Col {
+			startY, endY := start.Row, end.Row
+			if startY > endY {
+				startY, endY = endY, startY
 			}
-			for y := start; y <= end; y++ {
-				grid[y][startX] += 1
+			for y := startY; y <= endY; y++ {
+				val, _ := grid.Get(y, start.Col)
+				grid.Set(y, start.Col, val+1)
 			}
-		} else if startY == endY {
-			start, end := startX, endX
-			if start > end {
-				start, end = end, start
+		} else if start.Row == end.Row {
+			startX, endX := start.Col, end.Col
+			if startX > endX {
+				startX, endX = endX, startX
 			}
-			for x := start; x <= end; x++ {
-				grid[startY][x] += 1
+			for x := startX; x <= endX; x++ {
+				val, _ := grid.Get(start.Row, x)
+				grid.Set(start.Row, x, val+1)
 			}
 		} else {
-			incrX := 1
-			if startX > endX {
-				incrX = -1
+			// Diagonal lines
+			dx := 1
+			if start.Col > end.Col {
+				dx = -1
 			}
-			incrY := 1
-			if startY > endY {
-				incrY = -1
+			dy := 1
+			if start.Row > end.Row {
+				dy = -1
 			}
-			for x, y := startX, startY; ; x, y = x+incrX, y+incrY {
-				grid[y][x] += 1
-				if y == endY {
+
+			x, y := start.Col, start.Row
+			for {
+				val, _ := grid.Get(y, x)
+				grid.Set(y, x, val+1)
+				if x == end.Col {
 					break
 				}
+				x += dx
+				y += dy
 			}
 		}
 	}
 
 	count := 0
-	for x := 0; x < len(grid); x++ {
-		for y := 0; y < len(grid[x]); y++ {
-			if grid[x][y] >= 2 {
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			if val, ok := grid.Get(row, col); ok && val >= 2 {
 				count++
 			}
 		}
 	}
 
-	fmt.Println(count)
+	fmt.Println("Part 2", count)
 }
