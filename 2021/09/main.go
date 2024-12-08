@@ -113,7 +113,7 @@ func findBasinSize(grid gridutil.Grid2D[int], start gridutil.Coordinate) int {
 	return crawl(grid, start, visited)
 }
 
-func crawl(grid gridutil.Grid2D[int], coord gridutil.Coordinate, visited container.Set[gridutil.Coordinate]) int {
+func crawl(grid gridutil.Grid2D[int], coord gridutil.Coordinate, visited *container.Set[gridutil.Coordinate]) int {
 	if visited.Contains(coord) {
 		return 0
 	}
