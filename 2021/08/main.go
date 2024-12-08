@@ -1,13 +1,32 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
+	"aoc/internal/mathx"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
+)
+
+type segments [7]bool
+
+var (
+	zero  = segments{true, true, true, false, true, true, true}
+	one   = segments{false, false, true, false, false, true, false}
+	two   = segments{true, false, true, true, true, false, true}
+	three = segments{true, false, true, true, false, true, true}
+	four  = segments{false, true, true, true, false, true, false}
+	five  = segments{true, true, false, true, false, true, true}
+	six   = segments{true, true, false, true, true, true, true}
+	seven = segments{true, false, true, false, false, true, false}
+	eight = segments{true, true, true, true, true, true, true}
+	nine  = segments{true, true, true, true, false, true, true}
+
+	numbers = [10]segments{
+		zero, one, two, three, four, five, six, seven, eight, nine,
+	}
 )
 
 func main() {
@@ -21,147 +40,86 @@ func main() {
 }
 
 func part1(input string) {
+	lines := conv.SplitNewline(input)
 	count := 0
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
 
-		pos := strings.IndexAny(line, "|")
-		ins := strings.Fields(line[pos+1:])
-		for _, in := range ins {
-			l := len(in)
-			if l == 2 || l == 3 || l == 4 || l == 7 {
+	for _, line := range lines {
+		pos := strings.IndexByte(line, '|')
+		outputs := strings.Fields(line[pos+1:])
+		for _, output := range outputs {
+			switch len(output) {
+			case 2, 3, 4, 7: // digits 1, 7, 4, 8
 				count++
 			}
 		}
 	}
 
-	fmt.Println(count)
+	fmt.Println("Part 1", count)
 }
 
 func part2(input string) {
-	zero := [7]bool{true, true, true, false, true, true, true}
-	one := [7]bool{false, false, true, false, false, true, false}
-	two := [7]bool{true, false, true, true, true, false, true}
-	three := [7]bool{true, false, true, true, false, true, true}
-	four := [7]bool{false, true, true, true, false, true, false}
-	five := [7]bool{true, true, false, true, false, true, true}
-	six := [7]bool{true, true, false, true, true, true, true}
-	seven := [7]bool{true, false, true, false, false, true, false}
-	eight := [7]bool{true, true, true, true, true, true, true}
-	nine := [7]bool{true, true, true, true, false, true, true}
-
-	numbers := [10][7]bool{
-		zero, one, two, three, four, five, six, seven, eight, nine,
-	}
-	allAgPermutations := agPermutations()
-
+	lines := conv.SplitNewline(input)
 	sum := 0
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
-		pos := strings.IndexAny(line, "|")
-		ins := strings.Fields(line[:pos])
-		for _, agPerm := range allAgPermutations {
-			var ok [10]bool
-			for _, in := range ins {
-				num := convertToSegment(agPerm, in)
-				number := findPattern(numbers, num)
-				if number == -1 || ok[number] {
-					break
-				} else {
-					ok[number] = true
-				}
-			}
 
-			if allTrue(ok) {
-				pos := strings.IndexAny(line, "|")
-				outs := strings.Fields(line[pos+1:])
-				outnumbers := ""
-				for _, out := range outs {
-					num := convertToSegment(agPerm, out)
-					outnum := findPattern(numbers, num)
-					outnumbers += strconv.Itoa(outnum)
+	// Generate all possible segment permutations
+	chars := []string{"a", "b", "c", "d", "e", "f", "g"}
+	allPermutations := mathx.Permutations(chars)
+
+	for _, line := range lines {
+		pos := strings.IndexByte(line, '|')
+		patterns := strings.Fields(line[:pos])
+		outputs := strings.Fields(line[pos+1:])
+
+		// Try each permutation until we find one that works
+		for _, perm := range allPermutations {
+			if isValidPermutation(patterns, perm) {
+				// Convert output digits using the valid permutation
+				value := 0
+				for _, output := range outputs {
+					seg := convertToSegments(perm, output)
+					digit := findPattern(seg)
+					value = value*10 + digit
 				}
-				outnumbersi := conv.MustAtoi(outnumbers)
-				sum += outnumbersi
+				sum += value
 				break
 			}
 		}
 	}
 
-	fmt.Println(sum)
+	fmt.Println("Part 2", sum)
 }
 
-func convertToSegment(agPerm []string, str string) [7]bool {
-	var num [7]bool
-	for _, c := range str {
-		pos := index(agPerm, string(c))
-		num[pos] = true
-	}
-	return num
-}
-
-func allTrue(ok [10]bool) bool {
-	for _, o := range ok {
-		if !o {
+func isValidPermutation(patterns []string, perm []string) bool {
+	seen := container.NewSet[int]()
+	for _, pattern := range patterns {
+		seg := convertToSegments(perm, pattern)
+		digit := findPattern(seg)
+		if digit == -1 || seen.Contains(digit) {
 			return false
 		}
+		seen.Add(digit)
 	}
-	return true
+	return seen.Len() == 10
 }
 
-func findPattern(numbers [10][7]bool, num [7]bool) int {
-	for numberix, number := range numbers {
-		allOk := true
-		for i := 0; i < len(number); i++ {
-			if number[i] != num[i] {
-				allOk = false
+func convertToSegments(perm []string, str string) segments {
+	var result segments
+	for _, c := range str {
+		for i, p := range perm {
+			if p == string(c) {
+				result[i] = true
 				break
 			}
 		}
-		if allOk {
-			return numberix
+	}
+	return result
+}
+
+func findPattern(seg segments) int {
+	for i, pattern := range numbers {
+		if pattern == seg {
+			return i
 		}
 	}
 	return -1
-}
-
-func index(arr []string, p string) int {
-	for ix, v := range arr {
-		if v == p {
-			return ix
-		}
-	}
-	return -1
-}
-
-func agPermutations() [][]string {
-	arr := []string{"a", "b", "c", "d", "e", "f", "g"}
-
-	var helper func([]string, int)
-	var res [][]string
-
-	helper = func(arr []string, n int) {
-		if n == 1 {
-			tmp := make([]string, len(arr))
-			copy(tmp, arr)
-			res = append(res, tmp)
-		} else {
-			for i := 0; i < n; i++ {
-				helper(arr, n-1)
-				if n%2 == 1 {
-					tmp := arr[i]
-					arr[i] = arr[n-1]
-					arr[n-1] = tmp
-				} else {
-					tmp := arr[0]
-					arr[0] = arr[n-1]
-					arr[n-1] = tmp
-				}
-			}
-		}
-	}
-	helper(arr, len(arr))
-	return res
 }
