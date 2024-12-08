@@ -1,21 +1,18 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"strings"
 )
 
-type point struct {
-	x, y int
-}
-
 type fold struct {
-	dir string
-	val int
+	axis byte // 'x' or 'y'
+	pos  int
 }
 
 func main() {
@@ -29,136 +26,43 @@ func main() {
 }
 
 func part1(input string) {
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	var folds []fold
+	dots, folds := parseInput(input)
 
-	grid := make(map[point]struct{})
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "fold along ") {
-			blank := strings.LastIndex(line, " ")
-			l := line[blank+1:]
-			ls := strings.Split(l, "=")
-			val := conv.MustAtoi(ls[1])
-			folds = append(folds, fold{
-				dir: ls[0],
-				val: val,
-			})
-		} else if len(line) > 0 {
-			splitted := strings.Split(line, ",")
-			x := conv.MustAtoi(splitted[0])
-			y := conv.MustAtoi(splitted[1])
-			grid[point{
-				x: x,
-				y: y,
-			}] = struct{}{}
-		}
+	// Only perform first fold
+	if len(folds) > 0 {
+		dots = performFold(dots, folds[0])
 	}
 
-	ff := folds[0]
-
-	for k := range grid {
-		var np point
-		hasnp := false
-		if k.x > ff.val && ff.dir == "x" {
-			np = point{
-				x: ff.val - (k.x - ff.val),
-				y: k.y,
-			}
-			hasnp = true
-		} else if k.y > ff.val && ff.dir == "y" {
-			np = point{
-				x: k.x,
-				y: ff.val - (k.y - ff.val),
-			}
-			hasnp = true
-		}
-		if hasnp {
-			if _, ok := grid[np]; !ok {
-				grid[np] = struct{}{}
-			}
-			delete(grid, k)
-		}
-
-	}
-
-	fmt.Println(len(grid))
+	fmt.Println("Part 1", dots.Len())
 }
 
 func part2(input string) {
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	var folds []fold
+	dots, folds := parseInput(input)
 
-	grid := make(map[point]struct{})
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "fold along ") {
-			blank := strings.LastIndex(line, " ")
-			l := line[blank+1:]
-			ls := strings.Split(l, "=")
-			val := conv.MustAtoi(ls[1])
-			folds = append(folds, fold{
-				dir: ls[0],
-				val: val,
-			})
-		} else if len(line) > 0 {
-			splitted := strings.Split(line, ",")
-			x := conv.MustAtoi(splitted[0])
-			y := conv.MustAtoi(splitted[1])
-			grid[point{
-				x: x,
-				y: y,
-			}] = struct{}{}
-		}
+	// Perform all folds
+	for _, f := range folds {
+		dots = performFold(dots, f)
 	}
 
-	for _, ff := range folds {
-		for k := range grid {
-			var np point
-			hasnp := false
-			if k.x > ff.val && ff.dir == "x" {
-				np = point{
-					x: ff.val - (k.x - ff.val),
-					y: k.y,
-				}
-				hasnp = true
-			} else if k.y > ff.val && ff.dir == "y" {
-				np = point{
-					x: k.x,
-					y: ff.val - (k.y - ff.val),
-				}
-				hasnp = true
-			}
-			if hasnp {
-				if _, ok := grid[np]; !ok {
-					grid[np] = struct{}{}
-				}
-				delete(grid, k)
-			}
+	// Create grid for visualization
+	grid := gridutil.NewGrid2D[bool](false)
+	maxX, maxY := 0, 0
+
+	for _, dot := range dots.Values() {
+		if dot.Col > maxX {
+			maxX = dot.Col
 		}
+		if dot.Row > maxY {
+			maxY = dot.Row
+		}
+		grid.SetC(dot, true)
 	}
 
-	fmt.Println(len(grid))
-
-	minX := 0
-	minY := 0
-	for k := range grid {
-		if k.x > minX {
-			minX = k.x
-		}
-		if k.y > minY {
-			minY = k.y
-		}
-	}
-
-	for y := 0; y <= minY; y++ {
-		for x := 0; x <= minX; x++ {
-			if _, ok := grid[point{
-				x: x,
-				y: y,
-			}]; ok {
+	// Print result
+	fmt.Println("Final pattern:")
+	for row := 0; row <= maxY; row++ {
+		for col := 0; col <= maxX; col++ {
+			if val, _ := grid.Get(row, col); val {
 				fmt.Print("#")
 			} else {
 				fmt.Print(".")
@@ -166,4 +70,62 @@ func part2(input string) {
 		}
 		fmt.Println()
 	}
+}
+
+func parseInput(input string) (*container.Set[gridutil.Coordinate], []fold) {
+	lines := conv.SplitNewline(input)
+	dots := container.NewSet[gridutil.Coordinate]()
+	var folds []fold
+
+	// Parse input into dots and folds
+	parsingDots := true
+	for _, line := range lines {
+		if line == "" {
+			parsingDots = false
+			continue
+		}
+
+		if parsingDots {
+			parts := strings.Split(line, ",")
+			x := conv.MustAtoi(parts[0])
+			y := conv.MustAtoi(parts[1])
+			dots.Add(gridutil.Coordinate{Row: y, Col: x})
+		} else {
+			parts := strings.Split(line[11:], "=") // Remove "fold along "
+			folds = append(folds, fold{
+				axis: parts[0][0], // 'x' or 'y'
+				pos:  conv.MustAtoi(parts[1]),
+			})
+		}
+	}
+
+	return dots, folds
+}
+
+func performFold(dots *container.Set[gridutil.Coordinate], f fold) *container.Set[gridutil.Coordinate] {
+	newDots := container.NewSet[gridutil.Coordinate]()
+
+	for _, dot := range dots.Values() {
+		var newDot gridutil.Coordinate
+		if f.axis == 'x' && dot.Col > f.pos {
+			// Fold left
+			newDot = gridutil.Coordinate{
+				Row: dot.Row,
+				Col: f.pos - (dot.Col - f.pos),
+			}
+			newDots.Add(newDot)
+		} else if f.axis == 'y' && dot.Row > f.pos {
+			// Fold up
+			newDot = gridutil.Coordinate{
+				Row: f.pos - (dot.Row - f.pos),
+				Col: dot.Col,
+			}
+			newDots.Add(newDot)
+		} else {
+			// Point stays the same
+			newDots.Add(dot)
+		}
+	}
+
+	return newDots
 }
