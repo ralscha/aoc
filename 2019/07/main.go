@@ -136,7 +136,7 @@ func part1(input string) {
 			maxSignal = signal
 		}
 	}
-	fmt.Println("Part 1:", maxSignal)
+	fmt.Println("Part 1", maxSignal)
 }
 
 type amplifier2 struct {
@@ -277,5 +277,5 @@ func part2(input string) {
 			maxSignal = signal
 		}
 	}
-	fmt.Println("Part 2:", maxSignal)
+	fmt.Println("Part 2", maxSignal)
 }

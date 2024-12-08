@@ -61,7 +61,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Part 1:", result)
+	fmt.Println("Part 1", result)
 }
 
 func part2(input string) {
@@ -96,7 +96,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Part 2:")
+	fmt.Println("Part 2")
 	for row := 0; row < height; row++ {
 		for col := 0; col < width; col++ {
 			pixel, _ := finalImage.Get(row, col)

@@ -34,7 +34,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Part 1:", numbers[0])
+	fmt.Println("Part 1", numbers[0])
 }
 
 func part2(input string) {
@@ -60,7 +60,7 @@ func part2(input string) {
 			}
 
 			if numbers[0] == 19690720 {
-				fmt.Println("Part 2:", 100*noun+verb)
+				fmt.Println("Part 2", 100*noun+verb)
 				return
 			}
 		}

@@ -52,7 +52,7 @@ func part1(input string, sue map[string]int) {
 			}
 		}
 		if match {
-			fmt.Println("Part 1: ", sueNumber)
+			fmt.Println("Part 1 ", sueNumber)
 		}
 	}
 }
@@ -90,7 +90,7 @@ func part2(input string, sue map[string]int) {
 			}
 		}
 		if match {
-			fmt.Println("Part 2: ", sueNumber)
+			fmt.Println("Part 2 ", sueNumber)
 		}
 	}
 }

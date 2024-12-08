@@ -32,7 +32,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Part 1:", count)
+	fmt.Println("Part 1", count)
 }
 
 func isValidPassword(pw int) bool {
@@ -40,7 +40,7 @@ func isValidPassword(pw int) bool {
 	if !stringutil.HasRepeatedChar(pwStr) {
 		return false
 	}
-	
+
 	// Check if digits are non-decreasing
 	for i := 0; i < len(pwStr)-1; i++ {
 		if pwStr[i] > pwStr[i+1] {
@@ -64,7 +64,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Part 2:", count)
+	fmt.Println("Part 2", count)
 }
 
 func isValidPassword2(pw int) bool {

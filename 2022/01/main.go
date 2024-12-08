@@ -31,11 +31,11 @@ func main() {
 		return elves[i] > elves[j]
 	})
 
-	fmt.Printf("Largest amount of calories is %d\n", elves[0])
+	fmt.Println("Part 1", elves[0])
 
 	sum := 0
 	for i := 0; i < 3; i++ {
 		sum += elves[i]
 	}
-	fmt.Printf("Calories of top 3 elves is %d\n", sum)
+	fmt.Println("Part 2", sum)
 }

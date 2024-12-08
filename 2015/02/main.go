@@ -23,7 +23,7 @@ func main() {
 		totalRibbon += 2*min(l+w, w+h, h+l) + l*w*h
 	}
 
-	fmt.Printf("Total wrapping paper: %d\n", totalWrappingPaper)
-	fmt.Printf("Total ribbon: %d\n", totalRibbon)
+	fmt.Println("Part 1", totalWrappingPaper)
+	fmt.Println("Part 2", totalRibbon)
 
 }

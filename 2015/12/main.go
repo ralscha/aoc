@@ -24,10 +24,10 @@ func part1and2(input string) {
 	}
 
 	total := walk(v)
-	fmt.Printf("Total: %d\n", total)
+	fmt.Println("Part 1", total)
 
 	total = walkIgnoreRed(v)
-	fmt.Printf("Total: %d", total)
+	fmt.Println("Part 2", total)
 
 }
 

@@ -37,7 +37,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Part 1:", len(distinctMolecules))
+	fmt.Println("Part 1", len(distinctMolecules))
 }
 
 func part2(input string) {
@@ -62,7 +62,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Part 2:", steps)
+	fmt.Println("Part 2", steps)
 }
 
 func convertInput(lines []string) ([]replacement, string) {

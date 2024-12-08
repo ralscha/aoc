@@ -46,8 +46,8 @@ func part1and2(input string) {
 
 	player := player{100, 0, 0}
 	minCost, maxCost := getMinMaxCost(player, boss)
-	fmt.Printf("Part 1: %d\n", minCost)
-	fmt.Printf("Part 2: %d", maxCost)
+	fmt.Println("Part 1", minCost)
+	fmt.Println("Part 2", maxCost)
 
 }
 

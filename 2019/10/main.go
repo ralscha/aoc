@@ -44,7 +44,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Part 1:", maxVisible)
+	fmt.Println("Part 1", maxVisible)
 }
 
 func slope(a, b gridutil.Coordinate) gridutil.Coordinate {
@@ -142,7 +142,7 @@ func part2(input string) {
 			}
 			count++
 			if count == 200 {
-				fmt.Println("Part 2:", points[0].Col*100+points[0].Row)
+				fmt.Println("Part 2", points[0].Col*100+points[0].Row)
 			}
 			byAngle[angle] = points[1:]
 			if len(byAngle[angle]) == 0 {

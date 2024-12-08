@@ -73,5 +73,5 @@ func part1(input string) {
 		}
 		turn++
 	}
-	fmt.Println(turn)
+	fmt.Println("Part 1", turn)
 }

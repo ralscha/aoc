@@ -29,8 +29,8 @@ func main() {
 
 	maxRows := len(lines)
 	maxCols := len(lines[0])
-	fmt.Println("Part 1:", findAntinodes(antennas, maxRows, maxCols, false).Len())
-	fmt.Println("Part 2:", findAntinodes(antennas, maxRows, maxCols, true).Len())
+	fmt.Println("Part 1", findAntinodes(antennas, maxRows, maxCols, false).Len())
+	fmt.Println("Part 2", findAntinodes(antennas, maxRows, maxCols, true).Len())
 }
 
 func findAntinodes(antennas map[rune][]gridutil.Coordinate, rows, cols int, part2 bool) *container.Set[gridutil.Coordinate] {
