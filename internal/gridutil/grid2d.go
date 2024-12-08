@@ -60,6 +60,11 @@ func Get8Directions() []Direction {
 	return directions8
 }
 
+// Get4Directions returns a slice containing the 4 cardinal directions.
+func Get4Directions() []Direction {
+	return directions4
+}
+
 // TurnLeft returns a new direction after rotating the given direction 90 degrees counterclockwise.
 func TurnLeft(direction Direction) Direction {
 	switch direction {
