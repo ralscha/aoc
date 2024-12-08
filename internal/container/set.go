@@ -37,3 +37,12 @@ func (s Set[T]) Contains(data T) bool {
 func (s Set[T]) Len() int {
 	return len(s.m)
 }
+
+// Values returns a slice of all elements in the set.
+func (s Set[T]) Values() []T {
+	values := make([]T, 0, len(s.m))
+	for k := range s.m {
+		values = append(values, k)
+	}
+	return values
+}
