@@ -4,7 +4,6 @@ import (
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
-	"golang.org/x/exp/maps"
 	"log"
 	"slices"
 	"strings"
@@ -64,7 +63,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println(counts[maxCounts] - counts[minCounts])
+	fmt.Println("Part 1", counts[maxCounts]-counts[minCounts])
 }
 
 func part2(input string) {
@@ -103,9 +102,12 @@ func part2(input string) {
 		chars[k[1:]] += v
 	}
 
-	values := maps.Values(chars)
+	var values []int
+	for _, v := range chars {
+		values = append(values, v)
+	}
 	maxValue := slices.Max(values)
 	minValue := slices.Min(values)
 
-	fmt.Println((maxValue-minValue)/2 + 1)
+	fmt.Println("Part 2", (maxValue-minValue)/2+1)
 }
