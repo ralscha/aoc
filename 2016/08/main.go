@@ -44,20 +44,11 @@ func part1and2(lines []string) {
 			index := conv.MustAtoi(rotate[equalsIndex+1 : byIndex])
 			amount := conv.MustAtoi(rotate[byIndex+4:])
 
-			// Create a copy of the grid for rotation
-			gridCopy := grid.Copy()
-
 			switch axis {
 			case "row":
-				for x := 0; x < 50; x++ {
-					val, _ := gridCopy.Get(index, x)
-					grid.Set(index, (x+amount)%50, val)
-				}
+				grid.RotateRow(index, amount)
 			case "column":
-				for y := 0; y < 6; y++ {
-					val, _ := gridCopy.Get(y, index)
-					grid.Set((y+amount)%6, index, val)
-				}
+				grid.RotateColumn(index, amount)
 			}
 		}
 	}

@@ -305,3 +305,61 @@ func (g Grid2D[T]) GetNeighboursC(coord Coordinate, directions []Direction) []T 
 	}
 	return neighbours
 }
+
+// RotateRow rotates the values in the specified row by the given amount.
+// Positive amount rotates right, negative amount rotates left.
+func (g *Grid2D[T]) RotateRow(row, amount int) {
+	width := g.Width()
+	if width == 0 {
+		return
+	}
+
+	// Normalize amount to be within grid width
+	amount = ((amount % width) + width) % width
+	if amount == 0 {
+		return
+	}
+
+	// Create a temporary copy of the row
+	temp := make([]T, width)
+	for i := 0; i < width; i++ {
+		if val, ok := g.Get(row, g.minCol+i); ok {
+			temp[i] = val
+		}
+	}
+
+	// Rotate and set values back
+	for i := 0; i < width; i++ {
+		newPos := (i + amount) % width
+		g.Set(row, g.minCol+newPos, temp[i])
+	}
+}
+
+// RotateColumn rotates the values in the specified column by the given amount.
+// Positive amount rotates down, negative amount rotates up.
+func (g *Grid2D[T]) RotateColumn(col, amount int) {
+	height := g.Height()
+	if height == 0 {
+		return
+	}
+
+	// Normalize amount to be within grid height
+	amount = ((amount % height) + height) % height
+	if amount == 0 {
+		return
+	}
+
+	// Create a temporary copy of the column
+	temp := make([]T, height)
+	for i := 0; i < height; i++ {
+		if val, ok := g.Get(g.minRow+i, col); ok {
+			temp[i] = val
+		}
+	}
+
+	// Rotate and set values back
+	for i := 0; i < height; i++ {
+		newPos := (i + amount) % height
+		g.Set(g.minRow+newPos, col, temp[i])
+	}
+}
