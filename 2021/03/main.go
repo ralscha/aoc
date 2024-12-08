@@ -3,11 +3,9 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 )
 
 func main() {
@@ -21,17 +19,16 @@ func main() {
 }
 
 func part1(input string) {
+	lines := conv.SplitNewline(input)
 	var ones [12]int32
 	var zeros [12]int32
 
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
+	for _, line := range lines {
 		for ix, c := range line {
 			if c-'0' == 0 {
-				zeros[ix] += 1
+				zeros[ix]++
 			} else {
-				ones[ix] += 1
+				ones[ix]++
 			}
 		}
 	}
@@ -57,19 +54,15 @@ func part1(input string) {
 	if err != nil {
 		log.Fatalf("ParseInt failed: %s %v", epsilon, err)
 	}
-	fmt.Println(gammaNumber * epsilonNumber)
-	fmt.Println()
+	fmt.Println("Part 1", gammaNumber*epsilonNumber)
 }
 
 func part2(input string) {
-	var input1 []string
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
-		input1 = append(input1, line)
-	}
-	input2 := make([]string, len(input1))
-	copy(input2, input1)
+	lines := conv.SplitNewline(input)
+	input1 := make([]string, len(lines))
+	copy(input1, lines)
+	input2 := make([]string, len(lines))
+	copy(input2, lines)
 
 	for i := 0; i < 12; i++ {
 		if len(input1) > 1 {
@@ -87,30 +80,25 @@ func part2(input string) {
 		log.Fatalf("Wrong calculation")
 	}
 
-	fmt.Println(input1[0])
 	oxygen, err := strconv.ParseInt(input1[0], 2, 64)
 	if err != nil {
 		log.Fatalf("ParseInt failed: %s %v", input1[0], err)
 	}
-	fmt.Println(input2[0])
 	co2, err := strconv.ParseInt(input2[0], 2, 64)
 	if err != nil {
 		log.Fatalf("ParseInt failed: %s %v", input2[0], err)
 	}
 
-	fmt.Println(oxygen * co2)
+	fmt.Println("Part 2", oxygen*co2)
 }
 
 func count(lines []string, pos int, one bool) int {
-	var ones int
-	var zeros int
+	var ones, zeros int
 	for _, line := range lines {
-		chars := []rune(line)
-		c := chars[pos]
-		if c-'0' == 0 {
-			zeros += 1
+		if line[pos] == '0' {
+			zeros++
 		} else {
-			ones += 1
+			ones++
 		}
 	}
 	if one {
@@ -129,9 +117,7 @@ func count(lines []string, pos int, one bool) int {
 func filter(lines []string, winner, pos int) []string {
 	var filtered []string
 	for _, line := range lines {
-		char := line[pos : pos+1]
-		n := conv.MustAtoi(char)
-		if n == winner {
+		if int(line[pos]-'0') == winner {
 			filtered = append(filtered, line)
 		}
 	}
