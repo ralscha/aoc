@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"math"
@@ -19,8 +20,8 @@ func main() {
 }
 
 type point struct {
-	x, y                 int
-	velocityX, velocityY int
+	pos      gridutil.Coordinate
+	velocity gridutil.Direction
 }
 
 func part1and2(input string) {
@@ -35,10 +36,14 @@ func part1and2(input string) {
 		posSplitted := strings.Split(pos, ",")
 		velocitySplitted := strings.Split(velocity, ",")
 
-		points[i].x = conv.MustAtoi(strings.TrimSpace(posSplitted[0]))
-		points[i].y = conv.MustAtoi(strings.TrimSpace(posSplitted[1]))
-		points[i].velocityX = conv.MustAtoi(strings.TrimSpace(velocitySplitted[0]))
-		points[i].velocityY = conv.MustAtoi(strings.TrimSpace(velocitySplitted[1]))
+		points[i].pos = gridutil.Coordinate{
+			Col: conv.MustAtoi(strings.TrimSpace(posSplitted[0])),
+			Row: conv.MustAtoi(strings.TrimSpace(posSplitted[1])),
+		}
+		points[i].velocity = gridutil.Direction{
+			Col: conv.MustAtoi(strings.TrimSpace(velocitySplitted[0])),
+			Row: conv.MustAtoi(strings.TrimSpace(velocitySplitted[1])),
+		}
 	}
 
 	minBoundingBox := math.MaxInt
@@ -51,8 +56,8 @@ func part1and2(input string) {
 		maxY := math.MinInt
 
 		for _, p := range points {
-			x := p.x + i*p.velocityX
-			y := p.y + i*p.velocityY
+			x := p.pos.Col + i*p.velocity.Col
+			y := p.pos.Row + i*p.velocity.Row
 
 			if x < minX {
 				minX = x
@@ -81,8 +86,8 @@ func part1and2(input string) {
 	minY := math.MaxInt
 	maxY := math.MinInt
 	for _, p := range points {
-		x := p.x + minBoundingBoxIndex*p.velocityX
-		y := p.y + minBoundingBoxIndex*p.velocityY
+		x := p.pos.Col + minBoundingBoxIndex*p.velocity.Col
+		y := p.pos.Row + minBoundingBoxIndex*p.velocity.Row
 
 		if x < minX {
 			minX = x
@@ -98,23 +103,31 @@ func part1and2(input string) {
 		}
 	}
 
-	canvas := make([][]rune, maxY-minY+1)
-	for i := range canvas {
-		canvas[i] = make([]rune, maxX-minX+1)
-		for j := range canvas[i] {
-			canvas[i][j] = ' '
+	grid := gridutil.NewGrid2D[rune](false)
+	grid.SetMinRowCol(minY, minX)
+	grid.SetMaxRowCol(maxY, maxX)
+
+	// Initialize grid with spaces
+	for row := minY; row <= maxY; row++ {
+		for col := minX; col <= maxX; col++ {
+			grid.Set(row, col, ' ')
 		}
 	}
 
+	// Plot points
 	for _, p := range points {
-		x := p.x + minBoundingBoxIndex*p.velocityX
-		y := p.y + minBoundingBoxIndex*p.velocityY
-
-		canvas[y-minY][x-minX] = '*'
+		x := p.pos.Col + minBoundingBoxIndex*p.velocity.Col
+		y := p.pos.Row + minBoundingBoxIndex*p.velocity.Row
+		grid.Set(y, x, '*')
 	}
 
-	for _, line := range canvas {
-		fmt.Println(string(line))
+	// Print grid
+	for row := minY; row <= maxY; row++ {
+		for col := minX; col <= maxX; col++ {
+			if val, ok := grid.Get(row, col); ok {
+				fmt.Printf("%c", val)
+			}
+		}
+		fmt.Println()
 	}
-
 }

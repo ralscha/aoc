@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -21,7 +22,7 @@ func main() {
 type guard struct {
 	id      int
 	asleep  int
-	minutes [60]int
+	minutes *container.Bag[int]
 }
 
 type guardLog struct {
@@ -52,17 +53,24 @@ func part1and2(input string) {
 		case "falls asleep":
 			asleep = conv.MustAtoi(gl.date[15:17])
 		case "wakes up":
+			if currentGuard == nil {
+				log.Fatalf("no guard found")
+			}
 			minute := conv.MustAtoi(gl.date[15:17])
 			currentGuard.asleep += minute - asleep + 1
 			for i := asleep; i < minute; i++ {
-				currentGuard.minutes[i]++
+				currentGuard.minutes.Add(i)
 			}
 		default:
 			id := conv.MustAtoi(gl.action[7:strings.Index(gl.action, " begins")])
 			if v, ok := guards[id]; ok {
 				currentGuard = v
 			} else {
-				currentGuard = &guard{id: id}
+				bag := container.NewBag[int]()
+				currentGuard = &guard{
+					id:      id,
+					minutes: &bag,
+				}
 				guards[id] = currentGuard
 			}
 		}
@@ -75,30 +83,39 @@ func part1and2(input string) {
 		}
 	}
 
-	var maxMinute int
+	if maxGuard == nil {
+		log.Fatalf("no max guard found")
+	}
+
+	var maxMinuteCount int
 	var maxMinuteIndex int
 
-	for i, v := range maxGuard.minutes {
-		if v > maxMinute {
-			maxMinute = v
-			maxMinuteIndex = i
+	for minute := 0; minute < 60; minute++ {
+		count := maxGuard.minutes.Count(minute)
+		if count > maxMinuteCount {
+			maxMinuteCount = count
+			maxMinuteIndex = minute
 		}
 	}
 
 	fmt.Println(maxGuard.id * maxMinuteIndex)
 
 	maxGuard = nil
-	maxMinute = 0
+	maxMinuteCount = 0
 	maxMinuteIndex = 0
 
 	for _, g := range guards {
-		for i, v := range g.minutes {
-			if v > maxMinute {
-				maxMinute = v
-				maxMinuteIndex = i
+		for minute := 0; minute < 60; minute++ {
+			count := g.minutes.Count(minute)
+			if count > maxMinuteCount {
+				maxMinuteCount = count
+				maxMinuteIndex = minute
 				maxGuard = g
 			}
 		}
+	}
+	if maxGuard == nil {
+		log.Fatalf("no max guard found")
 	}
 	fmt.Println(maxGuard.id * maxMinuteIndex)
 }
