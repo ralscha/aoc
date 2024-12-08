@@ -5,7 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -38,7 +38,7 @@ func part1(input string) {
 				n := len(stack) - 1
 				cl := stack[n]
 				if s != cl {
-					log.Printf("Expected %s, but found %s instead.", cl, s)
+					// log.Printf("Expected %s, but found %s instead.", cl, s)
 					switch s {
 					case ")":
 						score += 3
@@ -56,7 +56,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println(score)
+	fmt.Println("Part 1", score)
 
 }
 
@@ -109,6 +109,6 @@ func part2(input string) {
 		}
 	}
 
-	sort.Ints(scores)
-	fmt.Println(scores[len(scores)/2])
+	slices.Sort(scores)
+	fmt.Println("Part 2", scores[len(scores)/2])
 }
