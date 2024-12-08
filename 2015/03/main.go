@@ -20,7 +20,7 @@ func main() {
 
 func part1(input string) {
 	visitedHouses := container.NewSet[string]()
-	pos := gridutil.Coordinate{0, 0}
+	pos := gridutil.Coordinate{}
 	visitedHouses.Add(fmt.Sprintf("%d,%d", pos.Row, pos.Col))
 
 	for _, dir := range input {
@@ -37,13 +37,13 @@ func part1(input string) {
 		visitedHouses.Add(fmt.Sprintf("%d,%d", pos.Row, pos.Col))
 	}
 
-	fmt.Println("Number of houses visited:", visitedHouses.Len())
+	fmt.Println("Part 1", visitedHouses.Len())
 }
 
 func part2(input string) {
 	visitedHouses := container.NewSet[string]()
-	santa := gridutil.Coordinate{0, 0}
-	roboSanta := gridutil.Coordinate{0, 0}
+	santa := gridutil.Coordinate{}
+	roboSanta := gridutil.Coordinate{}
 	visitedHouses.Add(fmt.Sprintf("%d,%d", santa.Row, santa.Col))
 
 	for i, dir := range input {
@@ -65,5 +65,5 @@ func part2(input string) {
 		visitedHouses.Add(fmt.Sprintf("%d,%d", pos.Row, pos.Col))
 	}
 
-	fmt.Println("Number of houses visited:", visitedHouses.Len())
+	fmt.Println("Part 2", visitedHouses.Len())
 }

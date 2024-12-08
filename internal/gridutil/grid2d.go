@@ -15,7 +15,7 @@ type Direction struct {
 }
 
 var (
-	// Predefined cardinal directions
+	// DirectionN Predefined cardinal directions
 	DirectionN  = Direction{Row: -1}          // North: Move up one row
 	DirectionS  = Direction{Row: 1}           // South: Move down one row
 	DirectionE  = Direction{Col: 1}           // East: Move right one column
