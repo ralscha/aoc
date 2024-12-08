@@ -38,10 +38,10 @@ func part1(input string) {
 		totalPoints += points
 	}
 
-	println(totalPoints)
+	fmt.Println("Part 1", totalPoints)
 }
 
-func calcPoints(myNumbers []string, winningSet container.Set[string]) (int, int) {
+func calcPoints(myNumbers []string, winningSet *container.Set[string]) (int, int) {
 	points := 0
 	numberOfWinningNumbers := 0
 	for _, y := range myNumbers {
@@ -60,7 +60,7 @@ func calcPoints(myNumbers []string, winningSet container.Set[string]) (int, int)
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 	totalScratchcards := countScratchcards(lines)
-	fmt.Println(totalScratchcards + len(lines))
+	fmt.Println("Part 2", totalScratchcards+len(lines))
 }
 
 var cardCache = make(map[string]int)
