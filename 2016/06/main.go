@@ -20,7 +20,7 @@ func main() {
 
 func part1and2(lines []string) {
 	// Create a bag for each position
-	bags := make([]container.Bag[rune], len(lines[0]))
+	bags := make([]*container.Bag[rune], len(lines[0]))
 	for i := range bags {
 		bags[i] = container.NewBag[rune]()
 	}

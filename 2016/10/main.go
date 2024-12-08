@@ -30,8 +30,7 @@ func part1and2(lines []string) {
 			value := conv.MustAtoi(splitted[1])
 			bot := conv.MustAtoi(splitted[5])
 			if _, ok := bots[bot]; !ok {
-				queue := container.NewQueue[int]()
-				bots[bot] = &queue
+				bots[bot] = container.NewQueue[int]()
 			}
 			bots[bot].Push(value)
 		}
@@ -67,8 +66,7 @@ func part1and2(lines []string) {
 					outputs[low] = minVal
 				} else {
 					if _, ok := bots[low]; !ok {
-						queue := container.NewQueue[int]()
-						bots[low] = &queue
+						bots[low] = container.NewQueue[int]()
 					}
 					bots[low].Push(minVal)
 				}
@@ -77,8 +75,7 @@ func part1and2(lines []string) {
 					outputs[high] = maxVal
 				} else {
 					if _, ok := bots[high]; !ok {
-						queue := container.NewQueue[int]()
-						bots[high] = &queue
+						bots[high] = container.NewQueue[int]()
 					}
 					bots[high].Push(maxVal)
 				}
