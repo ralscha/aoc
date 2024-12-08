@@ -21,8 +21,8 @@ func NewPriorityQueue[T any]() PriorityQueue[T] {
 }
 
 // IsEmpty returns true if the priority queue contains no elements.
-func (q PriorityQueue[T]) IsEmpty() bool {
-	return q.pq.Len() == 0
+func (pq PriorityQueue[T]) IsEmpty() bool {
+	return pq.pq.Len() == 0
 }
 
 // Len returns the number of elements in the priority queue.
