@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	grid2 "aoc/internal/gridutil"
+	"aoc/internal/gridutil"
 	"aoc/internal/mathx"
 	"fmt"
 	"log"
@@ -39,8 +39,8 @@ func part1(input string) {
 
 }
 
-func getWirePoints(path string) map[grid2.Coordinate]bool {
-	wire := make(map[grid2.Coordinate]bool)
+func getWirePoints(path string) map[gridutil.Coordinate]bool {
+	wire := make(map[gridutil.Coordinate]bool)
 	x, y := 0, 0
 	coords := strings.Split(path, ",")
 	for _, coord := range coords {
@@ -57,7 +57,7 @@ func getWirePoints(path string) map[grid2.Coordinate]bool {
 			case 'R':
 				x++
 			}
-			coord := grid2.Coordinate{Row: x, Col: y}
+			coord := gridutil.Coordinate{Row: x, Col: y}
 			wire[coord] = true
 		}
 	}
@@ -81,8 +81,8 @@ func part2(input string) {
 	fmt.Println("Part 2:", minSteps)
 }
 
-func getWirePointsWithSteps(path string) map[grid2.Coordinate]int {
-	wire := make(map[grid2.Coordinate]int)
+func getWirePointsWithSteps(path string) map[gridutil.Coordinate]int {
+	wire := make(map[gridutil.Coordinate]int)
 	x, y := 0, 0
 	steps := 0
 	coords := strings.Split(path, ",")
@@ -101,7 +101,7 @@ func getWirePointsWithSteps(path string) map[grid2.Coordinate]int {
 			case 'R':
 				x++
 			}
-			coord := grid2.Coordinate{Row: x, Col: y}
+			coord := gridutil.Coordinate{Row: x, Col: y}
 			if _, ok := wire[coord]; !ok {
 				wire[coord] = steps
 			}

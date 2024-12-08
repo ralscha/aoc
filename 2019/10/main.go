@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	grid2 "aoc/internal/gridutil"
+	"aoc/internal/gridutil"
 	"aoc/internal/mathx"
 	"fmt"
 	"log"
@@ -23,7 +23,7 @@ func main() {
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	grid := grid2.NewGrid2D[bool](false)
+	grid := gridutil.NewGrid2D[bool](false)
 	for row, line := range lines {
 		for col, c := range line {
 			grid.Set(row, col, c == '#')
@@ -37,7 +37,7 @@ func part1(input string) {
 			if !isAsteroid {
 				continue
 			}
-			visible := detectableAsteroids(grid, grid2.Coordinate{Row: row, Col: col})
+			visible := detectableAsteroids(grid, gridutil.Coordinate{Row: row, Col: col})
 			if visible > maxVisible {
 				maxVisible = visible
 			}
@@ -47,21 +47,21 @@ func part1(input string) {
 	fmt.Println("Part 1:", maxVisible)
 }
 
-func slope(a, b grid2.Coordinate) grid2.Coordinate {
+func slope(a, b gridutil.Coordinate) gridutil.Coordinate {
 	dCol := b.Col - a.Col
 	dRow := b.Row - a.Row
 	g := mathx.Abs(mathx.Gcd(dCol, dRow))
-	return grid2.Coordinate{
+	return gridutil.Coordinate{
 		Row: dRow / g,
 		Col: dCol / g,
 	}
 }
 
-func detectableAsteroids(grid grid2.Grid2D[bool], from grid2.Coordinate) int {
-	seenSlopes := make(map[grid2.Coordinate]bool)
+func detectableAsteroids(grid gridutil.Grid2D[bool], from gridutil.Coordinate) int {
+	seenSlopes := make(map[gridutil.Coordinate]bool)
 	for row := range grid.Height() {
 		for col := range grid.Width() {
-			to := grid2.Coordinate{Row: row, Col: col}
+			to := gridutil.Coordinate{Row: row, Col: col}
 			if from == to {
 				continue
 			}
@@ -78,7 +78,7 @@ func detectableAsteroids(grid grid2.Grid2D[bool], from grid2.Coordinate) int {
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	grid := grid2.NewGrid2D[bool](false)
+	grid := gridutil.NewGrid2D[bool](false)
 	for row, line := range lines {
 		for col, c := range line {
 			grid.Set(row, col, c == '#')
@@ -86,24 +86,24 @@ func part2(input string) {
 	}
 
 	maxVisible := 0
-	maxAsteroid := grid2.Coordinate{}
+	maxAsteroid := gridutil.Coordinate{}
 	for row := 0; row < grid.Height(); row++ {
 		for col := 0; col < grid.Width(); col++ {
 			isAsteroid, _ := grid.Get(row, col)
 			if !isAsteroid {
 				continue
 			}
-			visible := detectableAsteroids(grid, grid2.Coordinate{Row: row, Col: col})
+			visible := detectableAsteroids(grid, gridutil.Coordinate{Row: row, Col: col})
 			if visible > maxVisible {
 				maxVisible = visible
-				maxAsteroid = grid2.Coordinate{Row: row, Col: col}
+				maxAsteroid = gridutil.Coordinate{Row: row, Col: col}
 			}
 		}
 	}
 
 	grid.Set(maxAsteroid.Row, maxAsteroid.Col, false)
 
-	byAngle := map[float64][]grid2.Coordinate{}
+	byAngle := map[float64][]gridutil.Coordinate{}
 	for row := range grid.Height() {
 		for col := range grid.Width() {
 			isAsteroid, _ := grid.Get(row, col)
@@ -115,7 +115,7 @@ func part2(input string) {
 			if angle < 0 {
 				angle += 2 * math.Pi
 			}
-			byAngle[angle] = append(byAngle[angle], grid2.Coordinate{Row: row, Col: col})
+			byAngle[angle] = append(byAngle[angle], gridutil.Coordinate{Row: row, Col: col})
 		}
 	}
 

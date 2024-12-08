@@ -152,12 +152,12 @@ func part1(input string) {
 	code := conv.ToInt64SliceComma(input)
 	computer := newIntcodeComputer(code)
 	output := computer.Run(1)
-	fmt.Println("Result 1:", output)
+	fmt.Println("Part 1", output)
 }
 
 func part2(input string) {
 	code := conv.ToInt64SliceComma(input)
 	computer := newIntcodeComputer(code)
 	output := computer.Run(2)
-	fmt.Println("Result 2:", output)
+	fmt.Println("Part 2", output)
 }

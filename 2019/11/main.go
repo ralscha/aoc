@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	grid2 "aoc/internal/gridutil"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -156,9 +156,9 @@ func part1(input string) {
 	code := conv.ToInt64SliceComma(input)
 	computer := newIntcodeComputer(code)
 
-	direction := grid2.DirectionN
-	grid := grid2.NewGrid2D[int](false)
-	currentPos := grid2.Coordinate{Row: 0, Col: 0}
+	direction := gridutil.DirectionN
+	grid := gridutil.NewGrid2D[int](false)
+	currentPos := gridutil.Coordinate{Row: 0, Col: 0}
 
 	for !computer.halted {
 		color, _ := grid.GetC(currentPos)
@@ -175,26 +175,26 @@ func part1(input string) {
 
 		grid.SetC(currentPos, int(output))
 		if turnDirection == 0 {
-			direction = grid2.TurnLeft(direction)
+			direction = gridutil.TurnLeft(direction)
 		} else {
-			direction = grid2.TurnRight(direction)
+			direction = gridutil.TurnRight(direction)
 		}
-		currentPos = grid2.Coordinate{
+		currentPos = gridutil.Coordinate{
 			Row: currentPos.Row + direction.Row,
 			Col: currentPos.Col + direction.Col,
 		}
 	}
 
-	fmt.Println("Result 1", grid.Count())
+	fmt.Println("Part 1", grid.Count())
 }
 
 func part2(input string) {
 	code := conv.ToInt64SliceComma(input)
 	computer := newIntcodeComputer(code)
 
-	direction := grid2.DirectionN
-	grid := grid2.NewGrid2D[int](false)
-	currentPos := grid2.Coordinate{Row: 0, Col: 0}
+	direction := gridutil.DirectionN
+	grid := gridutil.NewGrid2D[int](false)
+	currentPos := gridutil.Coordinate{Row: 0, Col: 0}
 
 	for !computer.halted {
 		color, ok := grid.GetC(currentPos)
@@ -216,11 +216,11 @@ func part2(input string) {
 
 		grid.SetC(currentPos, int(output))
 		if turnDirection == 0 {
-			direction = grid2.TurnLeft(direction)
+			direction = gridutil.TurnLeft(direction)
 		} else {
-			direction = grid2.TurnRight(direction)
+			direction = gridutil.TurnRight(direction)
 		}
-		currentPos = grid2.Coordinate{
+		currentPos = gridutil.Coordinate{
 			Row: currentPos.Row + direction.Row,
 			Col: currentPos.Col + direction.Col,
 		}
@@ -240,6 +240,4 @@ func part2(input string) {
 		}
 		fmt.Println()
 	}
-
-	fmt.Println("Result 2", grid.Count())
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	grid2 "aoc/internal/gridutil"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -20,7 +20,7 @@ func main() {
 
 func part1(input string) {
 	inputLines := conv.SplitNewline(input)
-	grid := grid2.NewNumberGrid2D(inputLines)
+	grid := gridutil.NewNumberGrid2D(inputLines)
 
 	count := countVisibleTrees(grid)
 	fmt.Println(count)
@@ -28,7 +28,7 @@ func part1(input string) {
 
 func part2(input string) {
 	inputLines := conv.SplitNewline(input)
-	grid := grid2.NewNumberGrid2D(inputLines)
+	grid := gridutil.NewNumberGrid2D(inputLines)
 
 	minCol, maxCol := grid.GetMinMaxCol()
 	minRow, maxRow := grid.GetMinMaxRow()
@@ -46,7 +46,7 @@ func part2(input string) {
 	fmt.Println(scenicScore)
 }
 
-func countVisibleTrees(grid grid2.Grid2D[int]) int {
+func countVisibleTrees(grid gridutil.Grid2D[int]) int {
 	minCol, maxCol := grid.GetMinMaxCol()
 	minRow, maxRow := grid.GetMinMaxRow()
 	count := 0
@@ -68,7 +68,7 @@ func countVisibleTrees(grid grid2.Grid2D[int]) int {
 	return count
 }
 
-func isVisible(grid grid2.Grid2D[int], r, c, treeHeight int) bool {
+func isVisible(grid gridutil.Grid2D[int], r, c, treeHeight int) bool {
 	_, maxCol := grid.GetMinMaxCol()
 	_, maxRow := grid.GetMinMaxRow()
 
@@ -105,7 +105,7 @@ func isVisible(grid grid2.Grid2D[int], r, c, treeHeight int) bool {
 	return blockingTrees < 4
 }
 
-func calculateScenicScore(grid grid2.Grid2D[int], r, c, maxRow, maxCol int) int {
+func calculateScenicScore(grid gridutil.Grid2D[int], r, c, maxRow, maxCol int) int {
 	treeHeight, _ := grid.Get(r, c)
 
 	var scenicScore [4]int
