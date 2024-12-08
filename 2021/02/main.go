@@ -3,7 +3,6 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
 	"fmt"
 	"log"
 	"strings"
@@ -20,12 +19,11 @@ func main() {
 }
 
 func part1(input string) {
+	lines := conv.SplitNewline(input)
 	horizontalPosition := 0
 	depth := 0
 
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
+	for _, line := range lines {
 		split := strings.Fields(line)
 		num := conv.MustAtoi(split[1])
 		switch split[0] {
@@ -38,20 +36,16 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println("Depth: ", depth)
-	fmt.Println("Horizontal Position: ", horizontalPosition)
-	fmt.Println(depth * horizontalPosition)
-	fmt.Println()
+	fmt.Println("Part 1", depth*horizontalPosition)
 }
 
 func part2(input string) {
+	lines := conv.SplitNewline(input)
 	horizontalPosition := 0
 	depth := 0
 	aim := 0
 
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	for scanner.Scan() {
-		line := scanner.Text()
+	for _, line := range lines {
 		split := strings.Fields(line)
 		num := conv.MustAtoi(split[1])
 		switch split[0] {
@@ -65,8 +59,5 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Depth: ", depth)
-	fmt.Println("Horizontal Position: ", horizontalPosition)
-	fmt.Println("Aim: ", aim)
-	fmt.Println(depth * horizontalPosition)
+	fmt.Println("Part 2", depth*horizontalPosition)
 }

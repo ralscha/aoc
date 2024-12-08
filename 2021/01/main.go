@@ -5,7 +5,6 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"strings"
 )
 
 func main() {
@@ -19,44 +18,32 @@ func main() {
 }
 
 func part1(input string) {
-	numbers := strings.Fields(input)
+	lines := conv.SplitNewline(input)
+	numbers := conv.ToIntSlice(lines)
 	increasing := 0
 	lastNum := -1
 
-	for _, nums := range numbers {
-		num := conv.MustAtoi(nums)
-
+	for _, num := range numbers {
 		if lastNum != -1 && num > lastNum {
-			increasing += 1
+			increasing++
 		}
 		lastNum = num
 	}
-	fmt.Printf("increasing %d\n", increasing)
+	fmt.Println("Part 1", increasing)
 }
 
 func part2(input string) {
-	numbers := strings.Fields(input)
+	lines := conv.SplitNewline(input)
+	numbers := conv.ToIntSlice(lines)
 	increasing := 0
 	lastWindow := -1
-	windowCount := 0
-	windowSum := 0
 
-	for ix, nums := range numbers {
-		num := conv.MustAtoi(nums)
-		windowSum += num
-		if windowCount == 3 {
-			if windowSum > lastWindow && lastWindow != -1 {
-				increasing += 1
-			}
-			lastWindow = windowSum
-
-			firstNumOfWindow := conv.MustAtoi(numbers[ix-2])
-			windowSum = windowSum - firstNumOfWindow
-		} else {
-			windowCount += 1
-			windowSum += num
+	for i := 0; i < len(numbers)-2; i++ {
+		windowSum := numbers[i] + numbers[i+1] + numbers[i+2]
+		if lastWindow != -1 && windowSum > lastWindow {
+			increasing++
 		}
-
+		lastWindow = windowSum
 	}
-	fmt.Printf("increasing %d\n", increasing)
+	fmt.Println("Part 2", increasing)
 }
