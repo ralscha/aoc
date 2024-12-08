@@ -4,11 +4,9 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/mathx"
-	"bufio"
 	"fmt"
 	"log"
-	"slices"
-	"strings"
+	"math"
 )
 
 func main() {
@@ -22,66 +20,59 @@ func main() {
 }
 
 func part1(input string) {
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	scanner.Scan()
-	line := scanner.Text()
-	splitted := strings.Split(line, ",")
+	crabs := conv.ToIntSliceComma(input)
 
-	var crabs []int
-	for _, s := range splitted {
-		n := conv.MustAtoi(s)
-		crabs = append(crabs, n)
+	minCrabs, maxCrabs := math.MaxInt, math.MinInt
+	for _, c := range crabs {
+		if c < minCrabs {
+			minCrabs = c
+		}
+		if c > maxCrabs {
+			maxCrabs = c
+		}
 	}
 
-	leastFuel := -1
-	leastPos := -1
+	leastFuel := math.MaxInt
 
-	minCrabs, maxCrabs := findMinMax(crabs)
 	for p := minCrabs; p <= maxCrabs; p++ {
 		fuel := 0
 		for _, c := range crabs {
 			fuel += mathx.Abs(c - p)
 		}
-		if fuel < leastFuel || leastFuel == -1 {
+		if fuel < leastFuel {
 			leastFuel = fuel
-			leastPos = p
 		}
 	}
 
-	fmt.Println(leastPos, leastFuel)
+	fmt.Println("Part 1", leastFuel)
 }
 
 func part2(input string) {
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	scanner.Scan()
-	line := scanner.Text()
-	splitted := strings.Split(line, ",")
+	crabs := conv.ToIntSliceComma(input)
 
-	var crabs []int
-	for _, s := range splitted {
-		n := conv.MustAtoi(s)
-		crabs = append(crabs, n)
+	minCrabs, maxCrabs := math.MaxInt, math.MinInt
+	for _, c := range crabs {
+		if c < minCrabs {
+			minCrabs = c
+		}
+		if c > maxCrabs {
+			maxCrabs = c
+		}
 	}
 
-	leastFuel := -1
-	leastPos := -1
+	leastFuel := math.MaxInt
 
-	minCrabs, maxCrabs := findMinMax(crabs)
 	for p := minCrabs; p <= maxCrabs; p++ {
 		fuel := 0
 		for _, c := range crabs {
 			diff := mathx.Abs(c - p)
+			// Sum of arithmetic sequence: n * (n + 1) / 2
 			fuel += diff * (diff + 1) / 2
 		}
-		if fuel < leastFuel || leastFuel == -1 {
+		if fuel < leastFuel {
 			leastFuel = fuel
-			leastPos = p
 		}
 	}
 
-	fmt.Println(leastPos, leastFuel)
-}
-
-func findMinMax(a []int) (int, int) {
-	return slices.Min(a), slices.Max(a)
+	fmt.Println("Part 2", leastFuel)
 }
