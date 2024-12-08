@@ -183,7 +183,7 @@ func part1and2() {
 	part1 := state{bot: map[string][]string{"A": A1, "B": B1, "C": C1, "D": D1}, top: top}
 	part2 := state{bot: map[string][]string{"A": A, "B": B, "C": C, "D": D}, top: top}
 
-	fmt.Println(f(part1))
-	fmt.Println(f(part2))
+	fmt.Println("Part 1", f(part1))
+	fmt.Println("Part 2", f(part2))
 
 }
