@@ -278,3 +278,31 @@ func TestGcd(t *testing.T) {
 		})
 	}
 }
+
+func TestRound(t *testing.T) {
+	tests := []struct {
+		name string
+		x    float64
+		want int
+	}{
+		{"positive whole", 5.0, 5},
+		{"negative whole", -5.0, -5},
+		{"positive round up", 5.6, 6},
+		{"positive round down", 5.4, 5},
+		{"negative round up", -5.4, -5},
+		{"negative round down", -5.6, -6},
+		{"zero", 0.0, 0},
+		{"positive half", 5.5, 6},
+		{"negative half", -5.5, -6},
+		{"small positive", 0.2, 0},
+		{"small negative", -0.2, 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Round(tt.x); got != tt.want {
+				t.Errorf("Round() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

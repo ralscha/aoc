@@ -79,6 +79,14 @@ func Abs[E constraints.Float | constraints.Integer](input E) E {
 	return input
 }
 
+// Round rounds a float64 to the nearest integer
+func Round(x float64) int {
+	if x < 0 {
+		return int(x - 0.5)
+	}
+	return int(x + 0.5)
+}
+
 // Lcm calculates the Least Common Multiple (LCM) of a slice of integers.
 // It uses the property that LCM(a,b) = (a * b) / GCD(a,b) and extends it to multiple numbers.
 // The function assumes the input slice has at least one element.
