@@ -5,7 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
-	"math"
+	"slices"
 )
 
 func main() {
@@ -21,68 +21,57 @@ func main() {
 func part1and2(input string, groups int) {
 	lines := conv.SplitNewline(input)
 	packages := make([]int, len(lines))
+	sum := 0
 	for i, line := range lines {
 		packages[i] = conv.MustAtoi(line)
+		sum += packages[i]
 	}
 
-	sum := 0
-	for _, num := range packages {
-		sum += num
-	}
+	slices.SortFunc(packages, func(i, j int) int {
+		return j - i
+	})
 	targetWeight := sum / groups
 
-	combs := combinations(packages, targetWeight)
+	var minQE uint64
+	found := false
 
-	leastAmountOfPackages := math.MaxInt
-	smallestQuantumEntanglement := math.MaxInt
-	for _, group := range combs {
-		if len(group) < leastAmountOfPackages {
-			leastAmountOfPackages = len(group)
-			smallestQuantumEntanglement = quantumEntanglement(group)
-		} else if len(group) == leastAmountOfPackages {
-			qe := quantumEntanglement(group)
-			if qe < smallestQuantumEntanglement {
-				smallestQuantumEntanglement = qe
-			}
+	for size := 1; size <= len(packages) && !found; size++ {
+		minQE = findMinQE(packages, targetWeight, size, 0, 0, 0, 1)
+		if minQE > 0 {
+			found = true
 		}
 	}
 
-	fmt.Println(smallestQuantumEntanglement)
-
-}
-
-func quantumEntanglement(packages []int) int {
-	product := 0
-	for _, n := range packages {
-		if product > 0 {
-			product *= n
+	if found {
+		if groups == 3 {
+			fmt.Println("Part 1", minQE)
 		} else {
-			product = n
+			fmt.Println("Part 2", minQE)
 		}
 	}
-	return product
 }
 
-func combinations(input []int, targetWeight int) [][]int {
-	var results [][]int
-	for i := 0; i < 1<<uint(len(input)); i++ {
-		var combination []int
-		for ix, in := range input {
-			if i&(1<<uint(ix)) > 0 {
-				combination = append(combination, in)
-			}
-		}
-		if len(combination) > 0 && sum(combination) == targetWeight {
-			results = append(results, combination)
-		}
+func findMinQE(packages []int, target, size, pos, sum int, count int, qe uint64) uint64 {
+	if sum > target || count > size {
+		return 0
 	}
-	return results
-}
+	if count == size {
+		if sum == target {
+			return qe
+		}
+		return 0
+	}
+	if pos >= len(packages) {
+		return 0
+	}
 
-func sum(input []int) int {
-	sum := 0
-	for _, n := range input {
-		sum += n
+	minQE := findMinQE(packages, target, size, pos+1, sum, count, qe)
+
+	if newQE := findMinQE(packages, target, size, pos+1, sum+packages[pos], count+1, qe*uint64(packages[pos])); newQE > 0 {
+		if minQE == 0 || newQE < minQE {
+			minQE = newQE
+		}
 	}
-	return sum
+
+	return minQE
 }
