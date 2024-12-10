@@ -40,7 +40,7 @@ func part1(input string) {
 		}
 	}
 
-	fmt.Println(total - totalInMemory)
+	fmt.Println("Part 1", total-totalInMemory)
 }
 
 func part2(input string) {
@@ -58,5 +58,5 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println(totalEncoded - total)
+	fmt.Println("Part 2", totalEncoded-total)
 }
