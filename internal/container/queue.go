@@ -37,7 +37,7 @@ func (q *Queue[T]) Push(data T) {
 		// Queue is full, resize
 		q.resize()
 	}
-	
+
 	q.buf[q.tail] = data
 	q.tail = (q.tail + 1) % len(q.buf)
 	q.length++
@@ -67,7 +67,7 @@ func (q *Queue[T]) Pop() T {
 // resize doubles the size of the internal buffer
 func (q *Queue[T]) resize() {
 	newBuf := make([]T, len(q.buf)*2)
-	
+
 	// Copy elements to the start of the new buffer
 	if q.tail > q.head {
 		copy(newBuf, q.buf[q.head:q.tail])
@@ -84,7 +84,7 @@ func (q *Queue[T]) resize() {
 // shrink reduces the size of the internal buffer by half
 func (q *Queue[T]) shrink() {
 	newBuf := make([]T, len(q.buf)/2)
-	
+
 	// Copy elements to the start of the new buffer
 	if q.tail > q.head {
 		copy(newBuf, q.buf[q.head:q.tail])
