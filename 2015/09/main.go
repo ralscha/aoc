@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/graphutil"
 	"aoc/internal/mathx"
 	"fmt"
 	"log"
@@ -21,64 +22,67 @@ func main() {
 
 func part1and2(input string) {
 	lines := conv.SplitNewline(input)
-	distances := make(map[string]map[string]int)
+	graph := graphutil.NewGraph()
 
+	// Build graph from input
 	for _, line := range lines {
 		splitted := strings.Fields(line)
 		from := splitted[0]
 		to := splitted[2]
 		weight := conv.MustAtoi(splitted[4])
 
-		if _, ok := distances[from]; !ok {
-			distances[from] = make(map[string]int)
-		}
-		if _, ok := distances[to]; !ok {
-			distances[to] = make(map[string]int)
-		}
-		distances[from][to] = weight
-		distances[to][from] = weight
+		graph.AddNode(from, nil)
+		graph.AddNode(to, nil)
+		graph.AddEdge(from, to, weight)
+		graph.AddEdge(to, from, weight) // Add reverse edge since it's undirected
 	}
 
-	fmt.Println("shortest:", shortestRoute(distances))
-	fmt.Println("longest :", longestRoute(distances))
+	// Get all locations (nodes)
+	locations := make([]string, 0)
+	for _, node := range graph.GetNeighbors("") { // Empty string gets all nodes
+		locations = append(locations, node.ID)
+	}
+
+	fmt.Println("Part 1", shortestRoute(graph, locations))
+	fmt.Println("Part 2", longestRoute(graph, locations))
 }
 
-func shortestRoute(distances map[string]map[string]int) int {
-	locations := make([]string, 0, len(distances))
-	for location := range distances {
-		locations = append(locations, location)
-	}
-
+func shortestRoute(graph *graphutil.Graph, locations []string) int {
 	shortestDistance := math.MaxInt32
 	for _, route := range mathx.Permutations(locations) {
 		distance := 0
 		for i := 0; i < len(route)-1; i++ {
-			distance += distances[route[i]][route[i+1]]
+			// Find edge between current and next location
+			for _, neighbor := range graph.GetNeighbors(route[i]) {
+				if neighbor.ID == route[i+1] {
+					distance += neighbor.Edge.Weight
+					break
+				}
+			}
 		}
 		if distance < shortestDistance {
 			shortestDistance = distance
 		}
 	}
-
 	return shortestDistance
 }
 
-func longestRoute(distances map[string]map[string]int) int {
-	locations := make([]string, 0, len(distances))
-	for location := range distances {
-		locations = append(locations, location)
-	}
-
+func longestRoute(graph *graphutil.Graph, locations []string) int {
 	longestDistance := math.MinInt32
 	for _, route := range mathx.Permutations(locations) {
 		distance := 0
 		for i := 0; i < len(route)-1; i++ {
-			distance += distances[route[i]][route[i+1]]
+			// Find edge between current and next location
+			for _, neighbor := range graph.GetNeighbors(route[i]) {
+				if neighbor.ID == route[i+1] {
+					distance += neighbor.Edge.Weight
+					break
+				}
+			}
 		}
 		if distance > longestDistance {
 			longestDistance = distance
 		}
 	}
-
 	return longestDistance
 }
