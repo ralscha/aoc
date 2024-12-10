@@ -3,6 +3,8 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
+	"fmt"
 	"log"
 	"strings"
 )
@@ -19,10 +21,8 @@ func main() {
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	grid := make([][]bool, 1000)
-	for i := range grid {
-		grid[i] = make([]bool, 1000)
-	}
+	grid := gridutil.NewGrid2D[bool](false)
+	grid.SetMaxRowCol(999, 999)
 
 	const sep = " through "
 
@@ -33,7 +33,7 @@ func part1(input string) {
 			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
-					grid[x][y] = false
+					grid.Set(x, y, false)
 				}
 			}
 		} else if strings.HasPrefix(line, "turn on ") {
@@ -42,7 +42,7 @@ func part1(input string) {
 			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
-					grid[x][y] = true
+					grid.Set(x, y, true)
 				}
 			}
 		} else if strings.HasPrefix(line, "toggle ") {
@@ -51,7 +51,8 @@ func part1(input string) {
 			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
-					grid[x][y] = !grid[x][y]
+					val, _ := grid.Get(x, y)
+					grid.Set(x, y, !val)
 				}
 			}
 		}
@@ -60,20 +61,18 @@ func part1(input string) {
 	count := 0
 	for x := 0; x < 1000; x++ {
 		for y := 0; y < 1000; y++ {
-			if grid[x][y] {
+			if val, _ := grid.Get(x, y); val {
 				count++
 			}
 		}
 	}
-	println(count)
+	fmt.Println("Part 1", count)
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	grid := make([][]int, 1000)
-	for i := range grid {
-		grid[i] = make([]int, 1000)
-	}
+	grid := gridutil.NewGrid2D[int](false)
+	grid.SetMaxRowCol(999, 999)
 
 	const sep = " through "
 
@@ -84,8 +83,9 @@ func part2(input string) {
 			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
-					if grid[x][y] > 0 {
-						grid[x][y]--
+					val, _ := grid.Get(x, y)
+					if val > 0 {
+						grid.Set(x, y, val-1)
 					}
 				}
 			}
@@ -95,7 +95,8 @@ func part2(input string) {
 			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
-					grid[x][y]++
+					val, _ := grid.Get(x, y)
+					grid.Set(x, y, val+1)
 				}
 			}
 		} else if strings.HasPrefix(line, "toggle ") {
@@ -104,7 +105,8 @@ func part2(input string) {
 			end := conv.ToIntSlice(strings.Split(coords[1], ","))
 			for x := start[0]; x <= end[0]; x++ {
 				for y := start[1]; y <= end[1]; y++ {
-					grid[x][y] += 2
+					val, _ := grid.Get(x, y)
+					grid.Set(x, y, val+2)
 				}
 			}
 		}
@@ -113,8 +115,9 @@ func part2(input string) {
 	count := 0
 	for x := 0; x < 1000; x++ {
 		for y := 0; y < 1000; y++ {
-			count += grid[x][y]
+			val, _ := grid.Get(x, y)
+			count += val
 		}
 	}
-	println(count)
+	fmt.Println("Part 2", count)
 }
