@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"fmt"
 	"log"
 	"os"
@@ -14,13 +15,13 @@ type node struct {
 
 func findPowerfulFruit(graph map[string]node) []string {
 	var paths [][]string
-	visited := make(map[string]bool)
+	visited := container.NewSet[string]()
 	var currentPath []string
 
 	var dfs func(node string)
 	dfs = func(node string) {
 		currentPath = append(currentPath, node)
-		visited[node] = true
+		visited.Add(node)
 
 		if node == "@" {
 			pathCopy := make([]string, len(currentPath))
@@ -28,14 +29,14 @@ func findPowerfulFruit(graph map[string]node) []string {
 			paths = append(paths, pathCopy)
 		} else {
 			for _, child := range graph[node].children {
-				if !visited[child] {
+				if !visited.Contains(child) {
 					dfs(child)
 				}
 			}
 		}
 
 		currentPath = currentPath[:len(currentPath)-1]
-		visited[node] = false
+		visited.Remove(node)
 	}
 
 	dfs("RR")
