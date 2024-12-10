@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -28,16 +29,16 @@ func part1(input string) {
 	lines := conv.SplitNewline(input)
 	replacements, molecule := convertInput(lines)
 
-	distinctMolecules := make(map[string]bool)
+	distinctMolecules := container.NewSet[string]()
 	for _, replacement := range replacements {
 		for i := 0; i < len(molecule); i++ {
 			if strings.HasPrefix(molecule[i:], replacement.from) {
-				distinctMolecules[molecule[:i]+replacement.to+molecule[i+len(replacement.from):]] = true
+				distinctMolecules.Add(molecule[:i] + replacement.to + molecule[i+len(replacement.from):])
 			}
 		}
 	}
 
-	fmt.Println("Part 1", len(distinctMolecules))
+	fmt.Println("Part 1", distinctMolecules.Len())
 }
 
 func part2(input string) {
