@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -38,12 +39,14 @@ type parsedGraph struct {
 }
 
 func parseGraph(strs []string) parsedGraph {
-	var nodes []string
-	var edges [][2]int
+	nodes := make([]string, 0)
+	edges := make([][2]int, 0)
+	nodeSet := container.NewSet[string]()
 	indexes := make(map[string]int)
 
 	add := func(u string) int {
-		if _, exists := indexes[u]; !exists {
+		if !nodeSet.Contains(u) {
+			nodeSet.Add(u)
 			indexes[u] = len(nodes)
 			nodes = append(nodes, u)
 		}
@@ -83,9 +86,11 @@ func kargerMinCut(graph *graph) (int, []int) {
 	}
 
 	cutedges := 0
-	for _, edge := range graph.edges {
-		if find(subsets, edge.src) != find(subsets, edge.dest) {
+	edgeSet := container.NewSet[edge]()
+	for _, e := range graph.edges {
+		if find(subsets, e.src) != find(subsets, e.dest) {
 			cutedges++
+			edgeSet.Add(e)
 		}
 	}
 
@@ -124,6 +129,7 @@ func part1(input string) {
 	V := len(g.nodes)
 	E := len(g.edges)
 	gr := graph{V: V, E: E, edges: make([]edge, E)}
+	
 	for i, e := range g.edges {
 		gr.edges[i] = edge{src: e[0], dest: e[1]}
 	}
@@ -132,6 +138,8 @@ func part1(input string) {
 	var res int
 	var components []int
 	found := false
+	
+	// Try Karger's algorithm multiple times until we find a minimum cut of 3
 	for k < 1000 {
 		k++
 		res, components = kargerMinCut(&gr)
@@ -146,13 +154,15 @@ func part1(input string) {
 		return
 	}
 
-	list := make(map[int]int)
+	// Count size of each component
+	componentSizes := container.NewBag[int]()
 	for _, c := range components {
-		list[c]++
+		componentSizes.Add(c)
 	}
 
+	// Calculate product of component sizes
 	product := 1
-	for _, count := range list {
+	for _, count := range componentSizes.Values() {
 		product *= count
 	}
 
