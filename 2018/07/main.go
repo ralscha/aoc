@@ -4,6 +4,7 @@ import (
 	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/graphutil"
 	"fmt"
 	"log"
 	"slices"
@@ -21,63 +22,74 @@ func main() {
 }
 
 func part1(input string) {
-	jobDependencies := make(map[string][]string)
-
+	// Create dependency graph
+	graph := graphutil.NewGraph()
 	lines := conv.SplitNewline(input)
-	var jobs []string
 
+	// Build graph from input
 	for _, line := range lines {
 		words := strings.Fields(line)
-		step := words[7]
-		dependsOn := words[1]
-		jobDependencies[step] = append(jobDependencies[step], dependsOn)
-		if !slices.Contains(jobs, step) {
-			jobs = append(jobs, step)
-		}
-		if !slices.Contains(jobs, dependsOn) {
-			jobs = append(jobs, dependsOn)
-		}
+		dependsOn, step := words[1], words[7]
+		graph.AddNode(step, nil)
+		graph.AddNode(dependsOn, nil)
+		graph.AddEdge(dependsOn, step, 1) // Weight doesn't matter for part 1
 	}
 
-	var readyJobs []string
-	for _, job := range jobs {
-		if _, ok := jobDependencies[job]; !ok {
-			readyJobs = append(readyJobs, job)
-		}
-	}
-
-	slices.Sort(readyJobs)
-
-	jobOrder := ""
-	doneJobs := container.NewSet[string]()
-
-	for len(readyJobs) > 0 {
-		job := readyJobs[0]
-		jobOrder += job
-		doneJobs.Add(job)
-		readyJobs = readyJobs[1:]
-		for _, job := range jobs {
-			if doneJobs.Contains(job) {
-				continue
-			}
-			dependsOn := jobDependencies[job]
-			dependsOnJobsDone := true
-			for _, dependsOnJob := range dependsOn {
-				if !doneJobs.Contains(dependsOnJob) {
-					dependsOnJobsDone = false
+	// Find nodes with no dependencies (starting points)
+	readyNodes := make([]string, 0)
+	for _, node := range graph.GetNeighbors("") { // Empty string gets all nodes
+		hasIncoming := false
+		for _, otherNode := range graph.GetNeighbors("") {
+			for _, neighbor := range graph.GetNeighbors(otherNode.ID) {
+				if neighbor.ID == node.ID {
+					hasIncoming = true
 					break
 				}
 			}
-			if !dependsOnJobsDone {
+			if hasIncoming {
+				break
+			}
+		}
+		if !hasIncoming {
+			readyNodes = append(readyNodes, node.ID)
+		}
+	}
+
+	slices.Sort(readyNodes)
+	jobOrder := ""
+	doneJobs := container.NewSet[string]()
+
+	for len(readyNodes) > 0 {
+		job := readyNodes[0]
+		jobOrder += job
+		doneJobs.Add(job)
+		readyNodes = readyNodes[1:]
+
+		// Check which nodes are now ready
+		for _, node := range graph.GetNeighbors("") {
+			if doneJobs.Contains(node.ID) {
 				continue
 			}
 
-			if !slices.Contains(readyJobs, job) {
-				readyJobs = append(readyJobs, job)
+			// Check if all dependencies are done
+			allDependenciesDone := true
+			for _, otherNode := range graph.GetNeighbors("") {
+				for _, neighbor := range graph.GetNeighbors(otherNode.ID) {
+					if neighbor.ID == node.ID && !doneJobs.Contains(otherNode.ID) {
+						allDependenciesDone = false
+						break
+					}
+				}
+				if !allDependenciesDone {
+					break
+				}
+			}
+
+			if allDependenciesDone && !slices.Contains(readyNodes, node.ID) {
+				readyNodes = append(readyNodes, node.ID)
 			}
 		}
-		slices.Sort(readyJobs)
-
+		slices.Sort(readyNodes)
 	}
 
 	fmt.Println("Part 1", jobOrder)
@@ -89,32 +101,40 @@ type worker struct {
 }
 
 func part2(input string) {
-	jobDependencies := make(map[string][]string)
-
+	// Create dependency graph
+	graph := graphutil.NewGraph()
 	lines := conv.SplitNewline(input)
-	var jobs []string
 
+	// Build graph from input
 	for _, line := range lines {
 		words := strings.Fields(line)
-		step := words[7]
-		dependsOn := words[1]
-		jobDependencies[step] = append(jobDependencies[step], dependsOn)
-		if !slices.Contains(jobs, step) {
-			jobs = append(jobs, step)
+		dependsOn, step := words[1], words[7]
+		graph.AddNode(step, nil)
+		graph.AddNode(dependsOn, nil)
+		graph.AddEdge(dependsOn, step, 1)
+	}
+
+	// Find nodes with no dependencies (starting points)
+	readyNodes := make([]string, 0)
+	for _, node := range graph.GetNeighbors("") {
+		hasIncoming := false
+		for _, otherNode := range graph.GetNeighbors("") {
+			for _, neighbor := range graph.GetNeighbors(otherNode.ID) {
+				if neighbor.ID == node.ID {
+					hasIncoming = true
+					break
+				}
+			}
+			if hasIncoming {
+				break
+			}
 		}
-		if !slices.Contains(jobs, dependsOn) {
-			jobs = append(jobs, dependsOn)
+		if !hasIncoming {
+			readyNodes = append(readyNodes, node.ID)
 		}
 	}
 
-	var readyJobs []string
-	for _, job := range jobs {
-		if _, ok := jobDependencies[job]; !ok {
-			readyJobs = append(readyJobs, job)
-		}
-	}
-
-	slices.Sort(readyJobs)
+	slices.Sort(readyNodes)
 	doneJobs := container.NewSet[string]()
 
 	noOfWorkers := 5
@@ -122,7 +142,7 @@ func part2(input string) {
 
 	seconds := 0
 	for {
-		if doneJobs.Len() == len(jobs) {
+		if doneJobs.Len() == len(graph.GetNeighbors("")) {
 			break
 		}
 
@@ -136,44 +156,46 @@ func part2(input string) {
 		}
 
 		if completed {
-			for _, job := range jobs {
-				if doneJobs.Contains(job) {
+			// Check which nodes are now ready
+			for _, node := range graph.GetNeighbors("") {
+				if doneJobs.Contains(node.ID) {
 					continue
 				}
-				dependsOn := jobDependencies[job]
-				dependsOnJobsDone := true
-				for _, dependsOnJob := range dependsOn {
-					if !doneJobs.Contains(dependsOnJob) {
-						dependsOnJobsDone = false
+
+				// Check if all dependencies are done
+				allDependenciesDone := true
+				for _, otherNode := range graph.GetNeighbors("") {
+					for _, neighbor := range graph.GetNeighbors(otherNode.ID) {
+						if neighbor.ID == node.ID && !doneJobs.Contains(otherNode.ID) {
+							allDependenciesDone = false
+							break
+						}
+					}
+					if !allDependenciesDone {
 						break
 					}
-				}
-				if !dependsOnJobsDone {
-					continue
 				}
 
 				workInProgress := false
 				for _, worker := range workers {
-					if worker.job == job {
+					if worker.job == node.ID {
 						workInProgress = true
 						break
 					}
 				}
 
-				if !slices.Contains(readyJobs, job) && !workInProgress {
-					readyJobs = append(readyJobs, job)
+				if allDependenciesDone && !slices.Contains(readyNodes, node.ID) && !workInProgress {
+					readyNodes = append(readyNodes, node.ID)
 				}
 			}
-			slices.Sort(readyJobs)
+			slices.Sort(readyNodes)
 		}
 
 		for i, worker := range workers {
-			if worker.job == "" {
-				if len(readyJobs) > 0 {
-					workers[i].job = readyJobs[0]
-					workers[i].time = 60 + int(workers[i].job[0]) - 64
-					readyJobs = readyJobs[1:]
-				}
+			if worker.job == "" && len(readyNodes) > 0 {
+				workers[i].job = readyNodes[0]
+				workers[i].time = 60 + int(readyNodes[0][0]) - 64
+				readyNodes = readyNodes[1:]
 			}
 		}
 
