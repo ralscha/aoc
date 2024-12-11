@@ -48,7 +48,7 @@ func findAntinodes(antennas map[rune][]gridutil.Coordinate, rows, cols int, part
 					}
 
 					stepR, stepC := dr/gcd, dc/gcd
-					for dir := -1; dir <= 1; dir += 2 {
+					for _, dir := range []int{-1, 1} {
 						r, c := a.Row, a.Col
 						for r >= 0 && r < rows && c >= 0 && c < cols {
 							points.Add(gridutil.Coordinate{Row: r, Col: c})
