@@ -1,8 +1,12 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/geomutil"
+	"aoc/internal/gridutil"
+	"aoc/internal/mathx"
 	"fmt"
 	"log"
 	"strings"
@@ -21,10 +25,10 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 
-	headX, headY := 0, 0
-	tailX, tailY := 0, 0
-	visited := make(map[string]bool)
-	visited["0,0"] = true
+	head := gridutil.Coordinate{Row: 0, Col: 0}
+	tail := gridutil.Coordinate{Row: 0, Col: 0}
+	visited := container.NewSet[gridutil.Coordinate]()
+	visited.Add(tail)
 
 	for _, line := range lines {
 		splitted := strings.Fields(line)
@@ -32,63 +36,63 @@ func part1(input string) {
 		steps := conv.MustAtoi(splitted[1])
 
 		for i := 0; i < steps; i++ {
-			if direction == "U" {
-				headY -= 1
-			} else if direction == "D" {
-				headY += 1
-			} else if direction == "L" {
-				headX -= 1
-			} else if direction == "R" {
-				headX += 1
+			switch direction {
+			case "U":
+				head.Row--
+			case "D":
+				head.Row++
+			case "L":
+				head.Col--
+			case "R":
+				head.Col++
 			}
 
-			if (headX != tailX || headY != tailY) && !isAdjacent(headX, headY, tailX, tailY) {
-				if headX == tailX {
-					if headY > tailY {
-						tailY++
+			if (head != tail) && !isAdjacent(head, tail) {
+				if head.Col == tail.Col {
+					if head.Row > tail.Row {
+						tail.Row++
 					} else {
-						tailY--
+						tail.Row--
 					}
-				} else if headY == tailY {
-					if headX > tailX {
-						tailX++
+				} else if head.Row == tail.Row {
+					if head.Col > tail.Col {
+						tail.Col++
 					} else {
-						tailX--
+						tail.Col--
 					}
 				} else {
-					if headX > tailX && headY > tailY {
-						tailX++
-						tailY++
-					} else if headX > tailX && headY < tailY {
-						tailX++
-						tailY--
-					} else if headX < tailX && headY > tailY {
-						tailX--
-						tailY++
-					} else if headX < tailX && headY < tailY {
-						tailX--
-						tailY--
+					if head.Col > tail.Col && head.Row > tail.Row {
+						tail.Col++
+						tail.Row++
+					} else if head.Col > tail.Col && head.Row < tail.Row {
+						tail.Col++
+						tail.Row--
+					} else if head.Col < tail.Col && head.Row > tail.Row {
+						tail.Col--
+						tail.Row++
+					} else if head.Col < tail.Col && head.Row < tail.Row {
+						tail.Col--
+						tail.Row--
 					}
 				}
-				key := fmt.Sprintf("%d,%d", tailX, tailY)
-				visited[key] = true
+				visited.Add(tail)
 			}
 		}
 	}
-	fmt.Println("Visited:", len(visited))
+	fmt.Println("Part 1", visited.Len())
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 
-	headX, headY := 0, 0
-	tails := make([][2]int, 9)
-	for i := 0; i < 9; i++ {
-		tails[i] = [2]int{0, 0}
+	head := gridutil.Coordinate{Row: 0, Col: 0}
+	tails := make([]gridutil.Coordinate, 9)
+	for i := range tails {
+		tails[i] = gridutil.Coordinate{Row: 0, Col: 0}
 	}
 
-	visited := make(map[string]bool)
-	visited["0,0"] = true
+	visited := container.NewSet[gridutil.Coordinate]()
+	visited.Add(tails[len(tails)-1])
 
 	for _, line := range lines {
 		splitted := strings.Fields(line)
@@ -96,70 +100,61 @@ func part2(input string) {
 		steps := conv.MustAtoi(splitted[1])
 
 		for i := 0; i < steps; i++ {
-			if direction == "U" {
-				headY -= 1
-			} else if direction == "D" {
-				headY += 1
-			} else if direction == "L" {
-				headX -= 1
-			} else if direction == "R" {
-				headX += 1
+			switch direction {
+			case "U":
+				head.Row--
+			case "D":
+				head.Row++
+			case "L":
+				head.Col--
+			case "R":
+				head.Col++
 			}
 
-			prevX, prevY := headX, headY
-			for i := 0; i < len(tails); i++ {
-				if (prevX != tails[i][0] || prevY != tails[i][1]) && !isAdjacent(prevX, prevY, tails[i][0], tails[i][1]) {
-					if prevX == tails[i][0] {
-						if prevY > tails[i][1] {
-							tails[i][1]++
+			prev := head
+			for i := range tails {
+				if (prev != tails[i]) && !isAdjacent(prev, tails[i]) {
+					if prev.Col == tails[i].Col {
+						if prev.Row > tails[i].Row {
+							tails[i].Row++
 						} else {
-							tails[i][1]--
+							tails[i].Row--
 						}
-					} else if prevY == tails[i][1] {
-						if prevX > tails[i][0] {
-							tails[i][0]++
+					} else if prev.Row == tails[i].Row {
+						if prev.Col > tails[i].Col {
+							tails[i].Col++
 						} else {
-							tails[i][0]--
+							tails[i].Col--
 						}
 					} else {
-						if prevX > tails[i][0] && prevY > tails[i][1] {
-							tails[i][0]++
-							tails[i][1]++
-						} else if prevX > tails[i][0] && prevY < tails[i][1] {
-							tails[i][0]++
-							tails[i][1]--
-						} else if prevX < tails[i][0] && prevY > tails[i][1] {
-							tails[i][0]--
-							tails[i][1]++
-						} else if prevX < tails[i][0] && prevY < tails[i][1] {
-							tails[i][0]--
-							tails[i][1]--
+						if prev.Col > tails[i].Col && prev.Row > tails[i].Row {
+							tails[i].Col++
+							tails[i].Row++
+						} else if prev.Col > tails[i].Col && prev.Row < tails[i].Row {
+							tails[i].Col++
+							tails[i].Row--
+						} else if prev.Col < tails[i].Col && prev.Row > tails[i].Row {
+							tails[i].Col--
+							tails[i].Row++
+						} else if prev.Col < tails[i].Col && prev.Row < tails[i].Row {
+							tails[i].Col--
+							tails[i].Row--
 						}
 					}
 					if i == len(tails)-1 {
-						key := fmt.Sprintf("%d,%d", tails[i][0], tails[i][1])
-						visited[key] = true
+						visited.Add(tails[i])
 					}
 				}
-				prevX, prevY = tails[i][0], tails[i][1]
+				prev = tails[i]
 			}
 		}
 	}
-	fmt.Println("Visited:", len(visited))
+	fmt.Println("Part 2", visited.Len())
 }
 
-func isAdjacent(x1, y1, x2, y2 int) bool {
-	if x1 == x2 && (y1 == y2+1 || y1 == y2-1) {
-		return true
-	}
-	if (x1 == x2+1 || x1 == x2-1) && y1 == y2 {
-		return true
-	}
-	if x1 == x2+1 && (y1 == y2+1 || y1 == y2-1) {
-		return true
-	}
-	if (x1 == x2-1) && (y1 == y2+1 || y1 == y2-1) {
-		return true
-	}
-	return false
+func isAdjacent(p1, p2 gridutil.Coordinate) bool {
+	// Points are adjacent if they are at most 1 step away in any direction
+	// This means their Manhattan distance must be 1, or they must be diagonally adjacent
+	manhattanDist := geomutil.ManhattanDistance(p1, p2)
+	return manhattanDist <= 1 || (manhattanDist == 2 && mathx.Abs(p1.Row-p2.Row) == 1 && mathx.Abs(p1.Col-p2.Col) == 1)
 }
