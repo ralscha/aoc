@@ -1,9 +1,11 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func main() {
@@ -17,52 +19,64 @@ func main() {
 }
 
 func part1(input string) {
-	if input[len(input)-1] == '\n' {
-		input = input[:len(input)-1]
-	}
-	for {
-		changed := false
-		for i := 0; i < len(input)-1; i++ {
-			if input[i] == input[i+1]+32 || input[i] == input[i+1]-32 {
-				input = input[:i] + input[i+2:]
-				changed = true
-			}
-		}
-		if !changed {
-			break
-		}
-	}
-	fmt.Println(len(input))
+	input = strings.TrimSpace(input)
+	fmt.Println("Part 1", len(react(input)))
 }
 
 func part2(input string) {
-	if input[len(input)-1] == '\n' {
-		input = input[:len(input)-1]
+	input = strings.TrimSpace(input)
+	minLen := len(input)
+
+	// Use Set to track unique lowercase letters in input
+	uniqueChars := container.NewSet[rune]()
+	for _, c := range input {
+		uniqueChars.Add(toLower(c))
 	}
-	minInputLen := len(input)
-	var c uint8
-	for c = 'a'; c <= 'z'; c++ {
-		out := ""
-		for i := 0; i < len(input); i++ {
-			if input[i] != c && input[i] != c-32 {
-				out += string(input[i])
+
+	// Try removing each unique character
+	for _, c := range uniqueChars.Values() {
+		// Remove both cases of the current character
+		filtered := strings.Map(func(r rune) rune {
+			if toLower(r) == c {
+				return -1 // Will be removed by strings.Map
 			}
-		}
-		for {
-			changed := false
-			for i := 0; i < len(out)-1; i++ {
-				if out[i] == out[i+1]+32 || out[i] == out[i+1]-32 {
-					out = out[:i] + out[i+2:]
-					changed = true
-				}
-			}
-			if !changed {
-				break
-			}
-		}
-		if len(out) < minInputLen {
-			minInputLen = len(out)
+			return r
+		}, input)
+
+		// React the filtered polymer
+		result := react(filtered)
+		if len(result) < minLen {
+			minLen = len(result)
 		}
 	}
-	fmt.Println(minInputLen)
+
+	fmt.Println("Part 2", minLen)
+}
+
+// react performs the polymer reaction
+func react(polymer string) string {
+	stack := make([]rune, 0, len(polymer))
+
+	for _, c := range polymer {
+		if len(stack) > 0 && areReactive(stack[len(stack)-1], c) {
+			stack = stack[:len(stack)-1] // Pop
+		} else {
+			stack = append(stack, c) // Push
+		}
+	}
+
+	return string(stack)
+}
+
+// areReactive checks if two units react
+func areReactive(a, b rune) bool {
+	return a != b && toLower(a) == toLower(b)
+}
+
+// toLower converts a rune to lowercase
+func toLower(r rune) rune {
+	if r >= 'A' && r <= 'Z' {
+		return r + 32
+	}
+	return r
 }
