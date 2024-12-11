@@ -16,7 +16,7 @@ type Node[T comparable] struct {
 // PathResult holds the result of a pathfinding operation
 type PathResult[T comparable] struct {
 	Path []Coordinate // The path from start to goal
-	Cost float64     // Total cost of the path
+	Cost float64      // Total cost of the path
 }
 
 // IsGoal is a function type that determines if a position is the goal

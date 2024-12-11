@@ -70,7 +70,7 @@ func TestGrid2DNeighboursWrap(t *testing.T) {
 func TestGrid2DCoordinateBased(t *testing.T) {
 	g := NewGrid2D[int](false)
 	coord := Coordinate{Row: 1, Col: 1}
-	
+
 	// Test SetMaxRowColC
 	g.SetMaxRowColC(coord)
 	if g.maxRow != 1 || g.maxCol != 1 {
