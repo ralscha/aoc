@@ -1,15 +1,17 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/mathx"
 	"fmt"
 	"log"
 	"strings"
 )
 
 type monkey struct {
-	items          []int
+	items          *container.Queue[int]
 	operation      string
 	operationValue int
 	test           int
@@ -36,8 +38,9 @@ func part1(input string) {
 	for i := 0; i < 20; i++ {
 		for m := 0; m < len(monkeys); m++ {
 			monkey := monkeys[m]
-			for _, item := range monkey.items {
+			for !monkey.items.IsEmpty() {
 				inspectCount[m]++
+				item := monkey.items.Pop()
 				newWorryLevel := item
 				if monkey.operation == "*" {
 					if monkey.operationValue == -1 {
@@ -56,14 +59,11 @@ func part1(input string) {
 				newWorryLevel /= 3
 
 				if newWorryLevel%monkey.test == 0 {
-					trueMonkey := monkeys[monkey.ifTrue]
-					trueMonkey.items = append(trueMonkey.items, newWorryLevel)
+					monkeys[monkey.ifTrue].items.Push(newWorryLevel)
 				} else {
-					falseMonkey := monkeys[monkey.ifFalse]
-					falseMonkey.items = append(falseMonkey.items, newWorryLevel)
+					monkeys[monkey.ifFalse].items.Push(newWorryLevel)
 				}
 			}
-			monkey.items = []int{}
 		}
 	}
 
@@ -74,18 +74,21 @@ func part2(input string) {
 	lines := conv.SplitNewline(input)
 	monkeys := createMonkeys(lines)
 
-	prod := 1
+	// Calculate LCM of all test values to keep worry levels manageable
+	testValues := make([]int, 0, len(monkeys))
 	for _, m := range monkeys {
-		prod *= m.test
+		testValues = append(testValues, m.test)
 	}
+	lcm := mathx.Lcm(testValues)
 
 	inspectCount := make(map[int]int)
 
 	for i := 0; i < 10000; i++ {
 		for m := 0; m < len(monkeys); m++ {
 			monkey := monkeys[m]
-			for _, item := range monkey.items {
+			for !monkey.items.IsEmpty() {
 				inspectCount[m]++
+				item := monkey.items.Pop()
 				newWorryLevel := item
 				if monkey.operation == "*" {
 					if monkey.operationValue == -1 {
@@ -101,17 +104,14 @@ func part2(input string) {
 					newWorryLevel /= monkey.operationValue
 				}
 
-				newWorryLevel = newWorryLevel % prod
+				newWorryLevel = newWorryLevel % lcm
 
 				if newWorryLevel%monkey.test == 0 {
-					trueMonkey := monkeys[monkey.ifTrue]
-					trueMonkey.items = append(trueMonkey.items, newWorryLevel)
+					monkeys[monkey.ifTrue].items.Push(newWorryLevel)
 				} else {
-					falseMonkey := monkeys[monkey.ifFalse]
-					falseMonkey.items = append(falseMonkey.items, newWorryLevel)
+					monkeys[monkey.ifFalse].items.Push(newWorryLevel)
 				}
 			}
-			monkey.items = []int{}
 		}
 	}
 
@@ -137,13 +137,14 @@ func createMonkeys(lines []string) map[int]*monkey {
 	for i := 0; i < len(lines); i += 7 {
 		first := strings.Fields(lines[i])
 		monkeyNo := conv.MustAtoi(first[1][:len(first[1])-1])
-		items := strings.Fields(lines[i+1])[2:]
-		itemsNo := make([]int, len(items))
-		for j := range items {
-			if items[j][len(items[j])-1] == ',' {
-				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])-1])
+		
+		items := container.NewQueue[int]()
+		itemsStr := strings.Fields(lines[i+1])[2:]
+		for _, item := range itemsStr {
+			if item[len(item)-1] == ',' {
+				items.Push(conv.MustAtoi(item[:len(item)-1]))
 			} else {
-				itemsNo[j] = conv.MustAtoi(items[j][:len(items[j])])
+				items.Push(conv.MustAtoi(item))
 			}
 		}
 
@@ -160,7 +161,7 @@ func createMonkeys(lines []string) map[int]*monkey {
 		ifFalse := conv.MustAtoi(strings.Fields(lines[i+5])[5])
 
 		monkeys[monkeyNo] = &monkey{
-			items:          itemsNo,
+			items:          items,
 			operation:      operation,
 			operationValue: operationValueInt,
 			test:           test,
