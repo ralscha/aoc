@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -20,163 +21,88 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 
-	num := 5
+	// Create keypad grid
+	grid := gridutil.NewGrid2D[int](false)
+	grid.SetMaxRowCol(2, 2)
+	// Set keypad values
+	grid.Set(0, 0, 1)
+	grid.Set(0, 1, 2)
+	grid.Set(0, 2, 3)
+	grid.Set(1, 0, 4)
+	grid.Set(1, 1, 5)
+	grid.Set(1, 2, 6)
+	grid.Set(2, 0, 7)
+	grid.Set(2, 1, 8)
+	grid.Set(2, 2, 9)
+
+	pos := gridutil.Coordinate{Row: 1, Col: 1} // Start at 5
 	for _, line := range lines {
 		for _, c := range line {
+			var dir gridutil.Direction
 			switch c {
 			case 'U':
-				num = up(num)
+				dir = gridutil.DirectionN
 			case 'D':
-				num = down(num)
+				dir = gridutil.DirectionS
 			case 'L':
-				num = left(num)
+				dir = gridutil.DirectionW
 			case 'R':
-				num = right(num)
+				dir = gridutil.DirectionE
+			}
+			newPos := gridutil.Coordinate{Row: pos.Row + dir.Row, Col: pos.Col + dir.Col}
+			if val, ok := grid.GetC(newPos); ok {
+				pos = newPos
+				_ = val // Value exists, position is valid
 			}
 		}
-		fmt.Print(num)
+		val, _ := grid.GetC(pos)
+		fmt.Print(val)
 	}
 	fmt.Println()
-}
-
-func up(num int) int {
-	if num <= 3 {
-		return num
-	}
-	return num - 3
-}
-
-func down(num int) int {
-	if num == 7 || num == 8 || num == 9 {
-		return num
-	}
-	return num + 3
-}
-
-func left(num int) int {
-	if num == 1 || num == 4 || num == 7 {
-		return num
-	}
-	return num - 1
-}
-
-func right(num int) int {
-	if num == 3 || num == 6 || num == 9 {
-		return num
-	}
-	return num + 1
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 
-	num := 5
+	// Create keypad grid
+	grid := gridutil.NewGrid2D[rune](false)
+	grid.SetMaxRowCol(4, 4)
+	// Set keypad values
+	grid.Set(0, 2, '1')
+	grid.Set(1, 1, '2')
+	grid.Set(1, 2, '3')
+	grid.Set(1, 3, '4')
+	grid.Set(2, 0, '5')
+	grid.Set(2, 1, '6')
+	grid.Set(2, 2, '7')
+	grid.Set(2, 3, '8')
+	grid.Set(2, 4, '9')
+	grid.Set(3, 1, 'A')
+	grid.Set(3, 2, 'B')
+	grid.Set(3, 3, 'C')
+	grid.Set(4, 2, 'D')
+
+	pos := gridutil.Coordinate{Row: 2, Col: 0} // Start at 5
 	for _, line := range lines {
 		for _, c := range line {
+			var dir gridutil.Direction
 			switch c {
 			case 'U':
-				num = up2(num)
+				dir = gridutil.DirectionN
 			case 'D':
-				num = down2(num)
+				dir = gridutil.DirectionS
 			case 'L':
-				num = left2(num)
+				dir = gridutil.DirectionW
 			case 'R':
-				num = right2(num)
+				dir = gridutil.DirectionE
+			}
+			newPos := gridutil.Coordinate{Row: pos.Row + dir.Row, Col: pos.Col + dir.Col}
+			if val, ok := grid.GetC(newPos); ok && val != 0 {
+				pos = newPos
 			}
 		}
-		if num > 9 {
-			fmt.Printf("%c", num-10+'A')
-		} else {
-			fmt.Print(num)
-		}
+		val, _ := grid.GetC(pos)
+		fmt.Printf("%c", val)
 	}
 	fmt.Println()
-}
-
-func up2(num int) int {
-	switch num {
-	case 3:
-		return 1
-	case 6:
-		return 2
-	case 7:
-		return 3
-	case 8:
-		return 4
-	case 10:
-		return 6
-	case 11:
-		return 7
-	case 12:
-		return 8
-	case 13:
-		return 11
-	}
-	return num
-}
-
-func down2(num int) int {
-	switch num {
-	case 1:
-		return 3
-	case 2:
-		return 6
-	case 3:
-		return 7
-	case 4:
-		return 8
-	case 6:
-		return 10
-	case 7:
-		return 11
-	case 8:
-		return 12
-	case 11:
-		return 13
-	}
-	return num
-}
-
-func left2(num int) int {
-	switch num {
-	case 3:
-		return 2
-	case 4:
-		return 3
-	case 6:
-		return 5
-	case 7:
-		return 6
-	case 8:
-		return 7
-	case 9:
-		return 8
-	case 11:
-		return 10
-	case 12:
-		return 11
-	}
-	return num
-}
-
-func right2(num int) int {
-	switch num {
-	case 2:
-		return 3
-	case 3:
-		return 4
-	case 5:
-		return 6
-	case 6:
-		return 7
-	case 7:
-		return 8
-	case 8:
-		return 9
-	case 10:
-		return 11
-	case 11:
-		return 12
-	}
-	return num
 }
