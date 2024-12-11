@@ -1,8 +1,11 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/geomutil"
+	"aoc/internal/gridutil"
 	"aoc/internal/mathx"
 	"fmt"
 	"log"
@@ -19,12 +22,9 @@ func main() {
 	part2(input)
 }
 
-type point struct {
-	x, y int
-}
 type sensor struct {
-	pos               point
-	closestBeacon     point
+	pos               gridutil.Coordinate
+	closestBeacon     gridutil.Coordinate
 	manhattanDistance int
 }
 
@@ -33,23 +33,23 @@ func part1(input string) {
 	sensors := createSensors(lines)
 
 	targetY := 2000000
-	covers := make(map[point]bool)
-	beacons := make(map[point]bool)
+	covers := container.NewSet[gridutil.Coordinate]()
+	beacons := container.NewSet[gridutil.Coordinate]()
 
 	for _, sensor := range sensors {
-		if sensor.closestBeacon.y == targetY {
-			beacons[sensor.closestBeacon] = true
+		if sensor.closestBeacon.Row == targetY {
+			beacons.Add(sensor.closestBeacon)
 		}
 		radius := sensor.manhattanDistance
-		distance := mathx.Abs(sensor.pos.y - targetY)
+		distance := mathx.Abs(sensor.pos.Row - targetY)
 		if distance <= radius {
 			diff := radius - distance
-			for x := sensor.pos.x - diff; x <= sensor.pos.x+diff; x++ {
-				covers[point{x, targetY}] = true
+			for x := sensor.pos.Col - diff; x <= sensor.pos.Col+diff; x++ {
+				covers.Add(gridutil.Coordinate{Row: targetY, Col: x})
 			}
 		}
 	}
-	fmt.Println(len(covers) - len(beacons))
+	fmt.Println(covers.Len() - beacons.Len())
 }
 
 func part2(input string) {
@@ -58,25 +58,21 @@ func part2(input string) {
 
 	for y := 0; y <= 4000000; y++ {
 		for x := 0; x <= 4000000; x++ {
-			p := point{x, y}
+			p := gridutil.Coordinate{Row: y, Col: x}
 			jump := false
 			for _, sensor := range sensors {
-				distance := manhattanDistance(p, sensor.pos)
+				distance := geomutil.ManhattanDistance(p, sensor.pos)
 				if distance <= sensor.manhattanDistance {
-					x = sensor.pos.x + sensor.manhattanDistance - mathx.Abs(sensor.pos.y-p.y)
+					x = sensor.pos.Col + sensor.manhattanDistance - mathx.Abs(sensor.pos.Row-p.Row)
 					jump = true
 					break
 				}
 			}
 			if !jump {
-				fmt.Println(p.x*4000000 + p.y)
+				fmt.Println(p.Col*4000000 + p.Row)
 			}
 		}
 	}
-}
-
-func manhattanDistance(a, b point) int {
-	return mathx.Abs(a.x-b.x) + mathx.Abs(a.y-b.y)
 }
 
 func createSensors(lines []string) []sensor {
@@ -91,10 +87,13 @@ func createSensors(lines []string) []sensor {
 		beaconX := conv.MustAtoi(s[:len(s)-1])
 		beaconY := conv.MustAtoi(strings.TrimPrefix(splitted[9], "y="))
 
+		sensorPos := gridutil.Coordinate{Row: sensorY, Col: sensorX}
+		beaconPos := gridutil.Coordinate{Row: beaconY, Col: beaconX}
+
 		sensors = append(sensors, sensor{
-			pos:               point{sensorX, sensorY},
-			closestBeacon:     point{beaconX, beaconY},
-			manhattanDistance: manhattanDistance(point{sensorX, sensorY}, point{beaconX, beaconY}),
+			pos:               sensorPos,
+			closestBeacon:     beaconPos,
+			manhattanDistance: geomutil.ManhattanDistance(sensorPos, beaconPos),
 		})
 	}
 	return sensors
