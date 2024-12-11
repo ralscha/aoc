@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -49,13 +50,10 @@ func part1(input string) {
 }
 
 func part2(input string) {
-	crt := make([][]string, 6)
-	for i := range crt {
-		crt[i] = make([]string, 40)
-	}
-	for i := range crt {
-		for j := range crt[i] {
-			crt[i][j] = "."
+	crt := gridutil.NewGrid2D[rune](false)
+	for row := 0; row < 6; row++ {
+		for col := 0; col < 40; col++ {
+			crt.Set(row, col, '.')
 		}
 	}
 
@@ -72,7 +70,7 @@ func part2(input string) {
 		}
 		for i := 0; i < instructions; i++ {
 			if crtCol == x || crtCol == x+1 || crtCol == x-1 {
-				crt[crtRow][crtCol] = "#"
+				crt.Set(crtRow, crtCol, '#')
 			}
 			crtCol++
 			if crtCol == 40 {
@@ -88,9 +86,12 @@ func part2(input string) {
 		}
 	}
 
-	for i := range crt {
-		for j := range crt[i] {
-			fmt.Print(crt[i][j])
+	// Print the CRT display
+	for row := 0; row < 6; row++ {
+		for col := 0; col < 40; col++ {
+			if val, ok := crt.Get(row, col); ok {
+				fmt.Print(string(val))
+			}
 		}
 		fmt.Println()
 	}
