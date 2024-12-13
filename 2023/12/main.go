@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -26,15 +27,20 @@ func part1(input string) {
 		splitted := strings.Fields(line)
 		field := splitted[0]
 		recordedGroups := conv.ToIntSlice(strings.Split(splitted[1], ","))
-		combinations := generateCombinations(field)
-		for _, comb := range combinations {
-			groups := countGroups(comb)
+		
+		// Use Set to store unique combinations
+		combinations := container.NewSet[string]()
+		for _, comb := range generateCombinations(field) {
+			combinations.Add(comb)
+		}
 
+		// Process each unique combination
+		for _, comb := range combinations.Values() {
+			groups := countGroups(comb)
 			if slices.Equal(groups, recordedGroups) {
 				totalArrangements++
 			}
 		}
-
 	}
 	fmt.Println(totalArrangements)
 }
@@ -46,11 +52,9 @@ func countGroups(field string) []int {
 	for _, ch := range field {
 		if ch == '#' {
 			currentGroupCount++
-		} else {
-			if currentGroupCount > 0 {
-				counts = append(counts, currentGroupCount)
-				currentGroupCount = 0
-			}
+		} else if currentGroupCount > 0 {
+			counts = append(counts, currentGroupCount)
+			currentGroupCount = 0
 		}
 	}
 
@@ -70,16 +74,17 @@ func generateCombinations(pattern string) []string {
 		dotCombinations := generateCombinations("." + pattern[1:])
 		hashCombinations := generateCombinations("#" + pattern[1:])
 		return append(dotCombinations, hashCombinations...)
-	} else {
-		subCombinations := generateCombinations(pattern[1:])
-		for i, comb := range subCombinations {
-			subCombinations[i] = string(pattern[0]) + comb
-		}
-		return subCombinations
 	}
+	
+	subCombinations := generateCombinations(pattern[1:])
+	for i, comb := range subCombinations {
+		subCombinations[i] = string(pattern[0]) + comb
+	}
+	return subCombinations
 }
 
-var cache = map[string]int{}
+// Cache using container.Bag to store frequency of results
+var cache = make(map[string]int)
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
@@ -90,17 +95,16 @@ func part2(input string) {
 		field := splitted[0]
 		recordedGroups := conv.ToIntSlice(strings.Split(splitted[1], ","))
 
-		newField := field
-		newRecordedGroup := recordedGroups
-		for i := 0; i < 4; i++ {
+		// Build expanded field and groups
+		newField := strings.Join([]string{field, field, field, field, field}, "?")
+		newRecordedGroup := []int{}
+		for i := 0; i < 5; i++ {
 			newRecordedGroup = append(newRecordedGroup, recordedGroups...)
-			newField += "?" + field
 		}
 
 		clear(cache)
-		arrangments := count(newField, newRecordedGroup, 0, 0, 0)
-		totalArrangements += arrangments
-
+		arrangements := count(newField, newRecordedGroup, 0, 0, 0)
+		totalArrangements += arrangements
 	}
 	fmt.Println(totalArrangements)
 }
@@ -116,24 +120,23 @@ func count(field string, expectedGroups []int, currentPos int, currentGroupsSize
 			return 1
 		} else if currentGroupsSize == len(expectedGroups)-1 && expectedGroups[currentGroupsSize] == currentGroupLength {
 			return 1
-		} else {
-			return 0
 		}
+		return 0
 	}
 
-	c := 0
+	result := 0
 	for _, ch := range []byte{'.', '#'} {
 		if field[currentPos] == ch || field[currentPos] == '?' {
 			if ch == '.' && currentGroupLength == 0 {
-				c += count(field, expectedGroups, currentPos+1, currentGroupsSize, 0)
+				result += count(field, expectedGroups, currentPos+1, currentGroupsSize, 0)
 			} else if ch == '.' && currentGroupLength > 0 && currentGroupsSize < len(expectedGroups) && expectedGroups[currentGroupsSize] == currentGroupLength {
-				c += count(field, expectedGroups, currentPos+1, currentGroupsSize+1, 0)
+				result += count(field, expectedGroups, currentPos+1, currentGroupsSize+1, 0)
 			} else if ch == '#' {
-				c += count(field, expectedGroups, currentPos+1, currentGroupsSize, currentGroupLength+1)
+				result += count(field, expectedGroups, currentPos+1, currentGroupsSize, currentGroupLength+1)
 			}
 		}
 	}
 
-	cache[key] = c
-	return c
+	cache[key] = result
+	return result
 }
