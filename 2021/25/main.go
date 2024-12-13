@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -17,61 +18,68 @@ func main() {
 }
 
 const (
-	east  = 0
-	south = 1
+	empty = '.'
+	east  = '>'
+	south = 'v'
 )
-
-type pos struct {
-	row, col int
-}
-
-type cucumber int
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	width, height := len(lines[0]), len(lines)
-	cucumbers := make(map[pos]cucumber)
+	grid := gridutil.NewGrid2D[rune](false)
 
+	// Build grid
 	for row, line := range lines {
 		for col, char := range line {
-			if char == '>' {
-				cucumbers[pos{row, col}] = east
-			} else if char == 'v' {
-				cucumbers[pos{row, col}] = south
-			}
+			grid.Set(row, col, char)
 		}
 	}
 
-	directions := [2]pos{{0, 1}, {1, 0}}
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+	height := maxRow - minRow + 1
+	width := maxCol - minCol + 1
 
 	turn := 1
 	for {
 		moved := false
 
-		for dir, direction := range directions {
-			allMovableCucumbers := make(map[pos]pos)
-			for p, c := range cucumbers {
-				if c == cucumber(dir) {
-					newCol := (p.col + direction.col) % width
-					newRow := (p.row + direction.row) % height
-					newPos := pos{newRow, newCol}
-					if _, ok := cucumbers[newPos]; !ok {
-						allMovableCucumbers[p] = newPos
+		// Move east-facing cucumbers
+		newGrid := grid.Copy()
+		for row := minRow; row <= maxRow; row++ {
+			for col := minCol; col <= maxCol; col++ {
+				if val, _ := grid.Get(row, col); val == east {
+					nextCol := (col - minCol + 1) % width + minCol
+					if nextVal, _ := grid.Get(row, nextCol); nextVal == empty {
+						newGrid.Set(row, col, empty)
+						newGrid.Set(row, nextCol, east)
+						moved = true
 					}
 				}
 			}
-			for oldPos, newPos := range allMovableCucumbers {
-				c := cucumbers[oldPos]
-				delete(cucumbers, oldPos)
-				cucumbers[newPos] = c
-				moved = true
+		}
+		grid = newGrid
+
+		// Move south-facing cucumbers
+		newGrid = grid.Copy()
+		for row := minRow; row <= maxRow; row++ {
+			for col := minCol; col <= maxCol; col++ {
+				if val, _ := grid.Get(row, col); val == south {
+					nextRow := (row - minRow + 1) % height + minRow
+					if nextVal, _ := grid.Get(nextRow, col); nextVal == empty {
+						newGrid.Set(row, col, empty)
+						newGrid.Set(nextRow, col, south)
+						moved = true
+					}
+				}
 			}
 		}
+		grid = newGrid
 
 		if !moved {
 			break
 		}
 		turn++
 	}
+
 	fmt.Println("Part 1", turn)
 }
