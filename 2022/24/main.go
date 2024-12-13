@@ -1,9 +1,10 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"container/list"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -21,7 +22,7 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 	valley, endPos := makeValley(lines)
-	startPos := position{row: 0, col: 1}
+	startPos := gridutil.Coordinate{Row: 0, Col: 1}
 	minutes := valley.findFastestPath(0, startPos, endPos)
 	fmt.Println(minutes)
 }
@@ -29,26 +30,27 @@ func part1(input string) {
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 	valley, endPos := makeValley(lines)
-	startPos := position{row: 0, col: 1}
+	startPos := gridutil.Coordinate{Row: 0, Col: 1}
 	minutes := valley.findFastestPath(0, startPos, endPos)
 	minutes = valley.findFastestPath(minutes+1, endPos, startPos)
 	minutes = valley.findFastestPath(minutes+1, startPos, endPos)
 	fmt.Println(minutes)
 }
 
-func makeValley(lines []string) (*valley, position) {
+func makeValley(lines []string) (*valley, gridutil.Coordinate) {
 	var blizzards []blizzard
 	width, height := len(lines[0]), len(lines)
 	for row, line := range lines {
 		for col, c := range line {
-			pos := position{row, col}
-			if c == '>' {
+			pos := gridutil.Coordinate{Row: row, Col: col}
+			switch c {
+			case '>':
 				blizzards = append(blizzards, blizzard{startPos: pos, dir: right})
-			} else if c == '<' {
+			case '<':
 				blizzards = append(blizzards, blizzard{startPos: pos, dir: left})
-			} else if c == '^' {
+			case '^':
 				blizzards = append(blizzards, blizzard{startPos: pos, dir: up})
-			} else if c == 'v' {
+			case 'v':
 				blizzards = append(blizzards, blizzard{startPos: pos, dir: down})
 			}
 		}
@@ -59,7 +61,7 @@ func makeValley(lines []string) (*valley, position) {
 		height:    height,
 		blizzards: blizzards,
 	}
-	return valley, position{row: height - 1, col: width - 2}
+	return valley, gridutil.Coordinate{Row: height - 1, Col: width - 2}
 }
 
 const (
@@ -69,12 +71,15 @@ const (
 	right
 )
 
-type position struct {
-	row, col int
+var directions = []gridutil.Direction{
+	{Row: -1, Col: 0}, // up
+	{Row: 1, Col: 0},  // down
+	{Row: 0, Col: -1}, // left
+	{Row: 0, Col: 1},  // right
 }
 
 type path struct {
-	pos    position
+	pos    gridutil.Coordinate
 	minute int
 }
 
@@ -85,64 +90,55 @@ type valley struct {
 }
 
 type blizzard struct {
-	startPos position
+	startPos gridutil.Coordinate
 	dir      int
 }
 
-func (b *blizzard) posAtMinute(minute int, v valley) position {
+func (b *blizzard) posAtMinute(minute int, v valley) gridutil.Coordinate {
 	switch b.dir {
 	case up:
 		move := minute % (v.height - 2)
-		newRow := b.startPos.row - move
+		newRow := b.startPos.Row - move
 		if newRow <= 0 {
 			newRow = v.height - 2 + newRow
 		}
-		return position{row: newRow, col: b.startPos.col}
+		return gridutil.Coordinate{Row: newRow, Col: b.startPos.Col}
 	case down:
 		move := minute % (v.height - 2)
-		newRow := b.startPos.row + move
+		newRow := b.startPos.Row + move
 		if newRow >= v.height-1 {
 			newRow = newRow - (v.height - 2)
 		}
-		return position{row: newRow, col: b.startPos.col}
+		return gridutil.Coordinate{Row: newRow, Col: b.startPos.Col}
 	case left:
 		move := minute % (v.width - 2)
-		newCol := b.startPos.col - move
+		newCol := b.startPos.Col - move
 		if newCol <= 0 {
 			newCol = v.width - 2 + newCol
 		}
-		return position{row: b.startPos.row, col: newCol}
+		return gridutil.Coordinate{Row: b.startPos.Row, Col: newCol}
 	case right:
 		move := minute % (v.width - 2)
-		newCol := b.startPos.col + move
+		newCol := b.startPos.Col + move
 		if newCol >= v.width-1 {
 			newCol = newCol - (v.width - 2)
 		}
-		return position{row: b.startPos.row, col: newCol}
+		return gridutil.Coordinate{Row: b.startPos.Row, Col: newCol}
 	}
 	panic("invalid direction")
 }
 
-func (v *valley) moveExpedition(minute int, pos position, dir int, toPos position) (position, bool) {
-	nextRow, nextCol := pos.row, pos.col
-	switch dir {
-	case up:
-		nextRow--
-	case down:
-		nextRow++
-	case left:
-		nextCol--
-	case right:
-		nextCol++
+func (v *valley) moveExpedition(minute int, pos gridutil.Coordinate, dir gridutil.Direction, toPos gridutil.Coordinate) (gridutil.Coordinate, bool) {
+	nextPos := gridutil.Coordinate{
+		Row: pos.Row + dir.Row,
+		Col: pos.Col + dir.Col,
 	}
-
-	nextPos := position{row: nextRow, col: nextCol}
 
 	if nextPos == toPos {
 		return toPos, true
 	}
 
-	if nextRow < 1 || nextRow >= v.height-1 || nextCol < 1 || nextCol >= v.width-1 {
+	if nextPos.Row < 1 || nextPos.Row >= v.height-1 || nextPos.Col < 1 || nextPos.Col >= v.width-1 {
 		return pos, false
 	}
 	for _, b := range v.blizzards {
@@ -154,19 +150,17 @@ func (v *valley) moveExpedition(minute int, pos position, dir int, toPos positio
 	return nextPos, true
 }
 
-func (v *valley) findFastestPath(minute int, fromPos, toPos position) int {
-	paths := list.New()
-	paths.PushBack(path{pos: fromPos, minute: minute})
-	existingPaths := make(map[path]bool)
+func (v *valley) findFastestPath(minute int, fromPos, toPos gridutil.Coordinate) int {
+	paths := container.NewQueue[path]()
+	paths.Push(path{pos: fromPos, minute: minute})
+	existingPaths := container.NewSet[path]()
 
-	for paths.Len() > 0 {
-		e := paths.Front()
-		p := e.Value.(path)
-		paths.Remove(e)
-
+	for !paths.IsEmpty() {
+		p := paths.Pop()
 		p.minute++
 
-		for _, dir := range []int{up, down, left, right} {
+		// Try all directions
+		for _, dir := range directions {
 			nextPos, ok := v.moveExpedition(p.minute, p.pos, dir, toPos)
 			if !ok {
 				continue
@@ -175,21 +169,21 @@ func (v *valley) findFastestPath(minute int, fromPos, toPos position) int {
 				return p.minute
 			}
 			nextPath := path{pos: nextPos, minute: p.minute}
-			if !existingPaths[nextPath] {
-				existingPaths[nextPath] = true
-				paths.PushBack(nextPath)
+			if !existingPaths.Contains(nextPath) {
+				existingPaths.Add(nextPath)
+				paths.Push(nextPath)
 			}
 		}
 
-		nextPos, ok := v.moveExpedition(p.minute, p.pos, -1, toPos)
+		// Try waiting in place
+		nextPos, ok := v.moveExpedition(p.minute, p.pos, gridutil.Direction{}, toPos)
 		if ok {
 			nextPath := path{pos: nextPos, minute: p.minute}
-			if !existingPaths[nextPath] {
-				existingPaths[nextPath] = true
-				paths.PushBack(nextPath)
+			if !existingPaths.Contains(nextPath) {
+				existingPaths.Add(nextPath)
+				paths.Push(nextPath)
 			}
 		}
-
 	}
 	return -1
 }
