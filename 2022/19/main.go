@@ -36,7 +36,8 @@ type blueprint struct {
 	maxObsidian       int
 }
 
-type production struct {
+type state struct {
+	minute        int
 	ore           int
 	clay          int
 	obsidian      int
@@ -50,11 +51,9 @@ type production struct {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 	blueprints := createBlueprints(lines)
-	minutes := 24
-	startProd := production{oreRobot: 1}
 	sum := 0
 	for ix, blueprint := range blueprints {
-		maxGeode := simulate(blueprint, minutes, startProd)
+		maxGeode := findMaxGeodes(blueprint, 24)
 		sum += (ix + 1) * maxGeode
 	}
 	fmt.Println(sum)
@@ -63,11 +62,9 @@ func part1(input string) {
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 	blueprints := createBlueprints(lines)
-	minutes := 32
-	startProd := production{oreRobot: 1}
 	result := 1
-	for i := 0; i < 3; i++ {
-		maxGeode := simulate(blueprints[i], minutes, startProd)
+	for i := 0; i < min(3, len(blueprints)); i++ {
+		maxGeode := findMaxGeodes(blueprints[i], 32)
 		result *= maxGeode
 	}
 	fmt.Println(result)
@@ -92,129 +89,117 @@ func createBlueprints(lines []string) []blueprint {
 	return blueprints
 }
 
-func simulate(blueprint blueprint, minutes int, startProd production) int {
-	var nextGeneration []production
-	nextGeneration = append(nextGeneration, startProd)
+func findMaxGeodes(bp blueprint, totalMinutes int) int {
+	seen := container.NewSet[state]()
+	maxGeodes := 0
 
-	for m := 0; m < minutes; m++ {
-		currentGeneration := nextGeneration
-		nextGeneration = nil
+	var dfs func(s state)
+	dfs = func(s state) {
+		// Update max geodes if we found a better solution
+		if s.geode > maxGeodes {
+			maxGeodes = s.geode
+		}
 
-		generated := container.NewSet[production]()
-		for _, prod := range currentGeneration {
-			// building
-			if prod.obsidian >= blueprint.costGeodeRobot.obsidian &&
-				prod.ore >= blueprint.costGeodeRobot.ore {
-				p := copyProduction(prod)
-				p.obsidian -= blueprint.costGeodeRobot.obsidian
-				p.ore -= blueprint.costGeodeRobot.ore
-				p.ore += p.oreRobot
-				p.clay += p.clayRobot
-				p.obsidian += p.obsidianRobot
-				p.geode += p.geodeRobot
-				p.geodeRobot++
-				if !generated.Contains(p) {
-					nextGeneration = append(nextGeneration, p)
-					generated.Add(p)
-				}
-			} else {
-				if prod.obsidianRobot < blueprint.maxObsidian {
-					if prod.clay >= blueprint.costObsidianRobot.clay &&
-						prod.ore >= blueprint.costObsidianRobot.ore {
-						p := copyProduction(prod)
-						p.clay -= blueprint.costObsidianRobot.clay
-						p.ore -= blueprint.costObsidianRobot.ore
-						p.ore += p.oreRobot
-						p.clay += p.clayRobot
-						p.obsidian += p.obsidianRobot
-						p.geode += p.geodeRobot
-						p.obsidianRobot++
-						if !generated.Contains(p) {
-							nextGeneration = append(nextGeneration, p)
-							generated.Add(p)
-						}
-					}
-				}
-				if prod.clayRobot < blueprint.maxClay {
-					if prod.ore >= blueprint.costClayRobot.ore {
-						p := copyProduction(prod)
-						p.ore -= blueprint.costClayRobot.ore
-						p.ore += p.oreRobot
-						p.clay += p.clayRobot
-						p.obsidian += p.obsidianRobot
-						p.geode += p.geodeRobot
-						p.clayRobot++
-						if !generated.Contains(p) {
-							nextGeneration = append(nextGeneration, p)
-							generated.Add(p)
-						}
-					}
-				}
-				if prod.oreRobot < blueprint.maxOre {
-					if prod.ore >= blueprint.costOreRobot.ore {
-						p := copyProduction(prod)
-						p.ore -= blueprint.costOreRobot.ore
-						p.ore += p.oreRobot
-						p.clay += p.clayRobot
-						p.obsidian += p.obsidianRobot
-						p.geode += p.geodeRobot
-						p.oreRobot++
-						if !generated.Contains(p) {
-							nextGeneration = append(nextGeneration, p)
-							generated.Add(p)
-						}
-					}
-				}
-				// do nothing
-				prod.ore += prod.oreRobot
-				prod.clay += prod.clayRobot
-				prod.obsidian += prod.obsidianRobot
-				prod.geode += prod.geodeRobot
-				if !generated.Contains(prod) {
-					nextGeneration = append(nextGeneration, prod)
-					generated.Add(prod)
-				}
-			}
+		// If we've reached the time limit or seen this state, return
+		if s.minute == totalMinutes || seen.Contains(s) {
+			return
 		}
-		maxGeode := 0
-		maxGeodeRobot := 0
-		for _, prod := range nextGeneration {
-			if prod.geode > maxGeode {
-				maxGeode = prod.geode
-			}
-			if prod.geodeRobot > maxGeodeRobot {
-				maxGeodeRobot = prod.geodeRobot
-			}
-		}
-		// remove all that have less than maxGeode-2 and less than maxGeodeRobot-2
-		var newNextGeneration []production
-		for _, prod := range nextGeneration {
-			if prod.geode >= maxGeode-2 && prod.geodeRobot >= maxGeodeRobot-2 {
-				newNextGeneration = append(newNextGeneration, prod)
-			}
-		}
-		nextGeneration = newNextGeneration
-	}
 
-	// get max geode
-	maxGeode := 0
-	for _, prod := range nextGeneration {
-		if prod.geode > maxGeode {
-			maxGeode = prod.geode
+		// Calculate theoretical max geodes possible from this point
+		// Current geodes + current production + theoretical max new robots we could build
+		remainingTime := totalMinutes - s.minute
+		theoreticalMax := s.geode + (s.geodeRobot * remainingTime) +
+			((remainingTime * (remainingTime - 1)) / 2)
+
+		// If even the theoretical maximum can't beat our current best, prune this branch
+		if theoreticalMax <= maxGeodes {
+			return
+		}
+
+		seen.Add(s)
+
+		// Try building each type of robot, but only if we need more of that resource
+		nextMin := s.minute + 1
+
+		// Always try to build geode robot first if possible
+		if s.ore >= bp.costGeodeRobot.ore && s.obsidian >= bp.costGeodeRobot.obsidian {
+			dfs(state{
+				minute:        nextMin,
+				ore:           s.ore + s.oreRobot - bp.costGeodeRobot.ore,
+				clay:          s.clay + s.clayRobot,
+				obsidian:      s.obsidian + s.obsidianRobot - bp.costGeodeRobot.obsidian,
+				geode:         s.geode + s.geodeRobot,
+				oreRobot:      s.oreRobot,
+				clayRobot:     s.clayRobot,
+				obsidianRobot: s.obsidianRobot,
+				geodeRobot:    s.geodeRobot + 1,
+			})
+			return // If we can build a geode robot, we should always do it
+		}
+
+		// Try building obsidian robot
+		if s.obsidianRobot < bp.maxObsidian &&
+			s.ore >= bp.costObsidianRobot.ore && s.clay >= bp.costObsidianRobot.clay {
+			dfs(state{
+				minute:        nextMin,
+				ore:           s.ore + s.oreRobot - bp.costObsidianRobot.ore,
+				clay:          s.clay + s.clayRobot - bp.costObsidianRobot.clay,
+				obsidian:      s.obsidian + s.obsidianRobot,
+				geode:         s.geode + s.geodeRobot,
+				oreRobot:      s.oreRobot,
+				clayRobot:     s.clayRobot,
+				obsidianRobot: s.obsidianRobot + 1,
+				geodeRobot:    s.geodeRobot,
+			})
+		}
+
+		// Try building clay robot
+		if s.clayRobot < bp.maxClay && s.ore >= bp.costClayRobot.ore {
+			dfs(state{
+				minute:        nextMin,
+				ore:           s.ore + s.oreRobot - bp.costClayRobot.ore,
+				clay:          s.clay + s.clayRobot,
+				obsidian:      s.obsidian + s.obsidianRobot,
+				geode:         s.geode + s.geodeRobot,
+				oreRobot:      s.oreRobot,
+				clayRobot:     s.clayRobot + 1,
+				obsidianRobot: s.obsidianRobot,
+				geodeRobot:    s.geodeRobot,
+			})
+		}
+
+		// Try building ore robot
+		if s.oreRobot < bp.maxOre && s.ore >= bp.costOreRobot.ore {
+			dfs(state{
+				minute:        nextMin,
+				ore:           s.ore + s.oreRobot - bp.costOreRobot.ore,
+				clay:          s.clay + s.clayRobot,
+				obsidian:      s.obsidian + s.obsidianRobot,
+				geode:         s.geode + s.geodeRobot,
+				oreRobot:      s.oreRobot + 1,
+				clayRobot:     s.clayRobot,
+				obsidianRobot: s.obsidianRobot,
+				geodeRobot:    s.geodeRobot,
+			})
+		}
+
+		// Try doing nothing (but only if we're not at resource caps)
+		if s.ore < (bp.maxOre * 2) {
+			dfs(state{
+				minute:        nextMin,
+				ore:           s.ore + s.oreRobot,
+				clay:          s.clay + s.clayRobot,
+				obsidian:      s.obsidian + s.obsidianRobot,
+				geode:         s.geode + s.geodeRobot,
+				oreRobot:      s.oreRobot,
+				clayRobot:     s.clayRobot,
+				obsidianRobot: s.obsidianRobot,
+				geodeRobot:    s.geodeRobot,
+			})
 		}
 	}
-	return maxGeode
-}
 
-func copyProduction(prod production) production {
-	return production{
-		ore:           prod.ore,
-		clay:          prod.clay,
-		obsidian:      prod.obsidian,
-		geode:         prod.geode,
-		oreRobot:      prod.oreRobot,
-		clayRobot:     prod.clayRobot,
-		obsidianRobot: prod.obsidianRobot,
-		geodeRobot:    prod.geodeRobot,
-	}
+	// Start DFS with initial state
+	dfs(state{oreRobot: 1})
+	return maxGeodes
 }
