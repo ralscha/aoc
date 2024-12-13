@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -22,6 +23,7 @@ func part1(input string) []int {
 	lines := conv.SplitNewline(input)
 	summary := 0
 	var pattern []string
+	
 	for _, line := range lines {
 		if line == "" {
 			s := findMirror(pattern)
@@ -50,22 +52,32 @@ func part2(input string, mirrors []int) {
 	var pattern []string
 	for _, line := range lines {
 		if line == "" {
+			grid := gridutil.NewCharGrid2D(pattern)
+			minRow, maxRow := grid.GetMinMaxRow()
+			minCol, maxCol := grid.GetMinMaxCol()
 
 		outer:
-			for r := range pattern {
-				for c := range pattern[r] {
-					origStr := pattern[r]
-					if pattern[r][c] == '#' {
-						pattern[r] = pattern[r][:c] + "." + pattern[r][c+1:]
-					} else {
-						pattern[r] = pattern[r][:c] + "#" + pattern[r][c+1:]
-					}
-					s := findMirrorIgnore(pattern, mirrors[patternNo])
-					pattern[r] = origStr
+			for row := minRow; row <= maxRow; row++ {
+				for col := minCol; col <= maxCol; col++ {
+					if val, exists := grid.Get(row, col); exists {
+						// Flip the character
+						newVal := '.'
+						if val == '.' {
+							newVal = '#'
+						}
+						grid.Set(row, col, newVal)
+						
+						// Convert grid back to pattern for mirror finding
+						newPattern := gridToPattern(&grid)
+						s := findMirrorIgnore(newPattern, mirrors[patternNo])
+						
+						// Restore original character
+						grid.Set(row, col, val)
 
-					if s != 0 {
-						summary += s
-						break outer
+						if s != 0 {
+							summary += s
+							break outer
+						}
 					}
 				}
 			}
@@ -76,28 +88,57 @@ func part2(input string, mirrors []int) {
 			pattern = append(pattern, line)
 		}
 	}
-	patternNo = len(mirrors) - 1
+
 	if len(pattern) > 0 {
+		grid := gridutil.NewCharGrid2D(pattern)
+		minRow, maxRow := grid.GetMinMaxRow()
+		minCol, maxCol := grid.GetMinMaxCol()
+
 	outer2:
-		for r := range pattern {
-			for c := range pattern[r] {
-				origStr := pattern[r]
-				if pattern[r][c] == '#' {
-					pattern[r] = pattern[r][:c] + "." + pattern[r][c+1:]
-				} else {
-					pattern[r] = pattern[r][:c] + "#" + pattern[r][c+1:]
-				}
-				s := findMirrorIgnore(pattern, mirrors[patternNo])
-				pattern[r] = origStr
-				if s != 0 {
-					summary += s
-					break outer2
+		for row := minRow; row <= maxRow; row++ {
+			for col := minCol; col <= maxCol; col++ {
+				if val, exists := grid.Get(row, col); exists {
+					// Flip the character
+					newVal := '.'
+					if val == '.' {
+						newVal = '#'
+					}
+					grid.Set(row, col, newVal)
+					
+					// Convert grid back to pattern for mirror finding
+					newPattern := gridToPattern(&grid)
+					s := findMirrorIgnore(newPattern, mirrors[len(mirrors)-1])
+					
+					// Restore original character
+					grid.Set(row, col, val)
+
+					if s != 0 {
+						summary += s
+						break outer2
+					}
 				}
 			}
 		}
 	}
 
 	fmt.Println(summary)
+}
+
+func gridToPattern(grid *gridutil.Grid2D[rune]) []string {
+	var pattern []string
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+
+	for row := minRow; row <= maxRow; row++ {
+		line := ""
+		for col := minCol; col <= maxCol; col++ {
+			if val, exists := grid.Get(row, col); exists {
+				line += string(val)
+			}
+		}
+		pattern = append(pattern, line)
+	}
+	return pattern
 }
 
 func findMirror(pattern []string) int {
