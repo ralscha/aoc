@@ -1,19 +1,12 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
-	"strings"
 )
-
-type octo struct {
-	value   int32
-	flashed bool
-}
-
-var grid [][]*octo
 
 func main() {
 	input, err := download.ReadInput(2021, 11)
@@ -26,130 +19,103 @@ func main() {
 }
 
 func part1(input string) {
-	scanner := bufio.NewScanner(strings.NewReader(input))
+	lines := conv.SplitNewline(input)
+	grid := gridutil.NewGrid2D[int](false)
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		var row []*octo
-		for _, c := range line {
-			row = append(row, &octo{
-				value:   c - '0',
-				flashed: false,
-			})
-		}
-		grid = append(grid, row)
-	}
-
-	flashed := 0
-
-	for i := 0; i < 100; i++ {
-		for _, row := range grid {
-			for _, col := range row {
-				col.value++
-			}
-		}
-
-		flashes := 0
-		hashFlashes := true
-		for hashFlashes {
-			hashFlashes = false
-			for rowIx, row := range grid {
-				for colIx, col := range row {
-					if col.value > 9 {
-						col.value = 0
-						flashes++
-						incrNeighbors(rowIx, colIx)
-						hashFlashes = true
-					}
-				}
-			}
-		}
-
-		flashed += flashes
-	}
-
-	fmt.Println("Part 1", flashed)
-}
-
-func incrValue(rowIx, colIx int) {
-	if grid[rowIx][colIx].value > 0 {
-		grid[rowIx][colIx].value++
-	}
-}
-
-func incrNeighbors(rowIx, colIx int) {
-	if rowIx > 0 {
-		if colIx > 0 {
-			incrValue(rowIx-1, colIx-1)
-		}
-		incrValue(rowIx-1, colIx)
-
-		if colIx < len(grid[0])-1 {
-			incrValue(rowIx-1, colIx+1)
+	// Build grid
+	for row, line := range lines {
+		for col, c := range line {
+			grid.Set(row, col, int(c-'0'))
 		}
 	}
 
-	if colIx > 0 {
-		incrValue(rowIx, colIx-1)
-	}
-	if colIx < len(grid[0])-1 {
-		incrValue(rowIx, colIx+1)
+	totalFlashes := 0
+	for step := 0; step < 100; step++ {
+		totalFlashes += simulateStep(&grid)
 	}
 
-	if rowIx < len(grid)-1 {
-		if colIx > 0 {
-			incrValue(rowIx+1, colIx-1)
-		}
-		incrValue(rowIx+1, colIx)
-		if colIx < len(grid[0])-1 {
-			incrValue(rowIx+1, colIx+1)
-		}
-	}
+	fmt.Println("Part 1", totalFlashes)
 }
 
 func part2(input string) {
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	grid = nil
-	for scanner.Scan() {
-		line := scanner.Text()
-		var row []*octo
-		for _, c := range line {
-			row = append(row, &octo{
-				value:   c - '0',
-				flashed: false,
-			})
+	lines := conv.SplitNewline(input)
+	grid := gridutil.NewGrid2D[int](false)
+
+	// Build grid
+	for row, line := range lines {
+		for col, c := range line {
+			grid.Set(row, col, int(c-'0'))
 		}
-		grid = append(grid, row)
 	}
 
-	round := 1
+	step := 1
 	for {
-		for _, row := range grid {
-			for _, col := range row {
-				col.value++
-			}
+		flashes := simulateStep(&grid)
+		if flashes == 100 { // All octopuses flashed
+			fmt.Println("Part 2", step)
+			break
 		}
+		step++
+	}
+}
 
-		flashes := 0
-		hashFlashes := true
-		for hashFlashes {
-			hashFlashes = false
-			for rowIx, row := range grid {
-				for colIx, col := range row {
-					if col.value > 9 {
-						col.value = 0
-						flashes++
-						incrNeighbors(rowIx, colIx)
-						hashFlashes = true
+func simulateStep(grid *gridutil.Grid2D[int]) int {
+	// First, increase all energy levels by 1
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			val, _ := grid.Get(row, col)
+			grid.Set(row, col, val+1)
+		}
+	}
+
+	// Track flashed octopuses
+	flashed := gridutil.NewGrid2D[bool](false)
+	flashes := 0
+
+	// Keep flashing until no more flashes occur
+	for {
+		newFlashes := false
+		for row := minRow; row <= maxRow; row++ {
+			for col := minCol; col <= maxCol; col++ {
+				coord := gridutil.Coordinate{Row: row, Col: col}
+				hasFlashed, _ := flashed.GetC(coord)
+				energy, _ := grid.GetC(coord)
+
+				if energy > 9 && !hasFlashed {
+					// Flash this octopus
+					flashed.SetC(coord, true)
+					flashes++
+					newFlashes = true
+
+					// Increase energy of all neighbors
+					for _, dir := range gridutil.Get8Directions() {
+						neighborCoord := gridutil.Coordinate{
+							Row: coord.Row + dir.Row,
+							Col: coord.Col + dir.Col,
+						}
+						if val, ok := grid.GetC(neighborCoord); ok {
+							grid.SetC(neighborCoord, val+1)
+						}
 					}
 				}
 			}
 		}
-		if flashes == 100 {
-			fmt.Println("Part 2", round)
+		if !newFlashes {
 			break
 		}
-		round++
 	}
 
+	// Reset energy levels of flashed octopuses
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			coord := gridutil.Coordinate{Row: row, Col: col}
+			if hasFlashed, _ := flashed.GetC(coord); hasFlashed {
+				grid.SetC(coord, 0)
+			}
+		}
+	}
+
+	return flashes
 }
