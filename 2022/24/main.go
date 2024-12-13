@@ -5,6 +5,7 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/gridutil"
+	"aoc/internal/mathx"
 	"fmt"
 	"log"
 )
@@ -61,6 +62,7 @@ func makeValley(lines []string) (*valley, gridutil.Coordinate) {
 		height:    height,
 		blizzards: blizzards,
 	}
+	valley.initBlizzardCache()
 	return valley, gridutil.Coordinate{Row: height - 1, Col: width - 2}
 }
 
@@ -71,27 +73,33 @@ const (
 	right
 )
 
-var directions = []gridutil.Direction{
-	{Row: -1, Col: 0}, // up
-	{Row: 1, Col: 0},  // down
-	{Row: 0, Col: -1}, // left
-	{Row: 0, Col: 1},  // right
-}
-
-type path struct {
-	pos    gridutil.Coordinate
-	minute int
-}
-
 type valley struct {
-	width     int
-	height    int
-	blizzards []blizzard
+	width         int
+	height        int
+	blizzards     []blizzard
+	blizzardCache []map[gridutil.Coordinate]bool
+	cycleLength   int
 }
 
 type blizzard struct {
 	startPos gridutil.Coordinate
 	dir      int
+}
+
+func (v *valley) initBlizzardCache() {
+	// Calculate cycle length (LCM of width-2 and height-2)
+	v.cycleLength = mathx.Lcm([]int{v.width - 2, v.height - 2})
+	v.blizzardCache = make([]map[gridutil.Coordinate]bool, v.cycleLength)
+
+	// Pre-calculate all blizzard positions for the entire cycle
+	for minute := 0; minute < v.cycleLength; minute++ {
+		positions := make(map[gridutil.Coordinate]bool)
+		for _, b := range v.blizzards {
+			pos := b.posAtMinute(minute, *v)
+			positions[pos] = true
+		}
+		v.blizzardCache[minute] = positions
+	}
 }
 
 func (b *blizzard) posAtMinute(minute int, v valley) gridutil.Coordinate {
@@ -128,6 +136,10 @@ func (b *blizzard) posAtMinute(minute int, v valley) gridutil.Coordinate {
 	panic("invalid direction")
 }
 
+func (v *valley) isBlizzardAt(pos gridutil.Coordinate, minute int) bool {
+	return v.blizzardCache[minute%v.cycleLength][pos]
+}
+
 func (v *valley) moveExpedition(minute int, pos gridutil.Coordinate, dir gridutil.Direction, toPos gridutil.Coordinate) (gridutil.Coordinate, bool) {
 	nextPos := gridutil.Coordinate{
 		Row: pos.Row + dir.Row,
@@ -141,47 +153,51 @@ func (v *valley) moveExpedition(minute int, pos gridutil.Coordinate, dir griduti
 	if nextPos.Row < 1 || nextPos.Row >= v.height-1 || nextPos.Col < 1 || nextPos.Col >= v.width-1 {
 		return pos, false
 	}
-	for _, b := range v.blizzards {
-		bPos := b.posAtMinute(minute, *v)
-		if bPos == nextPos {
-			return pos, false
-		}
+
+	if v.isBlizzardAt(nextPos, minute) {
+		return pos, false
 	}
+
 	return nextPos, true
 }
 
-func (v *valley) findFastestPath(minute int, fromPos, toPos gridutil.Coordinate) int {
-	paths := container.NewQueue[path]()
-	paths.Push(path{pos: fromPos, minute: minute})
-	existingPaths := container.NewSet[path]()
+type state struct {
+	pos    gridutil.Coordinate
+	minute int
+}
 
-	for !paths.IsEmpty() {
-		p := paths.Pop()
-		p.minute++
+func (v *valley) findFastestPath(minute int, fromPos, toPos gridutil.Coordinate) int {
+	queue := container.NewQueue[state]()
+	queue.Push(state{pos: fromPos, minute: minute})
+	seen := make(map[state]bool)
+
+	for !queue.IsEmpty() {
+		current := queue.Pop()
+		nextMinute := current.minute + 1
 
 		// Try all directions
-		for _, dir := range directions {
-			nextPos, ok := v.moveExpedition(p.minute, p.pos, dir, toPos)
+		for _, dir := range gridutil.Get4Directions() {
+			nextPos, ok := v.moveExpedition(nextMinute, current.pos, dir, toPos)
 			if !ok {
 				continue
 			}
 			if nextPos == toPos {
-				return p.minute
+				return nextMinute
 			}
-			nextPath := path{pos: nextPos, minute: p.minute}
-			if !existingPaths.Contains(nextPath) {
-				existingPaths.Add(nextPath)
-				paths.Push(nextPath)
+			nextState := state{pos: nextPos, minute: nextMinute % v.cycleLength}
+			if !seen[nextState] {
+				seen[nextState] = true
+				queue.Push(state{pos: nextPos, minute: nextMinute})
 			}
 		}
 
 		// Try waiting in place
-		nextPos, ok := v.moveExpedition(p.minute, p.pos, gridutil.Direction{}, toPos)
+		nextPos, ok := v.moveExpedition(nextMinute, current.pos, gridutil.Direction{}, toPos)
 		if ok {
-			nextPath := path{pos: nextPos, minute: p.minute}
-			if !existingPaths.Contains(nextPath) {
-				existingPaths.Add(nextPath)
-				paths.Push(nextPath)
+			nextState := state{pos: nextPos, minute: nextMinute % v.cycleLength}
+			if !seen[nextState] {
+				seen[nextState] = true
+				queue.Push(state{pos: nextPos, minute: nextMinute})
 			}
 		}
 	}
