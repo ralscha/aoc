@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -16,7 +17,6 @@ func main() {
 
 	part1(input)
 	part2(input)
-
 }
 
 type cost struct {
@@ -100,7 +100,7 @@ func simulate(blueprint blueprint, minutes int, startProd production) int {
 		currentGeneration := nextGeneration
 		nextGeneration = nil
 
-		generated := make(map[production]bool)
+		generated := container.NewSet[production]()
 		for _, prod := range currentGeneration {
 			// building
 			if prod.obsidian >= blueprint.costGeodeRobot.obsidian &&
@@ -113,9 +113,9 @@ func simulate(blueprint blueprint, minutes int, startProd production) int {
 				p.obsidian += p.obsidianRobot
 				p.geode += p.geodeRobot
 				p.geodeRobot++
-				if !generated[p] {
+				if !generated.Contains(p) {
 					nextGeneration = append(nextGeneration, p)
-					generated[p] = true
+					generated.Add(p)
 				}
 			} else {
 				if prod.obsidianRobot < blueprint.maxObsidian {
@@ -129,9 +129,9 @@ func simulate(blueprint blueprint, minutes int, startProd production) int {
 						p.obsidian += p.obsidianRobot
 						p.geode += p.geodeRobot
 						p.obsidianRobot++
-						if !generated[p] {
+						if !generated.Contains(p) {
 							nextGeneration = append(nextGeneration, p)
-							generated[p] = true
+							generated.Add(p)
 						}
 					}
 				}
@@ -144,9 +144,9 @@ func simulate(blueprint blueprint, minutes int, startProd production) int {
 						p.obsidian += p.obsidianRobot
 						p.geode += p.geodeRobot
 						p.clayRobot++
-						if !generated[p] {
+						if !generated.Contains(p) {
 							nextGeneration = append(nextGeneration, p)
-							generated[p] = true
+							generated.Add(p)
 						}
 					}
 				}
@@ -159,9 +159,9 @@ func simulate(blueprint blueprint, minutes int, startProd production) int {
 						p.obsidian += p.obsidianRobot
 						p.geode += p.geodeRobot
 						p.oreRobot++
-						if !generated[p] {
+						if !generated.Contains(p) {
 							nextGeneration = append(nextGeneration, p)
-							generated[p] = true
+							generated.Add(p)
 						}
 					}
 				}
@@ -170,9 +170,9 @@ func simulate(blueprint blueprint, minutes int, startProd production) int {
 				prod.clay += prod.clayRobot
 				prod.obsidian += prod.obsidianRobot
 				prod.geode += prod.geodeRobot
-				if !generated[prod] {
+				if !generated.Contains(prod) {
 					nextGeneration = append(nextGeneration, prod)
-					generated[prod] = true
+					generated.Add(prod)
 				}
 			}
 		}
