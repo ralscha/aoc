@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -56,9 +57,8 @@ func handOrder(a, b hand) int {
 			}
 		}
 		return 0
-	} else {
-		return int(a.hType - b.hType)
 	}
+	return int(a.hType - b.hType)
 }
 
 func handOrderJoker(a, b hand) int {
@@ -69,17 +69,17 @@ func handOrderJoker(a, b hand) int {
 			}
 		}
 		return 0
-	} else {
-		return int(a.hType - b.hType)
 	}
+	return int(a.hType - b.hType)
 }
 
 func determineHandType(hand hand) handType {
-	cardCounts := make(map[rune]int)
+	cardBag := container.NewBag[rune]()
 	for _, card := range hand.cards {
-		cardCounts[card]++
+		cardBag.Add(card)
 	}
-
+	
+	cardCounts := cardBag.Values()
 	switch len(cardCounts) {
 	case 1:
 		return FiveOfAKind
@@ -100,65 +100,64 @@ func determineHandType(hand hand) handType {
 	case 4:
 		return OnePair
 	}
-
 	return HighCard
 }
 
 func determineHandTypeJoker(hand hand) handType {
-	cardCounts := make(map[rune]int)
+	cardBag := container.NewBag[rune]()
 	numberOfJokers := 0
 	for _, card := range hand.cards {
 		if card == 'J' {
 			numberOfJokers++
 			continue
 		}
-		cardCounts[card]++
+		cardBag.Add(card)
 	}
 
+	cardCounts := cardBag.Values()
 	ht := HighCard
-	for k1, v := range cardCounts {
+
+	for card, count := range cardCounts {
 		switch {
-		case v == 5:
+		case count == 5:
 			ht = FiveOfAKind
-		case v == 4:
+		case count == 4:
 			ht = FourOfAKind
 			if numberOfJokers == 1 {
 				ht = FiveOfAKind
 			}
-		case v == 3:
+		case count == 3:
 			ht = ThreeOfAKind
 			if numberOfJokers == 2 {
 				ht = FiveOfAKind
 			} else if numberOfJokers == 1 {
 				ht = FourOfAKind
 			} else {
-				for k2, v2 := range cardCounts {
-					if k1 == k2 {
+				for otherCard, otherCount := range cardCounts {
+					if card == otherCard {
 						continue
 					}
-
-					if v2 == 2 {
+					if otherCount == 2 {
 						ht = FullHouse
 						break
 					}
 				}
 			}
-		case v == 2:
+		case count == 2:
 			ht = OnePair
 			if numberOfJokers == 3 {
 				ht = FiveOfAKind
 			} else if numberOfJokers == 2 {
 				ht = FourOfAKind
 			} else {
-				for k2, v2 := range cardCounts {
-					if k1 == k2 {
+				for otherCard, otherCount := range cardCounts {
+					if card == otherCard {
 						continue
 					}
-
-					if v2 == 3 {
+					if otherCount == 3 {
 						ht = FullHouse
 						break
-					} else if v2 == 2 {
+					} else if otherCount == 2 {
 						ht = TwoPair
 						if numberOfJokers == 1 {
 							ht = FullHouse
@@ -191,7 +190,6 @@ func determineHandTypeJoker(hand hand) handType {
 		}
 	}
 	return ht
-
 }
 
 func part1(input string) {
@@ -207,9 +205,7 @@ func part1(input string) {
 		hands = append(hands, hand)
 	}
 
-	slices.SortFunc(hands, func(a, b hand) int {
-		return handOrder(a, b)
-	})
+	slices.SortFunc(hands, handOrder)
 
 	totalWinnings := 0
 	for i, hand := range hands {
@@ -231,9 +227,7 @@ func part2(input string) {
 		hands = append(hands, hand)
 	}
 
-	slices.SortFunc(hands, func(a, b hand) int {
-		return handOrderJoker(a, b)
-	})
+	slices.SortFunc(hands, handOrderJoker)
 
 	totalWinnings := 0
 	for i, hand := range hands {
