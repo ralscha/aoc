@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/mathx"
@@ -27,8 +28,6 @@ type pulseSend struct {
 	pulse    int
 }
 
-var pulseQueue []pulseSend
-
 type module interface {
 	receive(caller string, pulse int)
 	destinations() []string
@@ -42,7 +41,7 @@ type broadcaster struct {
 
 func (b *broadcaster) receive(_ string, pulse int) {
 	for _, dest := range b.moduleDestinations {
-		pulseQueue = append(pulseQueue, pulseSend{caller: b.moduleName, receiver: dest, pulse: pulse})
+		pulseQueue.Push(pulseSend{caller: b.moduleName, receiver: dest, pulse: pulse})
 	}
 }
 
@@ -57,7 +56,7 @@ func (b *broadcaster) name() string {
 type flipFlop struct {
 	moduleName         string
 	moduleDestinations []string
-	state              bool
+	state             bool
 }
 
 func (ff *flipFlop) receive(_ string, pulse int) {
@@ -71,7 +70,7 @@ func (ff *flipFlop) receive(_ string, pulse int) {
 			nextPulse = 0
 		}
 		for _, dest := range ff.moduleDestinations {
-			pulseQueue = append(pulseQueue, pulseSend{caller: ff.moduleName, receiver: dest, pulse: nextPulse})
+			pulseQueue.Push(pulseSend{caller: ff.moduleName, receiver: dest, pulse: nextPulse})
 		}
 	}
 }
@@ -104,7 +103,7 @@ func (c *conjunction) receive(caller string, pulse int) {
 		nextPulse = 0
 	}
 	for _, dest := range c.moduleDestinations {
-		pulseQueue = append(pulseQueue, pulseSend{caller: c.moduleName, receiver: dest, pulse: nextPulse})
+		pulseQueue.Push(pulseSend{caller: c.moduleName, receiver: dest, pulse: nextPulse})
 	}
 }
 
@@ -115,6 +114,8 @@ func (c *conjunction) destinations() []string {
 func (c *conjunction) name() string {
 	return c.moduleName
 }
+
+var pulseQueue *container.Queue[pulseSend]
 
 func part1and2(input string) {
 	lines := conv.SplitNewline(input)
@@ -162,13 +163,12 @@ func part1and2(input string) {
 
 	lowPulseSent := 0
 	highPulseSent := 0
+	pulseQueue = container.NewQueue[pulseSend]()
 
 	for i := 0; i < 1000; i++ {
-		pulseQueue = append(pulseQueue, pulseSend{caller: "", receiver: "broadcaster", pulse: 0})
-		for len(pulseQueue) > 0 {
-			pulse := pulseQueue[0]
-			pulseQueue = pulseQueue[1:]
-
+		pulseQueue.Push(pulseSend{caller: "", receiver: "broadcaster", pulse: 0})
+		for !pulseQueue.IsEmpty() {
+			pulse := pulseQueue.Pop()
 			receiver := modules[pulse.receiver]
 			if pulse.pulse == 0 {
 				lowPulseSent++
@@ -183,6 +183,7 @@ func part1and2(input string) {
 
 	fmt.Println(lowPulseSent * highPulseSent)
 
+	// Reset all modules for part 2
 	for _, c := range conjunctions {
 		for k := range c.inputStates {
 			c.inputStates[k] = 0
@@ -192,7 +193,7 @@ func part1and2(input string) {
 		f.state = false
 	}
 
-	// search conjunction that sends to rx
+	// Search conjunction that sends to rx
 	senderConjunction := ""
 	for _, line := range lines {
 		if strings.HasSuffix(line, "rx") {
@@ -211,19 +212,19 @@ func part1and2(input string) {
 		}
 	}
 
-	// search all inputs of sender conjunction
+	// Search all inputs of sender conjunction
 	inputs := make(map[string]int)
 	for k := range sender.inputStates {
 		inputs[k] = 0
 	}
 
 	cycleCount := 1
+	pulseQueue = container.NewQueue[pulseSend]()
 outer:
 	for {
-		pulseQueue = append(pulseQueue, pulseSend{caller: "", receiver: "broadcaster", pulse: 0})
-		for len(pulseQueue) > 0 {
-			pulse := pulseQueue[0]
-			pulseQueue = pulseQueue[1:]
+		pulseQueue.Push(pulseSend{caller: "", receiver: "broadcaster", pulse: 0})
+		for !pulseQueue.IsEmpty() {
+			pulse := pulseQueue.Pop()
 
 			if pulse.receiver == senderConjunction && pulse.pulse == 1 {
 				if _, ok := inputs[pulse.caller]; ok {
@@ -249,5 +250,4 @@ outer:
 	}
 
 	fmt.Println(mathx.Lcm(maps.Values(inputs)))
-
 }
