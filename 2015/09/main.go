@@ -31,8 +31,8 @@ func part1and2(input string) {
 		to := splitted[2]
 		weight := conv.MustAtoi(splitted[4])
 
-		graph.AddNode(from, nil)
-		graph.AddNode(to, nil)
+		graph.AddNode(from)
+		graph.AddNode(to)
 		graph.AddEdge(from, to, weight)
 		graph.AddEdge(to, from, weight) // Add reverse edge since it's undirected
 	}

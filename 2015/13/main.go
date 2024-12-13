@@ -29,20 +29,20 @@ func part1(input string) {
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 	graph := createGraph(lines)
-	
+
 	// Add "me" to the graph with 0 happiness to/from everyone
 	for _, node := range graph.GetNeighbors("") { // Empty string gets all nodes
-		graph.AddNode("me", nil)
+		graph.AddNode("me")
 		graph.AddEdge("me", node.ID, 0)
 		graph.AddEdge(node.ID, "me", 0)
 	}
-	
+
 	maxHappiness(graph)
 }
 
 func createGraph(lines []string) *graphutil.Graph {
 	graph := graphutil.NewGraph()
-	
+
 	for _, line := range lines {
 		splitted := strings.Fields(line)
 		name := splitted[0]
@@ -52,12 +52,12 @@ func createGraph(lines []string) *graphutil.Graph {
 		}
 		neighbour := splitted[10]
 		neighbour = neighbour[:len(neighbour)-1]
-		
-		graph.AddNode(name, nil)
-		graph.AddNode(neighbour, nil)
+
+		graph.AddNode(name)
+		graph.AddNode(neighbour)
 		graph.AddEdge(name, neighbour, gainLoseValue)
 	}
-	
+
 	return graph
 }
 
@@ -76,7 +76,7 @@ func maxHappiness(graph *graphutil.Graph) {
 			// Get happiness values between current person and their neighbors in the seating
 			neighbor1 := perm[(i-1+len(perm))%len(perm)]
 			neighbor2 := perm[(i+1)%len(perm)]
-			
+
 			// Add happiness in both directions (person -> neighbor and neighbor -> person)
 			for _, n := range graph.GetNeighbors(name) {
 				if n.ID == neighbor1 || n.ID == neighbor2 {

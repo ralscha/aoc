@@ -30,8 +30,8 @@ func part1(input string) {
 	for _, line := range lines {
 		words := strings.Fields(line)
 		dependsOn, step := words[1], words[7]
-		graph.AddNode(step, nil)
-		graph.AddNode(dependsOn, nil)
+		graph.AddNode(step)
+		graph.AddNode(dependsOn)
 		graph.AddEdge(dependsOn, step, 1) // Weight doesn't matter for part 1
 	}
 
@@ -109,8 +109,8 @@ func part2(input string) {
 	for _, line := range lines {
 		words := strings.Fields(line)
 		dependsOn, step := words[1], words[7]
-		graph.AddNode(step, nil)
-		graph.AddNode(dependsOn, nil)
+		graph.AddNode(step)
+		graph.AddNode(dependsOn)
 		graph.AddEdge(dependsOn, step, 1)
 	}
 
