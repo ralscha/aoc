@@ -1,8 +1,10 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"math/big"
@@ -18,52 +20,44 @@ func main() {
 	part2(input)
 }
 
-type pos struct {
-	x, y int
-}
-
-var directions = []pos{
-	{-1, 0},
-	{1, 0},
-	{0, -1},
-	{0, 1},
-}
-
 type state struct {
-	pos   pos
+	pos   gridutil.Coordinate
 	steps int
 }
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
+	grid := gridutil.NewCharGrid2D(lines)
 
-	var garden [][]bool
-	var startX, startY int
+	// Find start position
+	var start gridutil.Coordinate
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
 
-	row := 0
-	for _, line := range lines {
-		gardenRow := make([]bool, len(line))
-		for col, char := range line {
-			if char == 'S' {
-				startX, startY = row, col
-				gardenRow[col] = true
-			} else {
-				gardenRow[col] = char == '.'
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			if val, exists := grid.Get(row, col); exists && val == 'S' {
+				start = gridutil.Coordinate{Row: row, Col: col}
+				grid.Set(row, col, '.') // Replace 'S' with '.' for consistent movement
+				break
 			}
 		}
-		garden = append(garden, gardenRow)
-		row++
 	}
 
 	ways := make(map[state]int)
-	ways[state{pos{startX, startY}, 0}] = 1
+	ways[state{start, 0}] = 1
+
+	directions := gridutil.Get4Directions()
 
 	for step := 1; step <= 64; step++ {
 		nextWays := make(map[state]int)
 		for s, count := range ways {
 			for _, dir := range directions {
-				nextPos := pos{s.pos.x + dir.x, s.pos.y + dir.y}
-				if nextPos.x >= 0 && nextPos.x < len(garden) && nextPos.y >= 0 && nextPos.y < len(garden[0]) && garden[nextPos.x][nextPos.y] {
+				nextPos := gridutil.Coordinate{
+					Row: s.pos.Row + dir.Row,
+					Col: s.pos.Col + dir.Col,
+				}
+				if val, exists := grid.GetC(nextPos); exists && val == '.' {
 					nextState := state{nextPos, step}
 					nextWays[nextState] += count
 				}
@@ -80,53 +74,50 @@ func part1(input string) {
 	}
 
 	fmt.Println(count)
-
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	grid := make([][]bool, len(lines))
-	for i, line := range lines {
-		grid[i] = make([]bool, len(line))
-		for j, char := range line {
-			if char != '#' {
-				grid[i][j] = true
-			} else {
-				grid[i][j] = false
-			}
+	grid := gridutil.NewGrid2D[bool](false)
+
+	// Convert input to boolean grid (true for walkable, false for rocks)
+	for row, line := range lines {
+		for col, char := range line {
+			grid.Set(row, col, char != '#')
 		}
 	}
 
-	locs := make(map[pos]bool)
-	for y, line := range lines {
-		for x, char := range line {
+	// Find start position
+	locs := container.NewSet[gridutil.Coordinate]()
+	for row, line := range lines {
+		for col, char := range line {
 			if char == 'S' {
-				locs[pos{y: y, x: x}] = true
+				locs.Add(gridutil.Coordinate{Row: row, Col: col})
 			}
 		}
 	}
 
+	directions := gridutil.Get4Directions()
 	var steps [3]*big.Int
 	s := 0
-	for i := 1; i <= len(grid)*3+65; i++ {
-		nlocs := make(map[pos]bool)
-		for l := range locs {
-			y, x := l.y, l.x
-			if isValid(grid, y-1, x) {
-				nlocs[pos{y: y - 1, x: x}] = true
-			}
-			if isValid(grid, y+1, x) {
-				nlocs[pos{y: y + 1, x: x}] = true
-			}
-			if isValid(grid, y, x-1) {
-				nlocs[pos{y: y, x: x - 1}] = true
-			}
-			if isValid(grid, y, x+1) {
-				nlocs[pos{y: y, x: x + 1}] = true
+	gridSize := len(lines)
+
+	for i := 1; i <= gridSize*3+65; i++ {
+		nlocs := container.NewSet[gridutil.Coordinate]()
+		for _, loc := range locs.Values() {
+			for _, dir := range directions {
+				nextPos := gridutil.Coordinate{
+					Row: loc.Row + dir.Row,
+					Col: loc.Col + dir.Col,
+				}
+				if isValid(&grid, nextPos) {
+					nlocs.Add(nextPos)
+				}
 			}
 		}
-		if i%len(grid) == len(grid)/2 {
-			steps[s] = big.NewInt(int64(len(nlocs)))
+
+		if i%gridSize == gridSize/2 {
+			steps[s] = big.NewInt(int64(nlocs.Len()))
 			s++
 			if s == 3 {
 				break
@@ -135,7 +126,7 @@ func part2(input string) {
 		locs = nlocs
 	}
 
-	result := f(big.NewInt(int64(26501365/len(grid))), steps)
+	result := calculateResult(big.NewInt(int64(26501365/len(lines))), steps)
 	fmt.Println(result)
 }
 
@@ -143,11 +134,23 @@ func mod(a, b int) int {
 	return (a%b + b) % b
 }
 
-func isValid(grid [][]bool, y, x int) bool {
-	return grid[mod(y, len(grid))][mod(x, len(grid[0]))]
+func isValid(grid *gridutil.Grid2D[bool], pos gridutil.Coordinate) bool {
+	minRow, maxRow := grid.GetMinMaxRow()
+	minCol, maxCol := grid.GetMinMaxCol()
+	height := maxRow - minRow + 1
+	width := maxCol - minCol + 1
+
+	// Map position to grid bounds using modulo
+	mappedRow := mod(pos.Row-minRow, height) + minRow
+	mappedCol := mod(pos.Col-minCol, width) + minCol
+
+	if val, exists := grid.Get(mappedRow, mappedCol); exists {
+		return val
+	}
+	return false
 }
 
-func f(n *big.Int, steps [3]*big.Int) *big.Int {
+func calculateResult(n *big.Int, steps [3]*big.Int) *big.Int {
 	a0 := steps[0]
 	a1 := steps[1]
 	a2 := steps[2]
@@ -156,6 +159,7 @@ func f(n *big.Int, steps [3]*big.Int) *big.Int {
 	b1 := big.NewInt(0).Sub(a1, a0)
 	b2 := big.NewInt(0).Sub(a2, a1)
 
+	// Calculate quadratic formula components
 	c := big.NewInt(0).Mul(n, big.NewInt(0).Sub(n, big.NewInt(1)))
 	c = big.NewInt(0).Div(c, big.NewInt(2))
 	c = big.NewInt(0).Mul(c, big.NewInt(0).Sub(b2, b1))
