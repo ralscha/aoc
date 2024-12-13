@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/rangeutil"
 	"fmt"
 	"log"
 	"strings"
@@ -68,11 +69,11 @@ func part1and2(input string) {
 
 	fmt.Println(totalRating)
 
-	total := acceptedCombination(map[byte]partRange{
-		'x': {1, 4001},
-		'm': {1, 4001},
-		'a': {1, 4001},
-		's': {1, 4001},
+	total := acceptedCombination(map[byte]rangeutil.Range{
+		'x': rangeutil.NewRange(1, 4000),
+		'm': rangeutil.NewRange(1, 4000),
+		'a': rangeutil.NewRange(1, 4000),
+		's': rangeutil.NewRange(1, 4000),
 	}, "in", workflows)
 
 	fmt.Println(total)
@@ -90,10 +91,8 @@ func parseRule(ruleStr string) rule {
 			value:     value,
 			compare:   compare,
 		}, target: target}
-	} else {
-		return rule{condition: condition{},
-			target: parts[0]}
 	}
+	return rule{condition: condition{}, target: parts[0]}
 }
 
 func parseWorkflow(workflowStr string) workflow {
@@ -169,27 +168,22 @@ func processPart(part part, workflows map[string]workflow) (bool, int) {
 	}
 }
 
-type partRange struct {
-	start, stop int
-}
-
-func acceptedCombination(ranges map[byte]partRange, currentWorkflow string, workflows map[string]workflow) int {
+func acceptedCombination(ranges map[byte]rangeutil.Range, currentWorkflow string, workflows map[string]workflow) int {
 	if currentWorkflow == "A" {
-		return (ranges['x'].stop - ranges['x'].start) *
-			(ranges['m'].stop - ranges['m'].start) *
-			(ranges['a'].stop - ranges['a'].start) *
-			(ranges['s'].stop - ranges['s'].start)
+		return ranges['x'].Length() *
+			ranges['m'].Length() *
+			ranges['a'].Length() *
+			ranges['s'].Length()
 	} else if currentWorkflow == "R" {
 		return 0
 	}
 
-	rangesCopy := make(map[byte]partRange)
+	rangesCopy := make(map[byte]rangeutil.Range)
 	for k, v := range ranges {
 		rangesCopy[k] = v
 	}
 
 	workflow := workflows[currentWorkflow]
-
 	total := 0
 
 	for _, rule := range workflow.rules {
@@ -198,18 +192,30 @@ func acceptedCombination(ranges map[byte]partRange, currentWorkflow string, work
 			break
 		}
 
-		var destRange, afterRange partRange
+		currentRange := rangesCopy[rule.condition.attribute]
+		var destRange, afterRange *rangeutil.Range
+
 		if rule.condition.compare == '>' {
-			destRange = partRange{rule.condition.value + 1, rangesCopy[rule.condition.attribute].stop}
-			afterRange = partRange{rangesCopy[rule.condition.attribute].start, rule.condition.value + 1}
+			if before, after := currentRange.Split(rule.condition.value + 1); after != nil {
+				destRange = after
+				afterRange = before
+			}
 		} else {
-			destRange = partRange{rangesCopy[rule.condition.attribute].start, rule.condition.value}
-			afterRange = partRange{rule.condition.value, rangesCopy[rule.condition.attribute].stop}
+			if before, after := currentRange.Split(rule.condition.value); before != nil {
+				destRange = before
+				afterRange = after
+			}
 		}
 
-		rangesCopy[rule.condition.attribute] = destRange
-		total += acceptedCombination(rangesCopy, rule.target, workflows)
-		rangesCopy[rule.condition.attribute] = afterRange
+		if destRange != nil {
+			rangesCopy[rule.condition.attribute] = *destRange
+			total += acceptedCombination(rangesCopy, rule.target, workflows)
+		}
+		if afterRange != nil {
+			rangesCopy[rule.condition.attribute] = *afterRange
+		} else {
+			break
+		}
 	}
 	return total
 }
