@@ -2,7 +2,6 @@ package graphutil
 
 import (
 	"aoc/internal/container"
-	"strings"
 )
 
 type Node struct {
@@ -25,7 +24,7 @@ func NewGraph() *Graph {
 	}
 }
 
-func (g *Graph) AddNode(id string, data interface{}) {
+func (g *Graph) AddNode(id string) {
 	if _, exists := g.nodes[id]; !exists {
 		g.nodes[id] = make([]*Node, 0)
 	}
@@ -130,17 +129,4 @@ func (g *Graph) FindAllPaths(start, end string, condition func(node *Node) bool)
 
 	dfs(start)
 	return paths
-}
-
-func ParseNetwork(lines []string) *Graph {
-	g := NewGraph()
-	for _, line := range lines {
-		parts := strings.Fields(line)
-		from := parts[0]
-		to := parts[2]
-		g.AddNode(from, nil)
-		g.AddNode(to, nil)
-		g.AddEdge(from, to, 1)
-	}
-	return g
 }
