@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 )
@@ -15,105 +16,33 @@ func main() {
 
 	part1(input)
 	part2(input)
-
-}
-
-type position struct {
-	row, col int
 }
 
 type elf struct {
-	nextPosition *position
+	nextPosition *gridutil.Coordinate
 }
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
-	elves := make(map[position]*elf)
+	elves := make(map[gridutil.Coordinate]*elf)
 
 	for r, line := range lines {
 		for i, c := range line {
 			if c == '#' {
-				pos := position{row: r, col: i}
+				pos := gridutil.Coordinate{Row: r, Col: i}
 				elves[pos] = &elf{}
 			}
 		}
-
 	}
 
-	var directions = []string{"n", "s", "w", "e"}
+	directions := []string{"n", "s", "w", "e"}
+	neighborOffsets := getNeighborOffsets()
 
 	round := 10
 	for r := 1; r <= round; r++ {
-
-		for pos, elf := range elves {
-			var neighbors []bool
-			hasNeighbor := false
-			for i := -1; i <= 1; i++ {
-				for j := -1; j <= 1; j++ {
-					if i == 0 && j == 0 {
-						continue
-					}
-					checkPos := position{row: pos.row + i, col: pos.col + j}
-					if elves[checkPos] != nil {
-						neighbors = append(neighbors, true)
-						hasNeighbor = true
-					} else {
-						neighbors = append(neighbors, false)
-					}
-				}
-			}
-			if !hasNeighbor {
-				continue
-			}
-			for _, direction := range directions {
-				if direction == "n" && !neighbors[0] && !neighbors[1] && !neighbors[2] {
-					elf.nextPosition = &position{row: pos.row - 1, col: pos.col}
-					break
-				}
-				if direction == "s" && !neighbors[5] && !neighbors[6] && !neighbors[7] {
-					elf.nextPosition = &position{row: pos.row + 1, col: pos.col}
-					break
-				}
-				if direction == "w" && !neighbors[0] && !neighbors[3] && !neighbors[5] {
-					elf.nextPosition = &position{row: pos.row, col: pos.col - 1}
-					break
-				}
-				if direction == "e" && !neighbors[2] && !neighbors[4] && !neighbors[7] {
-					elf.nextPosition = &position{row: pos.row, col: pos.col + 1}
-					break
-				}
-			}
-		}
-
-		// remove duplicates
-		for _, elf := range elves {
-			if elf.nextPosition == nil {
-				continue
-			}
-			hasSame := false
-			for _, elf2 := range elves {
-				if elf != elf2 && elf2.nextPosition != nil && *elf.nextPosition == *elf2.nextPosition {
-					hasSame = true
-					elf2.nextPosition = nil
-				}
-			}
-			if hasSame {
-				elf.nextPosition = nil
-			}
-		}
-
-		// move
-		newElves := make(map[position]*elf)
-		for pos, elf := range elves {
-			if elf.nextPosition != nil {
-				newElves[*elf.nextPosition] = elf
-				elf.nextPosition = nil
-			} else {
-				newElves[pos] = elf
-			}
-		}
-		elves = newElves
-
+		proposeMovements(elves, directions, neighborOffsets)
+		removeDuplicateProposals(elves)
+		elves = moveElves(elves)
 		directions = append(directions[1:], directions[0])
 	}
 
@@ -123,81 +52,26 @@ func part1(input string) {
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-	elves := make(map[position]*elf)
+	elves := make(map[gridutil.Coordinate]*elf)
 
 	for r, line := range lines {
 		for i, c := range line {
 			if c == '#' {
-				pos := position{row: r, col: i}
+				pos := gridutil.Coordinate{Row: r, Col: i}
 				elves[pos] = &elf{}
 			}
 		}
-
 	}
 
-	var directions = []string{"n", "s", "w", "e"}
+	directions := []string{"n", "s", "w", "e"}
+	neighborOffsets := getNeighborOffsets()
 
 	round := 1
 	for {
+		proposeMovements(elves, directions, neighborOffsets)
+		removeDuplicateProposals(elves)
 
-		for pos, elf := range elves {
-			var neighbors []bool
-			hasNeighbor := false
-			for i := -1; i <= 1; i++ {
-				for j := -1; j <= 1; j++ {
-					if i == 0 && j == 0 {
-						continue
-					}
-					checkPos := position{row: pos.row + i, col: pos.col + j}
-					if elves[checkPos] != nil {
-						neighbors = append(neighbors, true)
-						hasNeighbor = true
-					} else {
-						neighbors = append(neighbors, false)
-					}
-				}
-			}
-			if !hasNeighbor {
-				continue
-			}
-			for _, direction := range directions {
-				if direction == "n" && !neighbors[0] && !neighbors[1] && !neighbors[2] {
-					elf.nextPosition = &position{row: pos.row - 1, col: pos.col}
-					break
-				}
-				if direction == "s" && !neighbors[5] && !neighbors[6] && !neighbors[7] {
-					elf.nextPosition = &position{row: pos.row + 1, col: pos.col}
-					break
-				}
-				if direction == "w" && !neighbors[0] && !neighbors[3] && !neighbors[5] {
-					elf.nextPosition = &position{row: pos.row, col: pos.col - 1}
-					break
-				}
-				if direction == "e" && !neighbors[2] && !neighbors[4] && !neighbors[7] {
-					elf.nextPosition = &position{row: pos.row, col: pos.col + 1}
-					break
-				}
-			}
-		}
-
-		// remove duplicates
-		for _, elf := range elves {
-			if elf.nextPosition == nil {
-				continue
-			}
-			hasSame := false
-			for _, elf2 := range elves {
-				if elf != elf2 && elf2.nextPosition != nil && *elf.nextPosition == *elf2.nextPosition {
-					hasSame = true
-					elf2.nextPosition = nil
-				}
-			}
-			if hasSame {
-				elf.nextPosition = nil
-			}
-		}
-
-		// count next positions
+		// Count next positions
 		nextPos := 0
 		for _, elf := range elves {
 			if elf.nextPosition != nil {
@@ -210,40 +84,100 @@ func part2(input string) {
 			break
 		}
 
-		// move
-		newElves := make(map[position]*elf)
-		for pos, elf := range elves {
-			if elf.nextPosition != nil {
-				newElves[*elf.nextPosition] = elf
-				elf.nextPosition = nil
-			} else {
-				newElves[pos] = elf
-			}
-		}
-		elves = newElves
-
+		elves = moveElves(elves)
 		directions = append(directions[1:], directions[0])
 		round++
 	}
 }
 
-func findMinMax(elves map[position]*elf) (int, int, int, int) {
-	minRow := 1000
-	maxRow := -1000
-	minCol := 1000
-	maxCol := -1000
+func getNeighborOffsets() []gridutil.Direction {
+	return []gridutil.Direction{
+		{Row: -1, Col: -1}, {Row: -1, Col: 0}, {Row: -1, Col: 1}, // NW, N, NE
+		{Row: 0, Col: -1}, {Row: 0, Col: 1}, // W, E
+		{Row: 1, Col: -1}, {Row: 1, Col: 0}, {Row: 1, Col: 1}, // SW, S, SE
+	}
+}
+
+func proposeMovements(elves map[gridutil.Coordinate]*elf, directions []string, neighborOffsets []gridutil.Direction) {
+	for pos, elf := range elves {
+		var neighbors []bool
+		hasNeighbor := false
+		for _, offset := range neighborOffsets {
+			checkPos := gridutil.Coordinate{Row: pos.Row + offset.Row, Col: pos.Col + offset.Col}
+			if elves[checkPos] != nil {
+				neighbors = append(neighbors, true)
+				hasNeighbor = true
+			} else {
+				neighbors = append(neighbors, false)
+			}
+		}
+		if !hasNeighbor {
+			continue
+		}
+		for _, direction := range directions {
+			if direction == "n" && !neighbors[0] && !neighbors[1] && !neighbors[2] {
+				elf.nextPosition = &gridutil.Coordinate{Row: pos.Row - 1, Col: pos.Col}
+				break
+			}
+			if direction == "s" && !neighbors[5] && !neighbors[6] && !neighbors[7] {
+				elf.nextPosition = &gridutil.Coordinate{Row: pos.Row + 1, Col: pos.Col}
+				break
+			}
+			if direction == "w" && !neighbors[0] && !neighbors[3] && !neighbors[5] {
+				elf.nextPosition = &gridutil.Coordinate{Row: pos.Row, Col: pos.Col - 1}
+				break
+			}
+			if direction == "e" && !neighbors[2] && !neighbors[4] && !neighbors[7] {
+				elf.nextPosition = &gridutil.Coordinate{Row: pos.Row, Col: pos.Col + 1}
+				break
+			}
+		}
+	}
+}
+
+func removeDuplicateProposals(elves map[gridutil.Coordinate]*elf) {
+	proposalCount := make(map[gridutil.Coordinate]int)
+	for _, elf := range elves {
+		if elf.nextPosition != nil {
+			proposalCount[*elf.nextPosition]++
+		}
+	}
+
+	for _, elf := range elves {
+		if elf.nextPosition != nil && proposalCount[*elf.nextPosition] > 1 {
+			elf.nextPosition = nil
+		}
+	}
+}
+
+func moveElves(elves map[gridutil.Coordinate]*elf) map[gridutil.Coordinate]*elf {
+	newElves := make(map[gridutil.Coordinate]*elf)
+	for pos, elf := range elves {
+		if elf.nextPosition != nil {
+			newElves[*elf.nextPosition] = elf
+			elf.nextPosition = nil
+		} else {
+			newElves[pos] = elf
+		}
+	}
+	return newElves
+}
+
+func findMinMax(elves map[gridutil.Coordinate]*elf) (int, int, int, int) {
+	minRow, maxRow := 1000, -1000
+	minCol, maxCol := 1000, -1000
 	for pos := range elves {
-		if pos.row < minRow {
-			minRow = pos.row
+		if pos.Row < minRow {
+			minRow = pos.Row
 		}
-		if pos.row > maxRow {
-			maxRow = pos.row
+		if pos.Row > maxRow {
+			maxRow = pos.Row
 		}
-		if pos.col < minCol {
-			minCol = pos.col
+		if pos.Col < minCol {
+			minCol = pos.Col
 		}
-		if pos.col > maxCol {
-			maxCol = pos.col
+		if pos.Col > maxCol {
+			maxCol = pos.Col
 		}
 	}
 	return minRow, maxRow, minCol, maxCol
