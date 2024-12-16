@@ -46,6 +46,12 @@ func (pq PriorityQueue[T]) Pop() T {
 	return item.value
 }
 
+// Peek returns the element with the lowest priority value from the queue without removing it.
+func (pq PriorityQueue[T]) Peek() T {
+	item := (*pq.pq)[0]
+	return item.value
+}
+
 type item[T any] struct {
 	value    T
 	priority int
