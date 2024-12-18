@@ -67,7 +67,7 @@ func part2(input string) {
 		}
 	}
 
-	for _, line := range lines {
+	for i, line := range lines {
 		parts := strings.Split(line, ",")
 		if len(parts) != 2 {
 			continue
@@ -75,6 +75,10 @@ func part2(input string) {
 		x := conv.MustAtoi(parts[0])
 		y := conv.MustAtoi(parts[1])
 		grid.Set(y, x, '#')
+
+		if i < 1024 {
+			continue
+		}
 
 		_, found := grid.ShortestPathWithBFS(
 			gridutil.Coordinate{Row: 0, Col: 0},
