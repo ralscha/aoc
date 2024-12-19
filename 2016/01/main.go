@@ -4,6 +4,7 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/gridutil"
+	"aoc/internal/mathx"
 	"fmt"
 	"log"
 	"strings"
@@ -44,7 +45,7 @@ func part1(input string) {
 		pos.Row += dir.Row * steps
 	}
 
-	fmt.Println("Part 1", abs(pos.Row)+abs(pos.Col))
+	fmt.Println("Part 1", mathx.Abs(pos.Row)+mathx.Abs(pos.Col))
 }
 
 func part2(input string) {
@@ -87,12 +88,5 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Part 2", abs(firstVisited.Row)+abs(firstVisited.Col))
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
+	fmt.Println("Part 2", mathx.Abs(firstVisited.Row)+mathx.Abs(firstVisited.Col))
 }
