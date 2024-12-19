@@ -3,10 +3,16 @@ package main
 import (
 	"aoc/internal/container"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"crypto/md5"
 	"fmt"
 	"log"
 )
+
+type state struct {
+	pos  gridutil.Coordinate
+	path string
+}
 
 func getOpenDoors(path string, salt string) [4]bool {
 	hash := fmt.Sprintf("%x", md5.Sum([]byte(salt+path)))
@@ -29,108 +35,65 @@ func main() {
 	part2(input)
 }
 
-func part1(input string) {
-	salt := input
-	queue := container.NewQueue[struct {
-		x    int
-		y    int
-		path string
-	}]()
-	queue.Push(struct {
-		x, y int
-		path string
-	}{0, 0, ""})
+func findPaths(salt string, findLongest bool) string {
+	queue := container.NewQueue[state]()
+	queue.Push(state{pos: gridutil.Coordinate{Row: 0, Col: 0}, path: ""})
+	target := gridutil.Coordinate{Row: 3, Col: 3}
+	longest := 0
+	shortestPath := ""
+
+	dirs := []struct {
+		dir  gridutil.Direction
+		char string
+	}{
+		{gridutil.DirectionN, "U"},
+		{gridutil.DirectionS, "D"},
+		{gridutil.DirectionW, "L"},
+		{gridutil.DirectionE, "R"},
+	}
 
 	for !queue.IsEmpty() {
 		curr := queue.Pop()
-		x := curr.x
-		y := curr.y
-		path := curr.path
 
-		if x == 3 && y == 3 {
-			fmt.Println("Part 1:", path)
-			return
+		if curr.pos == target {
+			if findLongest {
+				if len(curr.path) > longest {
+					longest = len(curr.path)
+				}
+				continue
+			} else {
+				return curr.path
+			}
 		}
 
-		open := getOpenDoors(path, salt)
-		if open[0] && y > 0 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x, y - 1, path + "U"})
-		}
-		if open[1] && y < 3 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x, y + 1, path + "D"})
-		}
-		if open[2] && x > 0 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x - 1, y, path + "L"})
-		}
-		if open[3] && x < 3 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x + 1, y, path + "R"})
+		open := getOpenDoors(curr.path, salt)
+		for i, d := range dirs {
+			if !open[i] {
+				continue
+			}
+
+			newPos := gridutil.Coordinate{Row: curr.pos.Row + d.dir.Row, Col: curr.pos.Col + d.dir.Col}
+			if newPos.Row < 0 || newPos.Row > 3 || newPos.Col < 0 || newPos.Col > 3 {
+				continue
+			}
+
+			queue.Push(state{
+				pos:  newPos,
+				path: curr.path + d.char,
+			})
 		}
 	}
+
+	if findLongest {
+		return fmt.Sprintf("%d", longest)
+	}
+	return shortestPath
+}
+
+func part1(input string) {
+	fmt.Println("Part 1:", findPaths(input, false))
 }
 
 func part2(input string) {
-	salt := input
-	queue := container.NewQueue[struct {
-		x    int
-		y    int
-		path string
-	}]()
-	queue.Push(struct {
-		x, y int
-		path string
-	}{0, 0, ""})
-	longest := 0
-
-	for !queue.IsEmpty() {
-		curr := queue.Pop()
-		x := curr.x
-		y := curr.y
-		path := curr.path
-
-		if x == 3 && y == 3 {
-			if len(path) > longest {
-				longest = len(path)
-			}
-			continue
-		}
-
-		open := getOpenDoors(path, salt)
-		if open[0] && y > 0 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x, y - 1, path + "U"})
-		}
-		if open[1] && y < 3 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x, y + 1, path + "D"})
-		}
-		if open[2] && x > 0 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x - 1, y, path + "L"})
-		}
-		if open[3] && x < 3 {
-			queue.Push(struct {
-				x, y int
-				path string
-			}{x + 1, y, path + "R"})
-		}
-	}
-	fmt.Println("Part 2:", longest)
+	fmt.Println("Part 2:", findPaths(input, true))
 }
