@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/mathx"
 	"fmt"
 	"log"
 	"regexp"
@@ -37,41 +38,26 @@ func main() {
 	part2(input)
 }
 
+func findValidTime(discs []disc) int {
+	time := 0
+	step := 1
+
+	for i, d := range discs {
+		for (d.start+time+i+1)%d.positions != 0 {
+			time += step
+		}
+		step = mathx.Lcm([]int{step, d.positions})
+	}
+	return time
+}
+
 func part1(input string) {
 	discs := parseInput(input)
-	time := 0
-	for {
-		valid := true
-		for i, disc := range discs {
-			if (disc.start+time+i+1)%disc.positions != 0 {
-				valid = false
-				break
-			}
-		}
-		if valid {
-			fmt.Println("Part 1", time)
-			return
-		}
-		time++
-	}
+	fmt.Println("Part 1", findValidTime(discs))
 }
 
 func part2(input string) {
 	discs := parseInput(input)
 	discs = append(discs, disc{positions: 11, start: 0})
-	time := 0
-	for {
-		valid := true
-		for i, disc := range discs {
-			if (disc.start+time+i+1)%disc.positions != 0 {
-				valid = false
-				break
-			}
-		}
-		if valid {
-			fmt.Println("Part 2", time)
-			return
-		}
-		time++
-	}
+	fmt.Println("Part 2", findValidTime(discs))
 }
