@@ -2,14 +2,16 @@ package main
 
 import (
 	"aoc/internal/download"
+	"aoc/internal/stringutil"
 	"fmt"
 	"log"
 )
 
 func dragonCurve(a []byte) []byte {
 	b := make([]byte, len(a))
-	for i := 0; i < len(a); i++ {
-		if a[len(a)-1-i] == '0' {
+	reversed := []byte(stringutil.Reverse(string(a)))
+	for i := 0; i < len(reversed); i++ {
+		if reversed[i] == '0' {
 			b[i] = '1'
 		} else {
 			b[i] = '0'
@@ -55,22 +57,19 @@ func main() {
 	part2(input)
 }
 
-func part1(input string) {
-	diskSize := 272
+func fillDisk(input string, diskSize int) string {
 	data := []byte(input)
 	for len(data) < diskSize {
 		data = dragonCurve(data)
 	}
 	data = data[:diskSize]
-	fmt.Println("Part 1:", string(checksum(data)))
+	return string(checksum(data))
+}
+
+func part1(input string) {
+	fmt.Println("Part 1:", fillDisk(input, 272))
 }
 
 func part2(input string) {
-	diskSize := 35651584
-	data := []byte(input)
-	for len(data) < diskSize {
-		data = dragonCurve(data)
-	}
-	data = data[:diskSize]
-	fmt.Println("Part 2:", string(checksum(data)))
+	fmt.Println("Part 2:", fillDisk(input, 35651584))
 }
