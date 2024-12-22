@@ -5,8 +5,8 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -27,7 +27,7 @@ func part1(input string) {
 		splitted := strings.Fields(line)
 		field := splitted[0]
 		recordedGroups := conv.ToIntSlice(strings.Split(splitted[1], ","))
-		
+
 		// Use Set to store unique combinations
 		combinations := container.NewSet[string]()
 		for _, comb := range generateCombinations(field) {
@@ -75,7 +75,7 @@ func generateCombinations(pattern string) []string {
 		hashCombinations := generateCombinations("#" + pattern[1:])
 		return append(dotCombinations, hashCombinations...)
 	}
-	
+
 	subCombinations := generateCombinations(pattern[1:])
 	for i, comb := range subCombinations {
 		subCombinations[i] = string(pattern[0]) + comb

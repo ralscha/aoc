@@ -6,8 +6,9 @@ import (
 	"aoc/internal/download"
 	"aoc/internal/mathx"
 	"fmt"
-	"golang.org/x/exp/maps"
 	"log"
+	"maps"
+	"slices"
 	"strings"
 )
 
@@ -56,7 +57,7 @@ func (b *broadcaster) name() string {
 type flipFlop struct {
 	moduleName         string
 	moduleDestinations []string
-	state             bool
+	state              bool
 }
 
 func (ff *flipFlop) receive(_ string, pulse int) {
@@ -249,5 +250,5 @@ outer:
 		cycleCount++
 	}
 
-	fmt.Println(mathx.Lcm(maps.Values(inputs)))
+	fmt.Println(mathx.Lcm(slices.Collect(maps.Values(inputs))))
 }

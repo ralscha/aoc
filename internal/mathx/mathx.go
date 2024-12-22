@@ -1,7 +1,6 @@
 package mathx
 
 import (
-	"golang.org/x/exp/constraints"
 	"math"
 )
 
@@ -69,10 +68,14 @@ func CartesianProductSelf[T any](n int, values []T) [][]T {
 	return result
 }
 
+type Number interface {
+	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64
+}
+
 // Abs returns the absolute value of the input number.
 // It works with both integer and floating-point types using Go's constraints package.
 // For example: Abs(-5) returns 5, Abs(3.14) returns 3.14.
-func Abs[E constraints.Float | constraints.Integer](input E) E {
+func Abs[E Number](input E) E {
 	if input < 0 {
 		return -input
 	}

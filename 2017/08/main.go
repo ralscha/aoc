@@ -4,8 +4,8 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
-	"golang.org/x/exp/maps"
 	"log"
+	"maps"
 	"slices"
 	"strings"
 )
@@ -50,8 +50,8 @@ func part1and2(input string) {
 			}
 		}
 	}
-
-	maxValue := slices.Max(maps.Values(registers))
+	
+	maxValue := slices.Max(slices.Collect(maps.Values(registers)))
 	fmt.Println(maxValue)
 	fmt.Println(highestValue)
 }
