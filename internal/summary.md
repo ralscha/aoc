@@ -56,6 +56,7 @@ This document provides a detailed description of each method within the `interna
 
 ### conv.go
 
+-   `func MustSscanf(s string, format string, a ...interface{})`: Parses a string according to a format specifier, logs a fatal error and terminates the program on error.
 -   `func MustAtoi(s string) int`: Converts a string to an integer, panics on error.
 -   `func MustAtoi64(s string) int64`: Converts a string to an int64, panics on error.
 -   `func SplitNewline(s string) []string`: Splits a string by newlines.

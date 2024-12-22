@@ -36,9 +36,10 @@ func generateNextSecret(secret int) int {
 
 func part1(input string) {
 	lines := conv.SplitNewline(input)
+	nums := conv.ToIntSlice(lines)
 	sum := 0
-	for _, initial := range lines {
-		secret := conv.MustAtoi(initial)
+	for _, initial := range nums {
+		secret := initial
 		for range 2000 {
 			secret = generateNextSecret(secret)
 		}
@@ -50,10 +51,10 @@ func part1(input string) {
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
-
+	nums := conv.ToIntSlice(lines)
 	patternValues := make(map[[4]int]int)
-	for _, initial := range lines {
-		secret := conv.MustAtoi(initial)
+	for _, initial := range nums {
+		secret := initial
 		lastPrice := secret % 10
 
 		var pattern [][2]int

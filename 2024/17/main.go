@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
 	"log"
@@ -102,27 +103,15 @@ func (cmp *computer) outputMatches(target []int) bool {
 func parseInput(input string) (a, b, c int, program []int) {
 	lines := strings.Split(input, "\n")
 
-	_, err := fmt.Sscanf(lines[0], "Register A: %d", &a)
-	if err != nil {
-		log.Fatalf("Failed to parse register A: %s", lines[0])
-	}
-	_, err = fmt.Sscanf(lines[1], "Register B: %d", &b)
-	if err != nil {
-		log.Fatalf("Failed to parse register B: %s", lines[1])
-	}
-	_, err = fmt.Sscanf(lines[2], "Register C: %d", &c)
-	if err != nil {
-		log.Fatalf("Failed to parse register C: %s", lines[2])
-	}
+	conv.MustSscanf(lines[0], "Register A: %d", &a)
+	conv.MustSscanf(lines[1], "Register B: %d", &b)
+	conv.MustSscanf(lines[2], "Register C: %d", &c)
 
 	programStr := strings.TrimPrefix(lines[4], "Program: ")
 	programParts := strings.Split(programStr, ",")
 	program = make([]int, len(programParts))
 	for i, p := range programParts {
-		_, err = fmt.Sscanf(p, "%d", &program[i])
-		if err != nil {
-			log.Fatalf("Failed to parse program instruction %d: %s", i, p)
-		}
+		conv.MustSscanf(p, "%d", &program[i])
 	}
 
 	return

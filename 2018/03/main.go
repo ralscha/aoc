@@ -31,10 +31,7 @@ func part1(input string) {
 	claims := make([]claim, len(lines))
 	for i, line := range lines {
 		var c claim
-		_, err := fmt.Sscanf(line, "#%d @ %d,%d: %dx%d", &c.id, &c.x, &c.y, &c.width, &c.height)
-		if err != nil {
-			log.Fatalf("scanning claim failed: %v", err)
-		}
+		conv.MustSscanf(line, "#%d @ %d,%d: %dx%d", &c.id, &c.x, &c.y, &c.width, &c.height)
 		claims[i] = c
 	}
 
@@ -73,10 +70,7 @@ func part2(input string) {
 	claims := make([]claim, len(lines))
 	for i, line := range lines {
 		var c claim
-		_, err := fmt.Sscanf(line, "#%d @ %d,%d: %dx%d", &c.id, &c.x, &c.y, &c.width, &c.height)
-		if err != nil {
-			log.Fatalf("scanning claim failed: %v", err)
-		}
+		conv.MustSscanf(line, "#%d @ %d,%d: %dx%d", &c.id, &c.x, &c.y, &c.width, &c.height)
 		claims[i] = c
 	}
 

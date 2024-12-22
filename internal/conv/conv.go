@@ -1,10 +1,20 @@
 package conv
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
 )
+
+// MustSscanf scans a string according to a format string and stores the results in the arguments.
+// If the scanning fails, it logs a fatal error and terminates the program.
+func MustSscanf(str string, format string, a ...any) {
+	_, err := fmt.Sscanf(str, format, a...)
+	if err != nil {
+		log.Fatalf("parsing line failed: %v", err)
+	}
+}
 
 // MustAtoi converts a string to an integer.
 // If the conversion fails, it logs a fatal error and terminates the program.

@@ -48,10 +48,7 @@ func parseInput(input string) []robot {
 
 	for i, line := range lines {
 		newRobot := robot{}
-		_, err := fmt.Sscanf(line, "p=%d,%d v=%d,%d\n", &newRobot.posX, &newRobot.posY, &newRobot.velX, &newRobot.velY)
-		if err != nil {
-			log.Fatalf("parsing failed: %v", err)
-		}
+		conv.MustSscanf(line, "p=%d,%d v=%d,%d\n", &newRobot.posX, &newRobot.posY, &newRobot.velX, &newRobot.velY)
 		robots[i] = newRobot
 	}
 

@@ -28,10 +28,7 @@ func part1(input string) {
 	moons := make([]moon, len(lines))
 	for i, line := range lines {
 		var x, y, z int
-		_, err := fmt.Sscanf(line, "<x=%d, y=%d, z=%d>", &x, &y, &z)
-		if err != nil {
-			log.Fatalf("parsing moon %d failed: %v", i, err)
-		}
+		conv.MustSscanf(line, "<x=%d, y=%d, z=%d>", &x, &y, &z)
 		moons[i] = moon{x: x, y: y, z: z}
 	}
 
@@ -88,10 +85,7 @@ func part2(input string) {
 	moons := make([]moon, len(lines))
 	for i, line := range lines {
 		var x, y, z int
-		_, err := fmt.Sscanf(line, "<x=%d, y=%d, z=%d>", &x, &y, &z)
-		if err != nil {
-			log.Fatalf("parsing moon %d failed: %v", i, err)
-		}
+		conv.MustSscanf(line, "<x=%d, y=%d, z=%d>", &x, &y, &z)
 		moons[i] = moon{x: x, y: y, z: z}
 	}
 

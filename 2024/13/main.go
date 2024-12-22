@@ -60,20 +60,9 @@ func (m machine) findSolutionCramer() (a, b int, possible bool) {
 func parseMachine(lines []string) machine {
 	var m machine
 
-	_, err := fmt.Sscanf(lines[0], "Button A: X+%d, Y+%d", &m.buttonA.x, &m.buttonA.y)
-	if err != nil {
-		log.Fatalf("parsing button A failed: %v", err)
-	}
-
-	_, err = fmt.Sscanf(lines[1], "Button B: X+%d, Y+%d", &m.buttonB.x, &m.buttonB.y)
-	if err != nil {
-		log.Fatalf("parsing button B failed: %v", err)
-	}
-
-	_, err = fmt.Sscanf(lines[2], "Prize: X=%d, Y=%d", &m.prize.x, &m.prize.y)
-	if err != nil {
-		log.Fatalf("parsing prize failed: %v", err)
-	}
+	conv.MustSscanf(lines[0], "Button A: X+%d, Y+%d", &m.buttonA.x, &m.buttonA.y)
+	conv.MustSscanf(lines[1], "Button B: X+%d, Y+%d", &m.buttonB.x, &m.buttonB.y)
+	conv.MustSscanf(lines[2], "Prize: X=%d, Y=%d", &m.prize.x, &m.prize.y)
 
 	return m
 }
