@@ -6,6 +6,7 @@ import (
 	"aoc/internal/mathx"
 	"fmt"
 	"log"
+	"slices"
 )
 
 func main() {
@@ -18,23 +19,26 @@ func main() {
 	part2(input)
 }
 
+func sumCombination(combination []int) int {
+	total := 0
+	for _, v := range combination {
+		total += v
+	}
+	return total
+}
+
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 	containerSizes := conv.ToIntSlice(lines)
 	totalEggnogLiters := 150
 
 	combinations := mathx.Combinations(containerSizes)
-	totalCombinations := 0
-	for _, combination := range combinations {
-		total := 0
-		for _, v := range combination {
-			total += v
-		}
-		if total == totalEggnogLiters {
-			totalCombinations++
-		}
-	}
-	fmt.Println(totalCombinations)
+
+	validCombos := slices.DeleteFunc(combinations, func(combo []int) bool {
+		return sumCombination(combo) != totalEggnogLiters
+	})
+
+	fmt.Println(len(validCombos))
 }
 
 func part2(input string) {
@@ -43,22 +47,19 @@ func part2(input string) {
 	totalEggnogLiters := 150
 
 	combinations := mathx.Combinations(containerSizes)
-	minContainers := 0
-	totalCombinations := 0
-	for _, combination := range combinations {
-		total := 0
-		for _, v := range combination {
-			total += v
-		}
-		if total == totalEggnogLiters {
-			combinationLength := len(combination)
-			if minContainers == 0 || combinationLength < minContainers {
-				minContainers = combinationLength
-				totalCombinations = 1
-			} else if combinationLength == minContainers {
-				totalCombinations++
-			}
-		}
-	}
-	fmt.Println(totalCombinations)
+
+	validCombos := slices.DeleteFunc(combinations, func(combo []int) bool {
+		return sumCombination(combo) != totalEggnogLiters
+	})
+	
+	minCombo := slices.MinFunc(validCombos, func(a, b []int) int {
+		return len(a) - len(b)
+	})
+	minLength := len(minCombo)
+
+	minLengthCombos := slices.DeleteFunc(validCombos, func(combo []int) bool {
+		return len(combo) != minLength
+	})
+
+	fmt.Println(len(minLengthCombos))
 }
