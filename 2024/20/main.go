@@ -39,7 +39,7 @@ func solve(grid gridutil.Grid2D[rune], maxCheatDistance int) int {
 	pathPositions := mainPath.Path
 
 	cheatsCount := 0
-	for i := 0; i < len(pathPositions)-1; i++ {
+	for i := range len(pathPositions) - 1 {
 		for j := i + 1; j < len(pathPositions); j++ {
 			savedBySkipping := j - i
 

@@ -111,7 +111,7 @@ func compare(input1 any, input2 any) int {
 		case float64:
 			return compare(input1, []any{input2})
 		case []any:
-			for i := 0; i < len(input1.([]any)); i++ {
+			for i := range len(input1.([]any)) {
 				if i >= len(input2.([]any)) {
 					return 1
 				}

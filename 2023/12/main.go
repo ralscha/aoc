@@ -98,7 +98,7 @@ func part2(input string) {
 		// Build expanded field and groups
 		newField := strings.Join([]string{field, field, field, field, field}, "?")
 		newRecordedGroup := []int{}
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			newRecordedGroup = append(newRecordedGroup, recordedGroups...)
 		}
 

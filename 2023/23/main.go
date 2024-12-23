@@ -84,7 +84,7 @@ func isValidPoint(p point, grid [][]byte) bool {
 
 func getNeighbors(p point, grid [][]byte) []point {
 	neighbors := make([]point, 0, 4)
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		next := point{p.x + dx[i], p.y + dy[i]}
 		if isValidPoint(next, grid) {
 			neighbors = append(neighbors, next)

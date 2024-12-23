@@ -63,7 +63,7 @@ func part2(input string) {
 	lines := conv.SplitNewline(input)
 	blueprints := createBlueprints(lines)
 	result := 1
-	for i := 0; i < min(3, len(blueprints)); i++ {
+	for i := range min(3, len(blueprints)) {
 		maxGeode := findMaxGeodes(blueprints[i], 32)
 		result *= maxGeode
 	}

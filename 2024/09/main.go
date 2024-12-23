@@ -31,7 +31,7 @@ func parseDiskMap(diskMap string) []int {
 	var blocks []int
 	fileID := 0
 
-	for i := 0; i < len(diskMap); i++ {
+	for i := range len(diskMap) {
 		id := fileID
 		if i%2 == 1 {
 			id = -1

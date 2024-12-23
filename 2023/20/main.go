@@ -166,7 +166,7 @@ func part1and2(input string) {
 	highPulseSent := 0
 	pulseQueue = container.NewQueue[pulseSend]()
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		pulseQueue.Push(pulseSend{caller: "", receiver: "broadcaster", pulse: 0})
 		for !pulseQueue.IsEmpty() {
 			pulse := pulseQueue.Pop()

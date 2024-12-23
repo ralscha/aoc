@@ -23,7 +23,7 @@ func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 	grid := gridutil.NewCharGrid2D(lines)
 	galaxies := make(map[gridutil.Coordinate]struct{})
-	
+
 	minRow, maxRow := grid.GetMinMaxRow()
 	minCol, maxCol := grid.GetMinMaxCol()
 
@@ -74,7 +74,7 @@ func part1and2(input string) {
 
 	sumPart1 := 0
 	sumPart2 := 0
-	for i := 0; i < len(galaxyPoints)-1; i++ {
+	for i := range len(galaxyPoints) - 1 {
 		for j := i + 1; j < len(galaxyPoints); j++ {
 			start := galaxyPoints[i]
 			end := galaxyPoints[j]

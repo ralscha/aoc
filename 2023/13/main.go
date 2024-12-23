@@ -23,7 +23,7 @@ func part1(input string) []int {
 	lines := conv.SplitNewline(input)
 	summary := 0
 	var pattern []string
-	
+
 	for _, line := range lines {
 		if line == "" {
 			s := findMirror(pattern)
@@ -66,11 +66,11 @@ func part2(input string, mirrors []int) {
 							newVal = '#'
 						}
 						grid.Set(row, col, newVal)
-						
+
 						// Convert grid back to pattern for mirror finding
 						newPattern := gridToPattern(&grid)
 						s := findMirrorIgnore(newPattern, mirrors[patternNo])
-						
+
 						// Restore original character
 						grid.Set(row, col, val)
 
@@ -104,11 +104,11 @@ func part2(input string, mirrors []int) {
 						newVal = '#'
 					}
 					grid.Set(row, col, newVal)
-					
+
 					// Convert grid back to pattern for mirror finding
 					newPattern := gridToPattern(&grid)
 					s := findMirrorIgnore(newPattern, mirrors[len(mirrors)-1])
-					
+
 					// Restore original character
 					grid.Set(row, col, val)
 
@@ -187,7 +187,7 @@ func findMirrorColumnVertically(pattern []string, ignore int) int {
 
 func isMirrorHorizontally(pattern []string, middle int) bool {
 	cols := len(pattern[0])
-	for i := 0; i < middle; i++ {
+	for range middle {
 		for col := 0; col < cols; col++ {
 			upper := ""
 			lower := ""

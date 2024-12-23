@@ -18,7 +18,7 @@ func simulateRace(name string, actionStr string, segments int) chariot {
 	power := 10
 	essence := 0
 
-	for i := 0; i < segments; i++ {
+	for i := range segments {
 		action := actions[i%len(actions)]
 
 		switch action {

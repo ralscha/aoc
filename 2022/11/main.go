@@ -35,7 +35,7 @@ func part1(input string) {
 	monkeys := createMonkeys(lines)
 	inspectCount := make(map[int]int)
 
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		for m := 0; m < len(monkeys); m++ {
 			monkey := monkeys[m]
 			for !monkey.items.IsEmpty() {
@@ -83,7 +83,7 @@ func part2(input string) {
 
 	inspectCount := make(map[int]int)
 
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		for m := 0; m < len(monkeys); m++ {
 			monkey := monkeys[m]
 			for !monkey.items.IsEmpty() {
@@ -137,7 +137,7 @@ func createMonkeys(lines []string) map[int]*monkey {
 	for i := 0; i < len(lines); i += 7 {
 		first := strings.Fields(lines[i])
 		monkeyNo := conv.MustAtoi(first[1][:len(first[1])-1])
-		
+
 		items := container.NewQueue[int]()
 		itemsStr := strings.Fields(lines[i+1])[2:]
 		for _, item := range itemsStr {

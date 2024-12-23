@@ -167,7 +167,7 @@ func part2(input string) {
 	}
 
 	var solutions []solution
-	for i := 0; i < 1024; i++ {
+	for i := range 1024 {
 		if steps[i] == program[0] {
 			solutions = append(solutions, solution{i})
 		}
@@ -177,7 +177,7 @@ func part2(input string) {
 		var newSolutions []solution
 		for _, s := range solutions {
 			current := s[len(s)-1] >> 3
-			for i := 0; i < 8; i++ {
+			for i := range 8 {
 				if steps[(i<<7)+current] == k {
 					newSol := make(solution, len(s)+1)
 					copy(newSol, s)

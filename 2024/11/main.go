@@ -55,7 +55,7 @@ func part1and2(input string, iterations int) {
 		stones[stone]++
 	}
 
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		stones = simulateBlink(stones)
 	}
 

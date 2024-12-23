@@ -71,7 +71,7 @@ func bfs(grid [][]int, start, end point) int {
 		if head.row == end.row && head.col == end.col {
 			break
 		}
-		for i := 0; i < 4; i++ {
+		for i := range 4 {
 			newRow := head.row + dx[i]
 			newCol := head.col + dy[i]
 			if newRow >= 0 && newRow < noRows && newCol >= 0 && newCol < noCols && !visited[point{newRow, newCol}] &&

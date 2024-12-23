@@ -51,7 +51,7 @@ type hand struct {
 
 func handOrder(a, b hand) int {
 	if a.hType == b.hType {
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			if a.cards[i] != b.cards[i] {
 				return cardOrder[rune(a.cards[i])] - cardOrder[rune(b.cards[i])]
 			}
@@ -63,7 +63,7 @@ func handOrder(a, b hand) int {
 
 func handOrderJoker(a, b hand) int {
 	if a.hType == b.hType {
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			if a.cards[i] != b.cards[i] {
 				return cardOrderJoker[rune(a.cards[i])] - cardOrderJoker[rune(b.cards[i])]
 			}
@@ -78,7 +78,7 @@ func determineHandType(hand hand) handType {
 	for _, card := range hand.cards {
 		cardBag.Add(card)
 	}
-	
+
 	cardCounts := cardBag.Values()
 	switch len(cardCounts) {
 	case 1:

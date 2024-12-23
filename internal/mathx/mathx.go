@@ -10,7 +10,7 @@ import (
 // For example, given [1,2], it returns [[1], [2], [1,2]].
 func Combinations[T any](input []T) [][]T {
 	var results [][]T
-	for i := 0; i < 1<<uint(len(input)); i++ {
+	for i := range 1 << uint(len(input)) {
 		var combination []T
 		for ix, in := range input {
 			if i&(1<<uint(ix)) > 0 {

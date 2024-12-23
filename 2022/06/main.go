@@ -21,7 +21,7 @@ func part1and2(input string, blockLength int) {
 		return
 	}
 
-	for i := 0; i < len(input)-blockLength; i++ {
+	for i := range len(input) - blockLength {
 		block := input[i : i+blockLength]
 		if uniqueCharacters(block) {
 			fmt.Printf("index: %d\n", i+blockLength)
@@ -32,7 +32,7 @@ func part1and2(input string, blockLength int) {
 
 func uniqueCharacters(s string) bool {
 	// return true if string contains unique characters
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		for j := i + 1; j < len(s); j++ {
 			if s[i] == s[j] {
 				return false

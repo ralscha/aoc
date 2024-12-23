@@ -61,7 +61,7 @@ func part1(input string) {
 }
 
 func move(g grid, currentPosition position, facing, number int) position {
-	for i := 0; i < number; i++ {
+	for range number {
 		switch facing {
 		case 0: // right
 			nextCol := (currentPosition.col + 1) % len(g[currentPosition.row])
@@ -188,7 +188,7 @@ func move3d(g grid, currentPosition position, facing, number int) (position, int
 	directions[2] = position{row: 0, col: -1}
 	directions[3] = position{row: -1, col: 0}
 
-	for i := 0; i < number; i++ {
+	for range number {
 		nextPosition := position{
 			row: currentPosition.row + directions[facing].row,
 			col: currentPosition.col + directions[facing].col,

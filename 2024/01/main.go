@@ -35,7 +35,7 @@ func part1(input string) {
 	slices.Sort(rightList)
 
 	totalDistance := 0
-	for i := 0; i < len(leftList); i++ {
+	for i := range len(leftList) {
 		totalDistance += mathx.Abs(leftList[i] - rightList[i])
 	}
 	fmt.Println("Part 1", totalDistance)

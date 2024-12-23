@@ -57,7 +57,7 @@ func part1and2(input string) {
 
 	intersections := 0
 
-	for i := 0; i < len(hailstones)-1; i++ {
+	for i := range len(hailstones) - 1 {
 		for j := i + 1; j < len(hailstones); j++ {
 
 			h1 := hailstones[i]

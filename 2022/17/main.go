@@ -49,7 +49,7 @@ func part1and2(jets string) {
 	cache := map[[2]int][]int{}
 
 	height, jet := 0, 0
-	for i := 0; i < 1000000000000; i++ {
+	for i := range 1000000000000 {
 		if i == 2022 {
 			fmt.Println(height)
 		}

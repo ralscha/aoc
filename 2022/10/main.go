@@ -28,7 +28,7 @@ func part1(input string) {
 		if line[:4] == "addx" {
 			instructions = 2
 		}
-		for i := 0; i < instructions; i++ {
+		for range instructions {
 			if cycle == 20 || cycle == 60 || cycle == 100 || cycle == 140 || cycle == 180 || cycle == 220 {
 				signalStrength := cycle * x
 				results = append(results, signalStrength)
@@ -68,7 +68,7 @@ func part2(input string) {
 		if line[:4] == "addx" {
 			instructions = 2
 		}
-		for i := 0; i < instructions; i++ {
+		for range instructions {
 			if crtCol == x || crtCol == x+1 || crtCol == x-1 {
 				crt.Set(crtRow, crtCol, '#')
 			}

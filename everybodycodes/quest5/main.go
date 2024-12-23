@@ -79,7 +79,7 @@ func (d *Dance) simulateClap(round int) int {
 
 func (d *Dance) moveUp(col int) {
 	currentCol := d.cols[col]
-	for i := 0; i < len(currentCol)-1; i++ {
+	for i := range len(currentCol) - 1 {
 		currentCol[i] = currentCol[i+1]
 	}
 	d.cols[col] = currentCol[:len(currentCol)-1]

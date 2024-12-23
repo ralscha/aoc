@@ -51,7 +51,7 @@ func CountVowels(s string) int {
 
 // HasRepeatedChar returns true if any character appears twice in a row
 func HasRepeatedChar(s string) bool {
-	for i := 0; i < len(s)-1; i++ {
+	for i := range len(s) - 1 {
 		if s[i] == s[i+1] {
 			return true
 		}
@@ -61,7 +61,7 @@ func HasRepeatedChar(s string) bool {
 
 // HasRepeatedPair returns true if any pair of characters appears twice without overlapping
 func HasRepeatedPair(s string) bool {
-	for i := 0; i < len(s)-1; i++ {
+	for i := range len(s) - 1 {
 		if strings.Count(s, s[i:i+2]) > 1 {
 			return true
 		}
@@ -72,7 +72,7 @@ func HasRepeatedPair(s string) bool {
 // HasSandwichedChar returns true if any character appears with exactly one character between them
 // For example, "aba" and "xyx" would return true, "abc" would not
 func HasSandwichedChar(s string) bool {
-	for i := 0; i < len(s)-2; i++ {
+	for i := range len(s) - 2 {
 		if s[i] == s[i+2] {
 			return true
 		}

@@ -35,7 +35,7 @@ func part1(input string) {
 		direction := splitted[0]
 		steps := conv.MustAtoi(splitted[1])
 
-		for i := 0; i < steps; i++ {
+		for range steps {
 			switch direction {
 			case "U":
 				head.Row--
@@ -99,7 +99,7 @@ func part2(input string) {
 		direction := splitted[0]
 		steps := conv.MustAtoi(splitted[1])
 
-		for i := 0; i < steps; i++ {
+		for range steps {
 			switch direction {
 			case "U":
 				head.Row--

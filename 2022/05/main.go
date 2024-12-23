@@ -48,7 +48,7 @@ func part1(input string) {
 		move, from, to := parseLine(line)
 		from -= 1
 		to -= 1
-		for i := 0; i < move; i++ {
+		for range move {
 			stacks[to] = append([]string{stacks[from][0]}, stacks[to]...)
 			stacks[from] = stacks[from][1:]
 		}

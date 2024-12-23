@@ -48,7 +48,7 @@ func part1and2(input string) {
 
 func calculateDifferences(numbers []int) []int {
 	differences := make([]int, len(numbers)-1)
-	for i := 0; i < len(numbers)-1; i++ {
+	for i := range len(numbers) - 1 {
 		differences[i] = numbers[i+1] - numbers[i]
 	}
 	return differences

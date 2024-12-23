@@ -33,7 +33,7 @@ func main() {
 	fmt.Println("Part 1", elves[0])
 
 	sum := 0
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		sum += elves[i]
 	}
 	fmt.Println("Part 2", sum)

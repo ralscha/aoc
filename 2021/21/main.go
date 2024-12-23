@@ -56,7 +56,7 @@ func part1(input string) {
 	for game.players[0].score < 1000 && game.players[1].score < 1000 {
 		// Roll three times and sum
 		sum := 0
-		for i := 0; i < 3; i++ {
+		for range 3 {
 			sum += die
 			die = die%100 + 1
 		}

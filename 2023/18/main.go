@@ -96,7 +96,7 @@ func part2(input string) {
 func shoelace(points []point, perimeter int) {
 	points = reverse(points)
 	a := 0
-	for i := 0; i < len(points)-1; i++ {
+	for i := range len(points) - 1 {
 		a += (points[i].y + points[i+1].y) * (points[i].x - points[i+1].x)
 	}
 	fmt.Println(perimeter/2 + a/2 + 1)

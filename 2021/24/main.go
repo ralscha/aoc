@@ -40,7 +40,7 @@ func solve(input string, part2 bool) {
 	next := 0
 	var inputs []z3.Int
 
-	for i := 0; i < 14; i++ {
+	for i := range 14 {
 		d := ctx.IntConst("i" + strconv.Itoa(i))
 		solver.Assert(d.LE(ctx.FromInt(9, ctx.IntSort()).(z3.Int)))
 		solver.Assert(d.GE(ctx.FromInt(1, ctx.IntSort()).(z3.Int)))
