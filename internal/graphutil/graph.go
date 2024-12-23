@@ -2,6 +2,7 @@ package graphutil
 
 import (
 	"aoc/internal/container"
+	"slices"
 )
 
 type Node struct {
@@ -76,8 +77,7 @@ func (g *Graph) FindCycle(startID string) []string {
 				}
 			}
 			if cycleStart != -1 {
-				cycle := make([]string, len(path)-cycleStart)
-				copy(cycle, path[cycleStart:])
+				cycle := slices.Clone(path[cycleStart:])
 				paths = append(paths, cycle)
 			}
 			return
@@ -110,8 +110,7 @@ func (g *Graph) FindAllPaths(start, end string, condition func(node *Node) bool)
 	var dfs func(current string)
 	dfs = func(current string) {
 		if current == end {
-			path := make([]string, len(currentPath))
-			copy(path, currentPath)
+			path := slices.Clone(currentPath)
 			paths = append(paths, path)
 			return
 		}
