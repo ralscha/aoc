@@ -20,7 +20,7 @@ func main() {
 
 func part1and2(input string, iterations int) {
 	str := input[:len(input)-1]
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		str = lookAndSay(str)
 	}
 	fmt.Println(len(str))

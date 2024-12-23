@@ -31,7 +31,7 @@ func part1(input string) {
 
 	distinctMolecules := container.NewSet[string]()
 	for _, replacement := range replacements {
-		for i := 0; i < len(molecule); i++ {
+		for i := range len(molecule) {
 			if strings.HasPrefix(molecule[i:], replacement.from) {
 				distinctMolecules.Add(molecule[:i] + replacement.to + molecule[i+len(replacement.from):])
 			}
@@ -53,7 +53,7 @@ func part2(input string) {
 	steps := 0
 	for molecule != targetMolecule {
 		for _, replacement := range replacements {
-			for i := 0; i < len(molecule); i++ {
+			for i := range len(molecule) {
 				if strings.HasPrefix(molecule[i:], replacement.to) {
 					molecule = molecule[:i] + replacement.from + molecule[i+len(replacement.to):]
 					steps++

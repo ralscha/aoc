@@ -55,7 +55,7 @@ func part1(input string) {
 		})
 
 		computedCheck := ""
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			computedCheck += string(chars[i].c)
 		}
 

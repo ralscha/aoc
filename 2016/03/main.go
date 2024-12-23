@@ -43,7 +43,7 @@ func part2(input string) {
 		line1 := strings.Fields(lines[i])
 		line2 := strings.Fields(lines[i+1])
 		line3 := strings.Fields(lines[i+2])
-		for c := 0; c < 3; c++ {
+		for c := range 3 {
 			n1 := conv.MustAtoi(line1[c])
 			n2 := conv.MustAtoi(line2[c])
 			n3 := conv.MustAtoi(line3[c])

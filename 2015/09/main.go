@@ -51,7 +51,7 @@ func shortestRoute(graph *graphutil.Graph, locations []string) int {
 	shortestDistance := math.MaxInt32
 	for _, route := range mathx.Permutations(locations) {
 		distance := 0
-		for i := 0; i < len(route)-1; i++ {
+		for i := range len(route) - 1 {
 			// Find edge between current and next location
 			for _, neighbor := range graph.GetNeighbors(route[i]) {
 				if neighbor.ID == route[i+1] {
@@ -71,7 +71,7 @@ func longestRoute(graph *graphutil.Graph, locations []string) int {
 	longestDistance := math.MinInt32
 	for _, route := range mathx.Permutations(locations) {
 		distance := 0
-		for i := 0; i < len(route)-1; i++ {
+		for i := range len(route) - 1 {
 			// Find edge between current and next location
 			for _, neighbor := range graph.GetNeighbors(route[i]) {
 				if neighbor.ID == route[i+1] {

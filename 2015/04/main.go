@@ -20,7 +20,7 @@ func main() {
 
 func part1and2(input string, numberOfZeros int) {
 	zeros := ""
-	for i := 0; i < numberOfZeros; i++ {
+	for range numberOfZeros {
 		zeros += "0"
 	}
 	input = input[:len(input)-1]

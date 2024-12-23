@@ -327,14 +327,14 @@ func (g *Grid2D[T]) RotateRow(row, amount int) {
 
 	// Create a temporary copy of the row
 	temp := make([]T, width)
-	for i := 0; i < width; i++ {
+	for i := range width {
 		if val, ok := g.Get(row, g.minCol+i); ok {
 			temp[i] = val
 		}
 	}
 
 	// Rotate and set values back
-	for i := 0; i < width; i++ {
+	for i := range width {
 		newPos := (i + amount) % width
 		g.Set(row, g.minCol+newPos, temp[i])
 	}
@@ -356,14 +356,14 @@ func (g *Grid2D[T]) RotateColumn(col, amount int) {
 
 	// Create a temporary copy of the column
 	temp := make([]T, height)
-	for i := 0; i < height; i++ {
+	for i := range height {
 		if val, ok := g.Get(g.minRow+i, col); ok {
 			temp[i] = val
 		}
 	}
 
 	// Rotate and set values back
-	for i := 0; i < height; i++ {
+	for i := range height {
 		newPos := (i + amount) % height
 		g.Set(g.minRow+newPos, col, temp[i])
 	}

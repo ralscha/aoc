@@ -40,9 +40,9 @@ func part1(input string) {
 	}
 
 	maxScore := 0
-	for i := 0; i < 100; i++ {
-		for j := 0; j < 100-i; j++ {
-			for k := 0; k < 100-i-j; k++ {
+	for i := range 100 {
+		for j := range 100 - i {
+			for k := range 100 - i - j {
 				l := 100 - i - j - k
 				score := score(ingredients, []ingredientAmount{
 					{ingredientsArray[0], i},
@@ -68,9 +68,9 @@ func part2(input string) {
 	}
 
 	maxScore := 0
-	for i := 0; i < 100; i++ {
-		for j := 0; j < 100-i; j++ {
-			for k := 0; k < 100-i-j; k++ {
+	for i := range 100 {
+		for j := range 100 - i {
+			for k := range 100 - i - j {
 				l := 100 - i - j - k
 				amounts := []ingredientAmount{
 					{ingredientsArray[0], i},

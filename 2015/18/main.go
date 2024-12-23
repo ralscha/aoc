@@ -30,7 +30,7 @@ func part1(input string) {
 	}
 
 	rounds := 100
-	for i := 0; i < rounds; i++ {
+	for range rounds {
 		newGrid := grid.Copy()
 		minRow, maxRow := grid.GetMinMaxRow()
 		minCol, maxCol := grid.GetMinMaxCol()
@@ -75,7 +75,7 @@ func part2(input string) {
 	turnOnCorners(grid)
 
 	rounds := 100
-	for i := 0; i < rounds; i++ {
+	for range rounds {
 		newGrid := grid.Copy()
 		minRow, maxRow := grid.GetMinMaxRow()
 		minCol, maxCol := grid.GetMinMaxCol()

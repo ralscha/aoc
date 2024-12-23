@@ -41,7 +41,7 @@ func part2(input string) {
 	reindeers := makeReindeers(input)
 
 	points := make(map[string]int)
-	for i := 0; i < 2503; i++ {
+	for i := range 2503 {
 		maxDistance := 0
 		for _, r := range reindeers {
 			distance := r.distance(i + 1)

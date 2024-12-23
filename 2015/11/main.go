@@ -65,7 +65,7 @@ func containsForbiddenLetters(s string) bool {
 }
 
 func containsIncreasingStraight(s string) bool {
-	for i := 0; i < len(s)-2; i++ {
+	for i := range len(s) - 2 {
 		if s[i+1] == s[i]+1 && s[i+2] == s[i]+2 {
 			return true
 		}
@@ -75,7 +75,7 @@ func containsIncreasingStraight(s string) bool {
 
 func containsTwoNonOverlappingPairs(s string) bool {
 	pairs := 0
-	for i := 0; i < len(s)-1; i++ {
+	for i := range len(s) - 1 {
 		if s[i] == s[i+1] {
 			pairs++
 			i++

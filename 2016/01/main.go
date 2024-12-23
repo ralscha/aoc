@@ -73,7 +73,7 @@ func part2(input string) {
 		}
 		steps := conv.MustAtoi(ins[1:])
 
-		for i := 0; i < steps; i++ {
+		for range steps {
 			pos.Col += dir.Col
 			pos.Row += dir.Row
 
