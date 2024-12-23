@@ -20,7 +20,7 @@ func main() {
 
 func part1(input string) {
 	decompressed := ""
-	for i := 0; i < len(input); i++ {
+	for i := range len(input) {
 		if input[i] == '(' {
 			end := strings.Index(input[i:], ")")
 			marker := input[i+1 : i+end]
@@ -44,7 +44,7 @@ func part2(input string) {
 
 func decompress(input string) int {
 	decompressed := 0
-	for i := 0; i < len(input); i++ {
+	for i := range len(input) {
 		if input[i] == '(' {
 			end := strings.Index(input[i:], ")")
 			marker := input[i+1 : i+end]

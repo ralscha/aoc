@@ -17,7 +17,7 @@ type state struct {
 func getOpenDoors(path string, salt string) [4]bool {
 	hash := fmt.Sprintf("%x", md5.Sum([]byte(salt+path)))
 	open := [4]bool{}
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		if hash[i] >= 'b' && hash[i] <= 'f' {
 			open[i] = true
 		}

@@ -24,7 +24,7 @@ func getHash(salt string, index int, stretch int, cache map[string]string) strin
 		return hash
 	}
 	hash := fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprintf("%s%d", salt, index))))
-	for i := 0; i < stretch; i++ {
+	for range stretch {
 		hash = fmt.Sprintf("%x", md5.Sum([]byte(hash)))
 	}
 	cache[key] = hash
@@ -32,7 +32,7 @@ func getHash(salt string, index int, stretch int, cache map[string]string) strin
 }
 
 func findRepeatingChar(hash string) (byte, bool) {
-	for i := 0; i < len(hash)-2; i++ {
+	for i := range len(hash) - 2 {
 		if hash[i] == hash[i+1] && hash[i] == hash[i+2] {
 			return hash[i], true
 		}

@@ -10,7 +10,7 @@ import (
 func dragonCurve(a []byte) []byte {
 	b := make([]byte, len(a))
 	reversed := []byte(stringutil.Reverse(string(a)))
-	for i := 0; i < len(reversed); i++ {
+	for i := range len(reversed) {
 		if reversed[i] == '0' {
 			b[i] = '1'
 		} else {
