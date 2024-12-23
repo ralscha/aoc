@@ -32,7 +32,7 @@ func main() {
 func part1(input string) {
 	ranges := parseInput(input)
 	mergedRanges := rangeutil.Merge(ranges)
-	for i := 0; i < len(mergedRanges)-1; i++ {
+	for i := range len(mergedRanges) - 1 {
 		if mergedRanges[i].End+1 < mergedRanges[i+1].Start {
 			fmt.Println("Part 1", mergedRanges[i].End+1)
 			return
@@ -45,7 +45,7 @@ func part2(input string) {
 	mergedRanges := rangeutil.Merge(ranges)
 
 	allowed := 0
-	for i := 0; i < len(mergedRanges)-1; i++ {
+	for i := range len(mergedRanges) - 1 {
 		allowed += mergedRanges[i+1].Start - (mergedRanges[i].End + 1)
 	}
 
