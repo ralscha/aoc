@@ -49,7 +49,7 @@ func part1and2(input string) {
 	minBoundingBox := math.MaxInt
 	minBoundingBoxIndex := 0
 
-	for i := 0; i < 100000; i++ {
+	for i := range 100000 {
 		minX := math.MaxInt
 		maxX := math.MinInt
 		minY := math.MaxInt

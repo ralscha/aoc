@@ -32,7 +32,7 @@ func part1(input string) {
 		moons[i] = moon{x: x, y: y, z: z}
 	}
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		applyGravity(moons)
 		applyVelocity(moons)
 	}
@@ -95,7 +95,7 @@ func part2(input string) {
 		seen[i] = make(map[[8]int]int)
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		for j := 0; ; j++ {
 			applyGravity(moons)
 			applyVelocity(moons)

@@ -19,7 +19,7 @@ func main() {
 func part1(input string) {
 	input = input[:len(input)-1]
 	sum := 0
-	for i := 0; i < len(input); i++ {
+	for i := range len(input) {
 		if input[i] == input[(i+1)%len(input)] {
 			sum += int(input[i] - '0')
 		}
@@ -31,7 +31,7 @@ func part1(input string) {
 func part2(input string) {
 	input = input[:len(input)-1]
 	sum := 0
-	for i := 0; i < len(input); i++ {
+	for i := range len(input) {
 		if input[i] == input[(i+len(input)/2)%len(input)] {
 			sum += int(input[i] - '0')
 		}

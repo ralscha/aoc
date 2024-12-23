@@ -48,7 +48,7 @@ func part1and2(input string, steps int) {
 	}
 
 	// Enhance image specified number of times
-	for i := 0; i < steps; i++ {
+	for range steps {
 		img = enhance(img, algorithm)
 	}
 

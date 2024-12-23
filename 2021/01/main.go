@@ -38,7 +38,7 @@ func part2(input string) {
 	increasing := 0
 	lastWindow := -1
 
-	for i := 0; i < len(numbers)-2; i++ {
+	for i := range len(numbers) - 2 {
 		windowSum := numbers[i] + numbers[i+1] + numbers[i+2]
 		if lastWindow != -1 && windowSum > lastWindow {
 			increasing++

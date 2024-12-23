@@ -136,7 +136,7 @@ func part1and2(input string) {
 	fmt.Println("Part 1", magnitude(reduce(add, lines)))
 
 	var maxMagnitude float64 = 0
-	for i := 0; i < len(lines); i++ {
+	for i := range len(lines) {
 		for j := 0; j < len(lines); j++ {
 			if i != j {
 				mag := magnitude(add(lines[i], lines[j]))

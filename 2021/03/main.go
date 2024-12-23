@@ -64,7 +64,7 @@ func part2(input string) {
 	input2 := make([]string, len(lines))
 	copy(input2, lines)
 
-	for i := 0; i < 12; i++ {
+	for i := range 12 {
 		if len(input1) > 1 {
 			onesWinner := count(input1, i, true)
 			input1 = filter(input1, onesWinner, i)

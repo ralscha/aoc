@@ -32,7 +32,7 @@ func part1(input string) {
 		eco = append(eco, &b)
 	}
 
-	for i := 0; i < 80; i++ {
+	for range 80 {
 		for _, f := range eco {
 			if *f > 0 {
 				*f = *f - 1
@@ -60,7 +60,7 @@ func part2(input string) {
 		eco[n] = eco[n] + 1
 	}
 
-	for i := 0; i < 256; i++ {
+	for range 256 {
 		var neweco [9]int
 		for j := 1; j < len(eco); j++ {
 			neweco[j-1] = eco[j]

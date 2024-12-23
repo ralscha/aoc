@@ -76,7 +76,7 @@ func parsePackets(binaryStr string, vTotal int64) (string, int64, int64) {
 		} else {
 			numSubPackets, _ := strconv.ParseInt(binaryStr[:11], 2, 64)
 			binaryStr = binaryStr[11:]
-			for i := 0; i < int(numSubPackets); i++ {
+			for range int(numSubPackets) {
 				var value int64
 				binaryStr, value, vTotal = parsePackets(binaryStr, vTotal)
 				values = append(values, value)

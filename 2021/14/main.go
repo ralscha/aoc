@@ -33,7 +33,7 @@ func part1(input string) {
 		}
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		newTemplate := template[:1]
 		ix := 0
 		for ix < len(template)-1 {
@@ -81,11 +81,11 @@ func part2(input string) {
 	}
 
 	pairs := make(map[string]int)
-	for i := 0; i < len(template)-1; i++ {
+	for i := range len(template) - 1 {
 		pairs[template[i:i+2]] += 1
 	}
 
-	for i := 0; i < 40; i++ {
+	for range 40 {
 		newpairs := make(map[string]int)
 		for k, count := range pairs {
 			if v, ok := rules[k]; ok {

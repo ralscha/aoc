@@ -46,7 +46,7 @@ func part2(input string) {
 	}
 	pos := 0
 	skip := 0
-	for i := 0; i < 64; i++ {
+	for range 64 {
 		for _, l := range s {
 			reverse(list, pos, int(l))
 			pos += int(l) + skip
@@ -54,7 +54,7 @@ func part2(input string) {
 		}
 	}
 	dense := make([]byte, 16)
-	for i := 0; i < 16; i++ {
+	for i := range 16 {
 		for j := 0; j < 16; j++ {
 			dense[i] ^= byte(list[i*16+j])
 		}
@@ -64,7 +64,7 @@ func part2(input string) {
 }
 
 func reverse(list []int, pos, length int) {
-	for i := 0; i < length/2; i++ {
+	for i := range length / 2 {
 		a := (pos + i) % len(list)
 		b := (pos + length - i - 1) % len(list)
 		list[a], list[b] = list[b], list[a]

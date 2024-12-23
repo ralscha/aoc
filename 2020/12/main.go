@@ -99,13 +99,13 @@ func part2(input string) {
 		case 'W':
 			waypointX -= value
 		case 'L':
-			for i := 0; i < value/90; i++ {
+			for range value / 90 {
 				temp := waypointX
 				waypointX = -waypointY
 				waypointY = temp
 			}
 		case 'R':
-			for i := 0; i < value/90; i++ {
+			for range value / 90 {
 				temp := waypointX
 				waypointX = waypointY
 				waypointY = -temp

@@ -42,7 +42,7 @@ func isValidPassword(pw int) bool {
 	}
 
 	// Check if digits are non-decreasing
-	for i := 0; i < len(pwStr)-1; i++ {
+	for i := range len(pwStr) - 1 {
 		if pwStr[i] > pwStr[i+1] {
 			return false
 		}
@@ -72,7 +72,7 @@ func isValidPassword2(pw int) bool {
 	hasExactDouble := false
 	groupSize := 1
 
-	for i := 0; i < len(pwStr)-1; i++ {
+	for i := range len(pwStr) - 1 {
 		if pwStr[i] > pwStr[i+1] {
 			return false
 		}

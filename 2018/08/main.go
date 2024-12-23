@@ -53,13 +53,13 @@ func parseNode(values []int) *node {
 	n := &node{}
 	values = values[2:]
 
-	for i := 0; i < childCount; i++ {
+	for range childCount {
 		child := parseNode(values)
 		n.children = append(n.children, child)
 		values = values[child.len():]
 	}
 
-	for i := 0; i < metadataCount; i++ {
+	for i := range metadataCount {
 		metadata := values[i]
 		n.metadata = append(n.metadata, metadata)
 	}
