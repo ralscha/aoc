@@ -1,7 +1,9 @@
 package gridutil
 
 import (
+	"maps"
 	"math"
+	"slices"
 )
 
 // Coordinate represents a position in a 2D grid with row and column values.
@@ -57,12 +59,12 @@ type Grid2D[T comparable] struct {
 
 // Get8Directions returns a slice containing all 8 possible directions (cardinal and diagonal).
 func Get8Directions() []Direction {
-	return directions8
+	return slices.Clone(directions8)
 }
 
 // Get4Directions returns a slice containing the 4 cardinal directions.
 func Get4Directions() []Direction {
-	return directions4
+	return slices.Clone(directions4)
 }
 
 // TurnLeft returns a new direction after rotating the given direction 90 degrees counterclockwise.
@@ -255,9 +257,11 @@ func (g *Grid2D[T]) PeekC(coord Coordinate, direction Direction) (T, bool) {
 // Copy creates a deep copy of the grid.
 func (g Grid2D[T]) Copy() Grid2D[T] {
 	newGrid := NewGrid2D[T](g.wrap)
-	for coord, val := range g.grid {
-		newGrid.SetC(coord, val)
-	}
+	newGrid.grid = maps.Clone(g.grid)
+	newGrid.minCol = g.minCol
+	newGrid.maxCol = g.maxCol
+	newGrid.minRow = g.minRow
+	newGrid.maxRow = g.maxRow
 	return newGrid
 }
 

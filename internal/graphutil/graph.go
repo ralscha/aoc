@@ -2,6 +2,7 @@ package graphutil
 
 import (
 	"aoc/internal/container"
+	"maps"
 	"slices"
 )
 
@@ -38,17 +39,21 @@ func (g *Graph) AddEdge(from, to string, weight int) {
 	})
 }
 
+// GetNeighbors returns all neighbors of a node.
+// If nodeID is empty, returns all nodes in the graph.
 func (g *Graph) GetNeighbors(nodeID string) []*Node {
 	if nodeID == "" {
 		// Special case: return all nodes
-		allNodes := make([]*Node, 0)
 		visited := container.NewSet[string]()
-		for id := range g.nodes {
+		allNodes := make([]*Node, 0)
+
+		for k, v := range maps.All(g.nodes) {
+			id, neighbors := k, v
 			if !visited.Contains(id) {
 				visited.Add(id)
 				allNodes = append(allNodes, &Node{ID: id})
 			}
-			for _, neighbor := range g.nodes[id] {
+			for _, neighbor := range neighbors {
 				if !visited.Contains(neighbor.ID) {
 					visited.Add(neighbor.ID)
 					allNodes = append(allNodes, &Node{ID: neighbor.ID})
@@ -57,7 +62,7 @@ func (g *Graph) GetNeighbors(nodeID string) []*Node {
 		}
 		return allNodes
 	}
-	return g.nodes[nodeID]
+	return slices.Clone(g.nodes[nodeID])
 }
 
 func (g *Graph) FindCycle(startID string) []string {

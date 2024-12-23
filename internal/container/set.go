@@ -1,6 +1,9 @@
 package container
 
-import "maps"
+import (
+	"maps"
+	"slices"
+)
 
 // Set implements a collection of unique ordered elements.
 // Each element can only appear once in the set.
@@ -41,15 +44,9 @@ func (s *Set[T]) Len() int {
 }
 
 // Values returns a slice of all elements in the set.
-// The slice is pre-allocated to the exact size needed to avoid reallocations.
+// Uses maps.Keys and slices.Collect for efficient key collection.
 func (s *Set[T]) Values() []T {
-	values := make([]T, len(s.m))
-	i := 0
-	for k := range s.m {
-		values[i] = k
-		i++
-	}
-	return values
+	return slices.Collect(maps.Keys(s.m))
 }
 
 // Copy returns a new set with the same elements as the original set.
