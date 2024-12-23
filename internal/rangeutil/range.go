@@ -83,8 +83,7 @@ func Merge(ranges []Range) []Range {
 	}
 
 	// Sort ranges by start value
-	sorted := make([]Range, len(ranges))
-	copy(sorted, ranges)
+	sorted := slices.Clone(ranges)
 	slices.SortFunc(sorted, func(a, b Range) int {
 		return a.Start - b.Start
 	})
