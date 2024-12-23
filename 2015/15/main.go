@@ -5,6 +5,8 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"maps"
+	"slices"
 	"strings"
 )
 
@@ -31,62 +33,61 @@ type ingredientAmount struct {
 	amount int
 }
 
-func part1(input string) {
-	lines := conv.SplitNewline(input)
-	ingredients := makeIngredients(lines)
-	var ingredientsArray []string
-	for name := range ingredients {
-		ingredientsArray = append(ingredientsArray, name)
-	}
-
-	maxScore := 0
+func generateCombinations(ingredientNames []string) [][]ingredientAmount {
+	var combinations [][]ingredientAmount
 	for i := range 100 {
 		for j := range 100 - i {
 			for k := range 100 - i - j {
 				l := 100 - i - j - k
-				score := score(ingredients, []ingredientAmount{
-					{ingredientsArray[0], i},
-					{ingredientsArray[1], j},
-					{ingredientsArray[2], k},
-					{ingredientsArray[3], l},
+				combinations = append(combinations, []ingredientAmount{
+					{ingredientNames[0], i},
+					{ingredientNames[1], j},
+					{ingredientNames[2], k},
+					{ingredientNames[3], l},
 				})
-				if score > maxScore {
-					maxScore = score
-				}
 			}
 		}
 	}
-	fmt.Println(maxScore)
+	return combinations
+}
+
+func part1(input string) {
+	lines := conv.SplitNewline(input)
+	ingredients := makeIngredients(lines)
+
+	ingredientNames := slices.Collect(maps.Keys(ingredients))
+	combinations := generateCombinations(ingredientNames)
+
+	maxCombo := slices.MaxFunc(combinations, func(a, b []ingredientAmount) int {
+		scoreA := score(ingredients, a)
+		scoreB := score(ingredients, b)
+		return scoreA - scoreB
+	})
+
+	fmt.Println(score(ingredients, maxCombo))
 }
 
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 	ingredients := makeIngredients(lines)
-	var ingredientsArray []string
-	for name := range ingredients {
-		ingredientsArray = append(ingredientsArray, name)
-	}
 
-	maxScore := 0
-	for i := range 100 {
-		for j := range 100 - i {
-			for k := range 100 - i - j {
-				l := 100 - i - j - k
-				amounts := []ingredientAmount{
-					{ingredientsArray[0], i},
-					{ingredientsArray[1], j},
-					{ingredientsArray[2], k},
-					{ingredientsArray[3], l},
-				}
-				score := score(ingredients, amounts)
-				calories := calories(ingredients, amounts)
-				if calories == 500 && score > maxScore {
-					maxScore = score
-				}
-			}
-		}
+	ingredientNames := slices.Collect(maps.Keys(ingredients))
+	combinations := generateCombinations(ingredientNames)
+
+	validCombos := slices.DeleteFunc(combinations, func(combo []ingredientAmount) bool {
+		return calories(ingredients, combo) != 500
+	})
+
+	if len(validCombos) > 0 {
+		maxCombo := slices.MaxFunc(validCombos, func(a, b []ingredientAmount) int {
+			scoreA := score(ingredients, a)
+			scoreB := score(ingredients, b)
+			return scoreA - scoreB
+		})
+		fmt.Println(score(ingredients, maxCombo))
+	} else {
+		fmt.Println(0)
 	}
-	fmt.Println(maxScore)
 }
 
 func score(ingredients map[string]ingredient, ia []ingredientAmount) int {
@@ -94,6 +95,7 @@ func score(ingredients map[string]ingredient, ia []ingredientAmount) int {
 	durability := 0
 	flavor := 0
 	texture := 0
+
 	for _, i := range ia {
 		if ing, ok := ingredients[i.name]; ok {
 			capacity += i.amount * ing.capacity
