@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"maps"
 	"strings"
 )
 
@@ -14,83 +15,92 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	sue := make(map[string]int)
-	sue["children"] = 3
-	sue["cats"] = 7
-	sue["samoyeds"] = 2
-	sue["pomeranians"] = 3
-	sue["akitas"] = 0
-	sue["vizslas"] = 0
-	sue["goldfish"] = 5
-	sue["trees"] = 3
-	sue["cars"] = 2
-	sue["perfumes"] = 1
+	// Initial Sue's properties
+	realSue := map[string]int{
+		"children":    3,
+		"cats":        7,
+		"samoyeds":    2,
+		"pomeranians": 3,
+		"akitas":      0,
+		"vizslas":     0,
+		"goldfish":    5,
+		"trees":       3,
+		"cars":        2,
+		"perfumes":    1,
+	}
 
-	part1(input, sue)
-	part2(input, sue)
+	part1(input, realSue)
+	part2(input, realSue)
 }
 
-func part1(input string, sue map[string]int) {
-	lines := conv.SplitNewline(input)
-	for _, line := range lines {
-		splitted := strings.Fields(line)
-		sueNumber := conv.MustAtoi(splitted[1][:len(splitted[1])-1])
-		clues := make(map[string]int)
-		for i := 2; i < len(splitted); i += 2 {
-			clue := splitted[i][:len(splitted[i])-1]
-			no := splitted[i+1]
-			if no[len(no)-1] == ',' {
-				no = no[:len(no)-1]
-			}
-			clues[clue] = conv.MustAtoi(no)
+func parseClues(line string) (int, map[string]int) {
+	splitted := strings.Fields(line)
+	sueNumber := conv.MustAtoi(splitted[1][:len(splitted[1])-1])
+	clues := make(map[string]int)
+
+	for i := 2; i < len(splitted); i += 2 {
+		clue := splitted[i][:len(splitted[i])-1]
+		no := splitted[i+1]
+		if no[len(no)-1] == ',' {
+			no = no[:len(no)-1]
 		}
+		clues[clue] = conv.MustAtoi(no)
+	}
+
+	return sueNumber, clues
+}
+
+func part1(input string, realSue map[string]int) {
+	lines := conv.SplitNewline(input)
+
+	for _, line := range lines {
+		sueNumber, clues := parseClues(line)
 
 		match := true
-		for clue, value := range clues {
-			if value != sue[clue] {
+		for key, value := range maps.All(clues) {
+			clue, value := key, value
+			if value != realSue[clue] {
 				match = false
+				break
 			}
 		}
+
 		if match {
-			fmt.Println("Part 1 ", sueNumber)
+			fmt.Println("Part 1", sueNumber)
 		}
 	}
 }
 
-func part2(input string, sue map[string]int) {
+func part2(input string, realSue map[string]int) {
 	lines := conv.SplitNewline(input)
+
 	for _, line := range lines {
-		splitted := strings.Fields(line)
-		sueNumber := conv.MustAtoi(splitted[1][:len(splitted[1])-1])
-		clues := make(map[string]int)
-		for i := 2; i < len(splitted); i += 2 {
-			clue := splitted[i][:len(splitted[i])-1]
-			no := splitted[i+1]
-			if no[len(no)-1] == ',' {
-				no = no[:len(no)-1]
-			}
-			clues[clue] = conv.MustAtoi(no)
-		}
+		sueNumber, clues := parseClues(line)
 
 		match := true
-		for clue, value := range clues {
+		for key, value := range maps.All(clues) {
+			clue, value := key, value
 			switch clue {
 			case "cats", "trees":
-				if value <= sue[clue] {
+				if value <= realSue[clue] {
 					match = false
 				}
 			case "pomeranians", "goldfish":
-				if value >= sue[clue] {
+				if value >= realSue[clue] {
 					match = false
 				}
 			default:
-				if value != sue[clue] {
+				if value != realSue[clue] {
 					match = false
 				}
 			}
+			if !match {
+				break
+			}
 		}
+
 		if match {
-			fmt.Println("Part 2 ", sueNumber)
+			fmt.Println("Part 2", sueNumber)
 		}
 	}
 }
