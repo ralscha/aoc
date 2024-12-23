@@ -105,7 +105,7 @@ func findJunctions(grid [][]byte) map[point]*junction {
 	junctions := make(map[point]*junction)
 
 	// Add start point
-	for y := 0; y < len(grid[0]); y++ {
+	for y := range len(grid[0]) {
 		if grid[0][y] == '.' {
 			junctions[point{0, y}] = &junction{pos: point{0, y}}
 			break
@@ -113,7 +113,7 @@ func findJunctions(grid [][]byte) map[point]*junction {
 	}
 
 	// Add end point
-	for y := 0; y < len(grid[0]); y++ {
+	for y := range len(grid[0]) {
 		if grid[len(grid)-1][y] == '.' {
 			junctions[point{len(grid) - 1, y}] = &junction{pos: point{len(grid) - 1, y}}
 			break
@@ -121,8 +121,8 @@ func findJunctions(grid [][]byte) map[point]*junction {
 	}
 
 	// Find all other junctions
-	for x := 0; x < len(grid); x++ {
-		for y := 0; y < len(grid[0]); y++ {
+	for x := range len(grid) {
+		for y := range len(grid[0]) {
 			p := point{x, y}
 			if grid[x][y] != '#' && isJunction(p, grid) {
 				if _, exists := junctions[p]; !exists {
@@ -195,7 +195,7 @@ func findLongestPath(grid [][]byte) int {
 
 	var start, end point
 	// Find start and end points
-	for y := 0; y < len(grid[0]); y++ {
+	for y := range len(grid[0]) {
 		if grid[0][y] == '.' {
 			start = point{0, y}
 		}

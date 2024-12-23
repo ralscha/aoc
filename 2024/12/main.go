@@ -129,7 +129,7 @@ func countCorners(coords []gridutil.Coordinate) int {
 			contains(coords, left) {
 			corners += 1
 		}
-		
+
 		bottomLeft := gridutil.Coordinate{Row: coord.Row + 1, Col: coord.Col - 1}
 		if !contains(coords, bottomLeft) &&
 			contains(coords, bottom) &&

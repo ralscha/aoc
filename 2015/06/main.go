@@ -59,8 +59,8 @@ func part1(input string) {
 	}
 
 	count := 0
-	for x := 0; x < 1000; x++ {
-		for y := 0; y < 1000; y++ {
+	for x := range 1000 {
+		for y := range 1000 {
 			if val, _ := grid.Get(x, y); val {
 				count++
 			}
@@ -113,8 +113,8 @@ func part2(input string) {
 	}
 
 	count := 0
-	for x := 0; x < 1000; x++ {
-		for y := 0; y < 1000; y++ {
+	for x := range 1000 {
+		for y := range 1000 {
 			val, _ := grid.Get(x, y)
 			count += val
 		}

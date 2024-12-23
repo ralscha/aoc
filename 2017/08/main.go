@@ -50,7 +50,7 @@ func part1and2(input string) {
 			}
 		}
 	}
-	
+
 	maxValue := slices.Max(slices.Collect(maps.Values(registers)))
 	fmt.Println(maxValue)
 	fmt.Println(highestValue)

@@ -51,7 +51,7 @@ func part2(input string) {
 	validCombos := slices.DeleteFunc(combinations, func(combo []int) bool {
 		return sumCombination(combo) != totalEggnogLiters
 	})
-	
+
 	minCombo := slices.MinFunc(validCombos, func(a, b []int) int {
 		return len(a) - len(b)
 	})

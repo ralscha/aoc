@@ -31,8 +31,8 @@ func part1and2(lines []string) {
 			xIndex := strings.Index(rect, "x")
 			col := conv.MustAtoi(rect[0:xIndex])
 			row := conv.MustAtoi(rect[xIndex+1:])
-			for y := 0; y < row; y++ {
-				for x := 0; x < col; x++ {
+			for y := range row {
+				for x := range col {
 					grid.Set(y, x, true)
 				}
 			}
@@ -53,19 +53,17 @@ func part1and2(lines []string) {
 		}
 	}
 
-	// Count lit pixels
 	count := 0
-	for y := 0; y < 6; y++ {
-		for x := 0; x < 50; x++ {
+	for y := range 6 {
+		for x := range 50 {
 			if val, _ := grid.Get(y, x); val {
 				count++
 			}
 		}
 	}
 
-	// Display the grid
-	for y := 0; y < 6; y++ {
-		for x := 0; x < 50; x++ {
+	for y := range 6 {
+		for x := range 50 {
 			if val, _ := grid.Get(y, x); val {
 				fmt.Print("#")
 			} else {

@@ -28,7 +28,7 @@ func part1and2(input string) {
 		}
 		firstPair := strings.Split(splitted[0], "-")
 		secondPair := strings.Split(splitted[1], "-")
-		
+
 		range1 := rangeutil.NewRange(
 			conv.MustAtoi(firstPair[0]),
 			conv.MustAtoi(firstPair[1]),
@@ -40,7 +40,7 @@ func part1and2(input string) {
 
 		// For full containment, one range must completely contain the other
 		if range1.Contains(range2.Start) && range1.Contains(range2.End) ||
-		   range2.Contains(range1.Start) && range2.Contains(range1.End) {
+			range2.Contains(range1.Start) && range2.Contains(range1.End) {
 			fullyContain++
 		}
 

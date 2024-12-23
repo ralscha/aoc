@@ -85,8 +85,8 @@ func tiltGrid(grid [][]byte, dx, dy int) [][]byte {
 	for moved {
 		moved = false
 
-		for y := 0; y < height; y++ {
-			for x := 0; x < width; x++ {
+		for y := range height {
+			for x := range width {
 				if grid[y][x] == 'O' {
 					newX, newY := x+dx, y+dy
 					if newX >= 0 && newY >= 0 && newX < width && newY < height && grid[newY][newX] == '.' {

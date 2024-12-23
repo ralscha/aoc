@@ -73,13 +73,13 @@ func part2(input string) {
 			maxEnergized = energized
 		}
 	}
-	for y := 0; y < len(grid); y++ {
+	for y := range len(grid) {
 		energized := energize(point{0, y}, right, grid)
 		if energized > maxEnergized {
 			maxEnergized = energized
 		}
 	}
-	for y := 0; y < len(grid); y++ {
+	for y := range len(grid) {
 		energized := energize(point{0, len(grid[y]) - 1}, left, grid)
 		if energized > maxEnergized {
 			maxEnergized = energized

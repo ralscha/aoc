@@ -39,7 +39,7 @@ func solve(input string, part2 bool) int {
 
 	allPairsDistances := make(map[[2]int]int)
 
-	for i := 0; i < len(locations); i++ {
+	for i := range len(locations) {
 		for j := i + 1; j < len(locations); j++ {
 			start, ok1 := locations[i]
 			end, ok2 := locations[j]

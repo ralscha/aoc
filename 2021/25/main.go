@@ -48,7 +48,7 @@ func part1(input string) {
 		for row := minRow; row <= maxRow; row++ {
 			for col := minCol; col <= maxCol; col++ {
 				if val, _ := grid.Get(row, col); val == east {
-					nextCol := (col - minCol + 1) % width + minCol
+					nextCol := (col-minCol+1)%width + minCol
 					if nextVal, _ := grid.Get(row, nextCol); nextVal == empty {
 						newGrid.Set(row, col, empty)
 						newGrid.Set(row, nextCol, east)
@@ -64,7 +64,7 @@ func part1(input string) {
 		for row := minRow; row <= maxRow; row++ {
 			for col := minCol; col <= maxCol; col++ {
 				if val, _ := grid.Get(row, col); val == south {
-					nextRow := (row - minRow + 1) % height + minRow
+					nextRow := (row-minRow+1)%height + minRow
 					if nextVal, _ := grid.Get(nextRow, col); nextVal == empty {
 						newGrid.Set(row, col, empty)
 						newGrid.Set(nextRow, col, south)

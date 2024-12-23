@@ -129,7 +129,7 @@ func part1(input string) {
 	V := len(g.nodes)
 	E := len(g.edges)
 	gr := graph{V: V, E: E, edges: make([]edge, E)}
-	
+
 	for i, e := range g.edges {
 		gr.edges[i] = edge{src: e[0], dest: e[1]}
 	}
@@ -138,7 +138,7 @@ func part1(input string) {
 	var res int
 	var components []int
 	found := false
-	
+
 	// Try Karger's algorithm multiple times until we find a minimum cut of 3
 	for k < 1000 {
 		k++

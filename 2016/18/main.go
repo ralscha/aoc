@@ -32,7 +32,7 @@ func generateNextRow(currentRow string) string {
 	var nextRow strings.Builder
 	nextRow.Grow(len(currentRow))
 
-	for i := 0; i < len(currentRow); i++ {
+	for i := range len(currentRow) {
 		if isTrap(currentRow, i) {
 			nextRow.WriteRune('^')
 		} else {
