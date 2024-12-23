@@ -49,3 +49,12 @@ func (s *Set[T]) Values() []T {
 	}
 	return values
 }
+
+// Copy returns a new set with the same elements as the original set.
+func (s *Set[T]) Copy() *Set[T] {
+	newSet := NewSet[T]()
+	for k := range s.m {
+		newSet.Add(k)
+	}
+	return newSet
+}
