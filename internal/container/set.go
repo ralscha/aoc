@@ -1,5 +1,7 @@
 package container
 
+import "maps"
+
 // Set implements a collection of unique ordered elements.
 // Each element can only appear once in the set.
 type Set[T comparable] struct {
@@ -53,8 +55,6 @@ func (s *Set[T]) Values() []T {
 // Copy returns a new set with the same elements as the original set.
 func (s *Set[T]) Copy() *Set[T] {
 	newSet := NewSet[T]()
-	for k := range s.m {
-		newSet.Add(k)
-	}
+	maps.Copy(newSet.m, s.m)
 	return newSet
 }
