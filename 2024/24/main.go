@@ -6,6 +6,8 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"maps"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -120,5 +122,149 @@ func part1(input string) {
 }
 
 func part2(input string) {
+	initialWireValues, gatesMap := parseInput(input)
+	inputBitCount := len(initialWireValues) / 2
+	gates := slices.Collect(maps.Values(gatesMap))
 
+	isDirect := func(gate gate) bool {
+		return strings.HasPrefix(gate.a, "x") || strings.HasPrefix(gate.b, "x")
+	}
+
+	isOutput := func(gate gate) bool {
+		return strings.HasPrefix(gate.output, "z")
+	}
+
+	isGate := func(opType string) func(gate) bool {
+		return func(gate gate) bool {
+			return gate.op == opType
+		}
+	}
+
+	hasOutput := func(output string) func(gate) bool {
+		return func(gate gate) bool {
+			return gate.output == output
+		}
+	}
+
+	hasInput := func(input string) func(gate) bool {
+		return func(gate gate) bool {
+			return gate.a == input || gate.b == input
+		}
+	}
+
+	flags := container.NewSet[string]()
+
+	var faGate0s []gate
+	for _, gate := range gates {
+		if isDirect(gate) && gate.op == "XOR" {
+			faGate0s = append(faGate0s, gate)
+		}
+	}
+
+	for _, gate := range faGate0s {
+		isFirst := gate.a == "x00" || gate.b == "x00"
+		if isFirst {
+			if gate.output != "z00" {
+				flags.Add(gate.output)
+			}
+			continue
+		} else if gate.output == "z00" {
+			flags.Add(gate.output)
+		}
+
+		if isOutput(gate) {
+			flags.Add(gate.output)
+		}
+	}
+
+	var faGate3s []gate
+	for _, gate := range gates {
+		if isGate("XOR")(gate) && !isDirect(gate) {
+			faGate3s = append(faGate3s, gate)
+			if !isOutput(gate) {
+				flags.Add(gate.output)
+			}
+		}
+	}
+
+	for _, gate := range gates {
+		if isOutput(gate) {
+			lastOutput := fmt.Sprintf("z%02d", inputBitCount)
+			isLast := gate.output == lastOutput
+
+			if isLast {
+				if gate.op != "OR" {
+					flags.Add(gate.output)
+				}
+				continue
+			} else if gate.op != "XOR" {
+				flags.Add(gate.output)
+			}
+		}
+	}
+
+	var checkNext []gate
+	for _, ga := range faGate0s {
+		if flags.Contains(ga.output) {
+			continue
+		}
+		if ga.output == "z00" {
+			continue
+		}
+
+		var matches []gate
+		for _, g := range faGate3s {
+			if hasInput(ga.output)(g) {
+				matches = append(matches, g)
+			}
+		}
+
+		if len(matches) == 0 {
+			checkNext = append(checkNext, ga)
+			flags.Add(ga.output)
+		}
+	}
+
+	for _, ga := range checkNext {
+		intendedResult := "z" + ga.a[1:]
+		var matches []gate
+		for _, g := range faGate3s {
+			if hasOutput(intendedResult)(g) {
+				matches = append(matches, g)
+			}
+		}
+
+		match := matches[0]
+		toCheck := []string{match.a, match.b}
+
+		var orMatches []gate
+		for _, g := range gates {
+			if isGate("OR")(g) {
+				for _, output := range toCheck {
+					if g.output == output {
+						orMatches = append(orMatches, g)
+					}
+				}
+			}
+		}
+
+		orMatchOutput := orMatches[0].output
+		var correctOutput string
+		for _, output := range toCheck {
+			if output != orMatchOutput {
+				correctOutput = output
+				break
+			}
+		}
+		flags.Add(correctOutput)
+	}
+
+	flagsSlice := flags.Values()
+	slices.Sort(flagsSlice)
+
+	if len(flagsSlice) > 8 {
+		flagsSlice = flagsSlice[:8]
+	}
+
+	fmt.Println("Part 2", strings.Join(flagsSlice, ","))
 }
