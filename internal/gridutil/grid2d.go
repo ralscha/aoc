@@ -1,9 +1,11 @@
 package gridutil
 
 import (
+	"fmt"
 	"maps"
 	"math"
 	"slices"
+	"strings"
 )
 
 // Coordinate represents a position in a 2D grid with row and column values.
@@ -371,4 +373,20 @@ func (g *Grid2D[T]) RotateColumn(col, amount int) {
 		newPos := (i + amount) % height
 		g.Set(g.minRow+newPos, col, temp[i])
 	}
+}
+
+func (g *Grid2D[T]) String() string {
+	var result strings.Builder
+	for r := g.minRow; r <= g.maxRow; r++ {
+		for c := g.minCol; c <= g.maxCol; c++ {
+			if val, ok := g.Get(r, c); ok {
+				result.WriteString(fmt.Sprintf("%v", val))
+			} else {
+				result.WriteString(".")
+			}
+		}
+		result.WriteString("\n")
+	}
+	return result.String()
+
 }
