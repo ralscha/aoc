@@ -6,6 +6,8 @@ import (
 	"aoc/internal/gridutil"
 	"fmt"
 	"log"
+
+	"aoc/2019/intcomputer"
 )
 
 func main() {
@@ -18,224 +20,84 @@ func main() {
 	part2(input)
 }
 
-type intCodeComputer struct {
-	memory       map[int64]int64
-	ip           int64
-	relativeBase int64
-	input        int64
-	halted       bool
-}
-
-func newIntcodeComputer(program []int64) *intCodeComputer {
-	memory := make(map[int64]int64)
-	for i, v := range program {
-		memory[int64(i)] = v
-	}
-	return &intCodeComputer{memory: memory}
-}
-
-func (comp *intCodeComputer) getValue(addr int64) int64 {
-	return comp.memory[addr]
-}
-
-func (comp *intCodeComputer) setValue(addr int64, value int64) {
-	comp.memory[addr] = value
-}
-
-func decodeInstruction(instruction int64) (int64, [3]int64) {
-	opcode := instruction % 100
-	modes := [3]int64{
-		(instruction / 100) % 10,
-		(instruction / 1000) % 10,
-		(instruction / 10000) % 10,
-	}
-	return opcode, modes
-}
-
-func (comp *intCodeComputer) getParameter(mode int64, offset int64) int64 {
-	switch mode {
-	case 0:
-		return comp.getValue(comp.getValue(comp.ip + offset))
-	case 1:
-		return comp.getValue(comp.ip + offset)
-	case 2:
-		return comp.getValue(comp.relativeBase + comp.getValue(comp.ip+offset))
-	default:
-		log.Fatalf("Invalid parameter mode: %d", mode)
-		return 0
-	}
-}
-
-func (comp *intCodeComputer) getAddress(mode int64, offset int64) int64 {
-	switch mode {
-	case 0:
-		return comp.getValue(comp.ip + offset)
-	case 2:
-		return comp.relativeBase + comp.getValue(comp.ip+offset)
-	default:
-		log.Fatalf("Invalid address mode: %d", mode)
-		return 0
-	}
-}
-
-func (comp *intCodeComputer) run() int64 {
-	for {
-		opcode, modes := decodeInstruction(comp.getValue(comp.ip))
-
-		switch opcode {
-		case 1: // Addition
-			a := comp.getParameter(modes[0], 1)
-			b := comp.getParameter(modes[1], 2)
-			dst := comp.getAddress(modes[2], 3)
-			comp.setValue(dst, a+b)
-			comp.ip += 4
-		case 2: // Multiplication
-			a := comp.getParameter(modes[0], 1)
-			b := comp.getParameter(modes[1], 2)
-			dst := comp.getAddress(modes[2], 3)
-			comp.setValue(dst, a*b)
-			comp.ip += 4
-		case 3: // Input
-			dst := comp.getAddress(modes[0], 1)
-			comp.setValue(dst, comp.input)
-			comp.ip += 2
-		case 4: // Output
-			a := comp.getParameter(modes[0], 1)
-			comp.ip += 2
-			return a
-		case 5: // Jump-if-true
-			a := comp.getParameter(modes[0], 1)
-			b := comp.getParameter(modes[1], 2)
-			if a != 0 {
-				comp.ip = b
-			} else {
-				comp.ip += 3
-			}
-		case 6: // Jump-if-false
-			a := comp.getParameter(modes[0], 1)
-			b := comp.getParameter(modes[1], 2)
-			if a == 0 {
-				comp.ip = b
-			} else {
-				comp.ip += 3
-			}
-		case 7: // Less than
-			a := comp.getParameter(modes[0], 1)
-			b := comp.getParameter(modes[1], 2)
-			dst := comp.getAddress(modes[2], 3)
-			if a < b {
-				comp.setValue(dst, 1)
-			} else {
-				comp.setValue(dst, 0)
-			}
-			comp.ip += 4
-		case 8: // Equals
-			a := comp.getParameter(modes[0], 1)
-			b := comp.getParameter(modes[1], 2)
-			dst := comp.getAddress(modes[2], 3)
-			if a == b {
-				comp.setValue(dst, 1)
-			} else {
-				comp.setValue(dst, 0)
-			}
-			comp.ip += 4
-		case 9: // Adjust relative base
-			a := comp.getParameter(modes[0], 1)
-			comp.relativeBase += a
-			comp.ip += 2
-		case 99: // Halt
-			comp.halted = true
-			return 0
-		default:
-			log.Fatalf("Unknown opcode: %d", opcode)
-		}
-	}
-}
-
 func part1(input string) {
-	code := conv.ToInt64SliceComma(input)
-	computer := newIntcodeComputer(code)
-
-	direction := gridutil.DirectionN
-	grid := gridutil.NewGrid2D[int](false)
-	currentPos := gridutil.Coordinate{Row: 0, Col: 0}
-
-	for !computer.halted {
-		color, _ := grid.GetC(currentPos)
-		computer.input = int64(color)
-
-		output := computer.run()
-		if computer.halted {
-			break
-		}
-		turnDirection := computer.run()
-		if computer.halted {
-			break
-		}
-
-		grid.SetC(currentPos, int(output))
-		if turnDirection == 0 {
-			direction = gridutil.TurnLeft(direction)
-		} else {
-			direction = gridutil.TurnRight(direction)
-		}
-		currentPos = gridutil.Coordinate{
-			Row: currentPos.Row + direction.Row,
-			Col: currentPos.Col + direction.Col,
-		}
-	}
-
-	fmt.Println("Part 1", grid.Count())
+	program := conv.ToIntSliceComma(input)
+	computer := intcomputer.NewIntcodeComputer(program)
+	painted := runRobot(computer, 0)
+	fmt.Println("Part 1", len(painted))
 }
 
 func part2(input string) {
-	code := conv.ToInt64SliceComma(input)
-	computer := newIntcodeComputer(code)
+	program := conv.ToIntSliceComma(input)
+	computer := intcomputer.NewIntcodeComputer(program)
+	painted := runRobot(computer, 1)
+	fmt.Println("Part 2")
+	printRegistration(painted)
+}
 
-	direction := gridutil.DirectionN
-	grid := gridutil.NewGrid2D[int](false)
-	currentPos := gridutil.Coordinate{Row: 0, Col: 0}
+func runRobot(computer *intcomputer.IntcodeComputer, startColor int) map[gridutil.Coordinate]int {
+	painted := make(map[gridutil.Coordinate]int)
+	pos := gridutil.Coordinate{}
+	dir := gridutil.DirectionN
 
-	for !computer.halted {
-		color, ok := grid.GetC(currentPos)
+	painted[pos] = startColor
 
-		// always start with white
-		if !ok {
-			color = 1
-		}
-		computer.input = int64(color)
-
-		output := computer.run()
-		if computer.halted {
+	for !computer.Halted {
+		color := painted[pos]
+		computer.Input = color
+		computer.Run()
+		if computer.Halted {
 			break
 		}
-		turnDirection := computer.run()
-		if computer.halted {
-			break
-		}
+		newColor := computer.Output
+		computer.Run()
+		turn := computer.Output
 
-		grid.SetC(currentPos, int(output))
-		if turnDirection == 0 {
-			direction = gridutil.TurnLeft(direction)
+		painted[pos] = newColor
+
+		if turn == 0 {
+			dir = gridutil.TurnLeft(dir)
 		} else {
-			direction = gridutil.TurnRight(direction)
+			dir = gridutil.TurnRight(dir)
 		}
-		currentPos = gridutil.Coordinate{
-			Row: currentPos.Row + direction.Row,
-			Col: currentPos.Col + direction.Col,
+
+		switch dir {
+		case gridutil.DirectionN:
+			pos.Row--
+		case gridutil.DirectionE:
+			pos.Col++
+		case gridutil.DirectionS:
+			pos.Row++
+		case gridutil.DirectionW:
+			pos.Col--
+		}
+	}
+	return painted
+}
+
+func printRegistration(painted map[gridutil.Coordinate]int) {
+	minCol, maxCol, minRow, maxRow := 0, 0, 0, 0
+	for p := range painted {
+		if p.Col < minCol {
+			minCol = p.Col
+		}
+		if p.Col > maxCol {
+			maxCol = p.Col
+		}
+		if p.Row < minRow {
+			minRow = p.Row
+		}
+		if p.Row > maxRow {
+			maxRow = p.Row
 		}
 	}
 
-	minCol, maxCol := grid.GetMinMaxCol()
-	minRow, maxRow := grid.GetMinMaxRow()
-
-	for row := minRow; row <= maxRow; row++ {
-		for col := minCol; col <= maxCol; col++ {
-			color, ok := grid.Get(row, col)
-			if !ok || color == 0 {
-				fmt.Print(" ")
+	for r := minRow; r <= maxRow; r++ {
+		for c := minCol; c <= maxCol; c++ {
+			if painted[gridutil.Coordinate{Col: c, Row: r}] == 1 {
+				fmt.Print("#")
 			} else {
-				fmt.Print("O")
+				fmt.Print(" ")
 			}
 		}
 		fmt.Println()
