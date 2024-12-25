@@ -97,3 +97,21 @@ func (q *Queue[T]) shrink() {
 	q.tail = q.length
 	q.buf = newBuf
 }
+
+// Values returns a slice of all elements in the queue in the order they were added.
+func (q *Queue[T]) Values() []T {
+	values := make([]T, q.Len())
+	for i := range q.Len() {
+		values[i] = q.buf[(q.head+i)%len(q.buf)]
+	}
+	return values
+}
+
+// NewQueueFromSlice creates and returns a new queue initialized with the elements from the given slice.
+func NewQueueFromSlice[T any](slice []T) *Queue[T] {
+	q := NewQueue[T]()
+	for _, elem := range slice {
+		q.Push(elem)
+	}
+	return q
+}

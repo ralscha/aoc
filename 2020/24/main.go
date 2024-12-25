@@ -20,75 +20,13 @@ func main() {
 }
 
 func part1(input string) {
-	lines := strings.Split(input, "\n")
-	flipped := container.NewSet[gridutil.Coordinate]()
-
-	re := regexp.MustCompile(`e|se|sw|w|nw|ne`)
-	for _, line := range lines {
-		matches := re.FindAllString(line, -1)
-		c := gridutil.Coordinate{Col: 0, Row: 0}
-		for _, move := range matches {
-			switch move {
-			case "e":
-				c.Col++
-			case "se":
-				c.Row++
-			case "sw":
-				c.Col--
-				c.Row++
-			case "w":
-				c.Col--
-			case "nw":
-				c.Row--
-			case "ne":
-				c.Col++
-				c.Row--
-			}
-		}
-		if flipped.Contains(c) {
-			flipped.Remove(c)
-		} else {
-			flipped.Add(c)
-		}
-	}
-
+	flipped := parseAndFlipTiles(input)
 	blackCount := flipped.Len()
 	fmt.Println("Part 1", blackCount)
 }
 
 func part2(input string) {
-	lines := strings.Split(input, "\n")
-	flipped := container.NewSet[gridutil.Coordinate]()
-
-	re := regexp.MustCompile(`e|se|sw|w|nw|ne`)
-	for _, line := range lines {
-		matches := re.FindAllString(line, -1)
-		c := gridutil.Coordinate{Col: 0, Row: 0}
-		for _, move := range matches {
-			switch move {
-			case "e":
-				c.Col++
-			case "se":
-				c.Row++
-			case "sw":
-				c.Col--
-				c.Row++
-			case "w":
-				c.Col--
-			case "nw":
-				c.Row--
-			case "ne":
-				c.Col++
-				c.Row--
-			}
-		}
-		if flipped.Contains(c) {
-			flipped.Remove(c)
-		} else {
-			flipped.Add(c)
-		}
-	}
-
+	flipped := parseAndFlipTiles(input)
 	blackTiles := container.NewSet[gridutil.Coordinate]()
 	for _, c := range flipped.Values() {
 		blackTiles.Add(c)
@@ -124,6 +62,41 @@ func part2(input string) {
 	}
 
 	fmt.Println("Part 2", blackTiles.Len())
+}
+
+func parseAndFlipTiles(input string) *container.Set[gridutil.Coordinate] {
+	lines := strings.Split(input, "\n")
+	flipped := container.NewSet[gridutil.Coordinate]()
+
+	re := regexp.MustCompile(`e|se|sw|w|nw|ne`)
+	for _, line := range lines {
+		matches := re.FindAllString(line, -1)
+		c := gridutil.Coordinate{Col: 0, Row: 0}
+		for _, move := range matches {
+			switch move {
+			case "e":
+				c.Col++
+			case "se":
+				c.Row++
+			case "sw":
+				c.Col--
+				c.Row++
+			case "w":
+				c.Col--
+			case "nw":
+				c.Row--
+			case "ne":
+				c.Col++
+				c.Row--
+			}
+		}
+		if flipped.Contains(c) {
+			flipped.Remove(c)
+		} else {
+			flipped.Add(c)
+		}
+	}
+	return flipped
 }
 
 func getNeighbors(c gridutil.Coordinate) []gridutil.Coordinate {
