@@ -55,3 +55,14 @@ func (s *Set[T]) Copy() *Set[T] {
 	maps.Copy(newSet.m, s.m)
 	return newSet
 }
+
+// Intersection returns a new set with elements that are present in both sets.
+func (s *Set[T]) Intersection(otherSet *Set[T]) *Set[T] {
+	newSet := NewSet[T]()
+	for k := range s.m {
+		if otherSet.Contains(k) {
+			newSet.Add(k)
+		}
+	}
+	return newSet
+}
