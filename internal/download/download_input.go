@@ -88,7 +88,12 @@ func DownloadInput(year, day int) (string, error) {
 		return "", fmt.Errorf("request failed: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(resp.Body)
 
 	if resp.StatusCode != 200 {
 		return "", errors.New(resp.Status)

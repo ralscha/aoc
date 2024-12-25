@@ -28,13 +28,11 @@ func part1(input string) {
 		field := splitted[0]
 		recordedGroups := conv.ToIntSlice(strings.Split(splitted[1], ","))
 
-		// Use Set to store unique combinations
 		combinations := container.NewSet[string]()
 		for _, comb := range generateCombinations(field) {
 			combinations.Add(comb)
 		}
 
-		// Process each unique combination
 		for _, comb := range combinations.Values() {
 			groups := countGroups(comb)
 			if slices.Equal(groups, recordedGroups) {
@@ -83,7 +81,6 @@ func generateCombinations(pattern string) []string {
 	return subCombinations
 }
 
-// Cache using container.Bag to store frequency of results
 var cache = make(map[string]int)
 
 func part2(input string) {
@@ -95,9 +92,8 @@ func part2(input string) {
 		field := splitted[0]
 		recordedGroups := conv.ToIntSlice(strings.Split(splitted[1], ","))
 
-		// Build expanded field and groups
 		newField := strings.Join([]string{field, field, field, field, field}, "?")
-		newRecordedGroup := []int{}
+		var newRecordedGroup []int
 		for range 5 {
 			newRecordedGroup = append(newRecordedGroup, recordedGroups...)
 		}

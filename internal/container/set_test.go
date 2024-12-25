@@ -9,8 +9,7 @@ func TestNewSet(t *testing.T) {
 	s := NewSet[int]()
 	if s == nil {
 		t.Error("NewSet returned nil")
-	}
-	if s.Len() != 0 {
+	} else if s.Len() != 0 {
 		t.Errorf("Expected empty set, got length %d", s.Len())
 	}
 
@@ -18,8 +17,7 @@ func TestNewSet(t *testing.T) {
 	ss := NewSet[string]()
 	if ss == nil {
 		t.Error("NewSet[string] returned nil")
-	}
-	if ss.Len() != 0 {
+	} else if ss.Len() != 0 {
 		t.Errorf("Expected empty string set, got length %d", ss.Len())
 	}
 }

@@ -67,10 +67,10 @@ func part2(input string) {
 
 		distanceString := color[1:6]
 		distance, err := strconv.ParseInt(distanceString, 16, 64)
-		distanceInt := int(distance)
 		if err != nil {
 			log.Fatalf("parsing hex failed: %v", err)
 		}
+		distanceInt := int(distance)
 		directionString := color[6:]
 
 		var direction point
