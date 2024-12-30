@@ -28,7 +28,7 @@ func part1(input string) {
 		binaryString := calculateKnotHashBinary(hashInput)
 		usedSquares += strings.Count(binaryString, "1")
 	}
-	fmt.Println("Part 1:", usedSquares)
+	fmt.Println("Part 1", usedSquares)
 }
 
 func part2(input string) {
@@ -68,7 +68,7 @@ func part2(input string) {
 		}
 	}
 
-	fmt.Println("Part 2:", regions)
+	fmt.Println("Part 2", regions)
 }
 
 func calculateKnotHashBinary(input string) string {

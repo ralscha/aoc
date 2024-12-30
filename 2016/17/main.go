@@ -91,9 +91,9 @@ func findPaths(salt string, findLongest bool) string {
 }
 
 func part1(input string) {
-	fmt.Println("Part 1:", findPaths(input, false))
+	fmt.Println("Part 1", findPaths(input, false))
 }
 
 func part2(input string) {
-	fmt.Println("Part 2:", findPaths(input, true))
+	fmt.Println("Part 2", findPaths(input, true))
 }

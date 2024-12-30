@@ -79,7 +79,7 @@ func part1and2(input string) {
 		}
 	}
 
-	fmt.Println("Part2:", minBoundingBoxIndex)
+	fmt.Println("Part2", minBoundingBoxIndex)
 
 	minX := math.MaxInt
 	maxX := math.MinInt

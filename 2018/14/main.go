@@ -40,7 +40,7 @@ func part1(input string) {
 	for i := numRecipes; i < numRecipes+10; i++ {
 		result += strconv.Itoa(scoreboard[i])
 	}
-	fmt.Println("Part 1:", result)
+	fmt.Println("Part 1", result)
 }
 
 func part2(input string) {
@@ -73,7 +73,7 @@ func part2(input string) {
 					}
 				}
 				if match {
-					fmt.Println("Part 2:", len(scoreboard)-len(target))
+					fmt.Println("Part 2", len(scoreboard)-len(target))
 					return
 				}
 			}
