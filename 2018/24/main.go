@@ -8,7 +8,6 @@ import (
 	"log"
 	"regexp"
 	"slices"
-	"sort"
 	"strings"
 )
 
@@ -45,8 +44,58 @@ func part1(input string) {
 	fmt.Println("Part 1", winningUnits)
 }
 
+func simulateWithBoost(input string, boost int) int {
+	immuneSystem, infection := parseInput(input)
+
+	for _, g := range immuneSystem {
+		g.attackDmg += boost
+	}
+
+	for len(immuneSystem) > 0 && len(infection) > 0 {
+		newImmune, newInfection := simulateFight(immuneSystem, infection)
+		if newImmune == nil && newInfection == nil {
+			return 0
+		}
+		immuneSystem = newImmune
+		infection = newInfection
+	}
+
+	immuneUnits := 0
+	for _, g := range immuneSystem {
+		immuneUnits += g.units
+	}
+	if immuneUnits > 0 && len(infection) == 0 {
+		return immuneUnits
+	}
+	return 0
+}
+
 func part2(input string) {
-	fmt.Println("Part 2", "not yet implemented")
+	lo := 0
+	loBool := simulateWithBoost(input, lo) > 0
+
+	offset := 1
+	for simulateWithBoost(input, lo+offset) == 0 {
+		offset *= 2
+	}
+	hi := lo + offset
+
+	bestSoFar := hi
+	for lo <= hi {
+		mid := (hi + lo) / 2
+		result := simulateWithBoost(input, mid)
+		if result > 0 {
+			bestSoFar = mid
+		}
+		if (result > 0) == loBool {
+			lo = mid + 1
+		} else {
+			hi = mid - 1
+		}
+	}
+
+	result := simulateWithBoost(input, bestSoFar)
+	fmt.Println("Part 2", result)
 }
 
 type group struct {
@@ -118,8 +167,8 @@ func parseInput(input string) ([]*group, []*group) {
 		log.Fatalf("invalid input format")
 	}
 
-	immuneLines := strings.Split(parts[0], "\n")[1:]
-	infectionLines := strings.Split(parts[1], "\n")[1:]
+	immuneLines := conv.SplitNewline(parts[0])[1:]
+	infectionLines := conv.SplitNewline(parts[1])[1:]
 
 	var immuneSystem []*group
 	for i, line := range immuneLines {
@@ -141,141 +190,119 @@ func parseInput(input string) ([]*group, []*group) {
 }
 
 func simulateFight(immuneSystem []*group, infection []*group) ([]*group, []*group) {
-	allGroups := append(immuneSystem, infection...)
-
-	slices.SortFunc(allGroups, func(a, b *group) int {
-		if a.initiative > b.initiative {
-			return -1
-		}
-		if a.initiative < b.initiative {
+	for _, team := range [][]*group{immuneSystem, infection} {
+		slices.SortFunc(team, func(a, b *group) int {
+			if a.effectivePower() != b.effectivePower() {
+				if a.effectivePower() > b.effectivePower() {
+					return -1
+				}
+				return 1
+			}
+			if a.initiative > b.initiative {
+				return -1
+			}
 			return 1
-		}
-		return 0
-	})
-
-	targets := make(map[*group]*group)
-	attackedBy := make(map[*group]*group)
-
-	var selectableGroups []*group
-	for _, g := range immuneSystem {
-		if g.units > 0 {
-			selectableGroups = append(selectableGroups, g)
-		}
-	}
-	for _, g := range infection {
-		if g.units > 0 {
-			selectableGroups = append(selectableGroups, g)
-		}
-	}
-
-	slices.SortFunc(selectableGroups, func(a, b *group) int {
-		if a.effectivePower() > b.effectivePower() {
-			return -1
-		}
-		if a.effectivePower() < b.effectivePower() {
-			return 1
-		}
-		if a.initiative > b.initiative {
-			return -1
-		}
-		if a.initiative < b.initiative {
-			return 1
-		}
-		return 0
-	})
-
-	availableDefenders := make(map[*group]bool)
-	for _, g := range infection {
-		if g.units > 0 {
-			availableDefenders[g] = true
-		}
-	}
-	availableImmuneDefenders := make(map[*group]bool)
-	for _, g := range immuneSystem {
-		if g.units > 0 {
-			availableImmuneDefenders[g] = true
-		}
-	}
-
-	for _, attacker := range selectableGroups {
-		var target *group
-		maxDmg := -1
-
-		var defenders []*group
-		if attacker.isImmune {
-			for defender := range availableDefenders {
-				defenders = append(defenders, defender)
-			}
-		} else {
-			for defender := range availableImmuneDefenders {
-				defenders = append(defenders, defender)
-			}
-		}
-
-		sort.Slice(defenders, func(i, j int) bool {
-			dmg1 := attacker.damageTo(defenders[i])
-			dmg2 := attacker.damageTo(defenders[j])
-			if dmg1 != dmg2 {
-				return dmg1 > dmg2
-			}
-			ep1 := defenders[i].effectivePower()
-			ep2 := defenders[j].effectivePower()
-			if ep1 != ep2 {
-				return ep1 > ep2
-			}
-			return defenders[i].initiative > defenders[j].initiative
 		})
+	}
 
-		for _, defender := range defenders {
-			dmg := attacker.damageTo(defender)
-			if dmg > maxDmg {
-				maxDmg = dmg
-				target = defender
+	immuneTargets := make([]*group, len(immuneSystem))
+	infectionTargets := make([]*group, len(infection))
+
+	selectTargets := func(attackers []*group, defenders []*group, targets []*group) {
+		availableTargets := make([]*group, 0, len(defenders))
+		for _, g := range defenders {
+			if g.units > 0 {
+				availableTargets = append(availableTargets, g)
 			}
 		}
 
-		if target != nil {
-			if attacker.isImmune {
-				if _, ok := attackedBy[target]; !ok {
-					targets[attacker] = target
-					delete(availableDefenders, target)
-					attackedBy[target] = attacker
+		for i, attacker := range attackers {
+			if attacker.units <= 0 {
+				continue
+			}
+
+			slices.SortFunc(availableTargets, func(a, b *group) int {
+				dmgA := attacker.damageTo(a)
+				dmgB := attacker.damageTo(b)
+				if dmgA != dmgB {
+					if dmgA > dmgB {
+						return -1
+					}
+					return 1
 				}
-			} else {
-				if _, ok := attackedBy[target]; !ok {
-					targets[attacker] = target
-					delete(availableImmuneDefenders, target)
-					attackedBy[target] = attacker
+				if a.effectivePower() != b.effectivePower() {
+					if a.effectivePower() > b.effectivePower() {
+						return -1
+					}
+					return 1
+				}
+				if a.initiative > b.initiative {
+					return -1
+				}
+				return 1
+			})
+
+			for k, target := range availableTargets {
+				if attacker.damageTo(target) > 0 {
+					targets[i] = target
+					availableTargets = append(availableTargets[:k], availableTargets[k+1:]...)
+					break
 				}
 			}
 		}
 	}
 
-	slices.SortFunc(allGroups, func(a, b *group) int {
+	selectTargets(immuneSystem, infection, immuneTargets)
+	selectTargets(infection, immuneSystem, infectionTargets)
+
+	type attack struct {
+		attacker   *group
+		defender   *group
+		isImmune   bool
+		initiative int
+	}
+
+	var attacks []attack
+	for i, attacker := range immuneSystem {
+		if attacker.units > 0 && immuneTargets[i] != nil {
+			attacks = append(attacks, attack{
+				attacker:   attacker,
+				defender:   immuneTargets[i],
+				isImmune:   true,
+				initiative: attacker.initiative,
+			})
+		}
+	}
+	for i, attacker := range infection {
+		if attacker.units > 0 && infectionTargets[i] != nil {
+			attacks = append(attacks, attack{
+				attacker:   attacker,
+				defender:   infectionTargets[i],
+				isImmune:   false,
+				initiative: attacker.initiative,
+			})
+		}
+	}
+
+	slices.SortFunc(attacks, func(a, b attack) int {
 		if a.initiative > b.initiative {
 			return -1
 		}
-		if a.initiative < b.initiative {
-			return 1
-		}
-		return 0
+		return 1
 	})
 
 	unitsKilled := false
-	for _, attacker := range allGroups {
-		if attacker.units <= 0 {
+	for _, atk := range attacks {
+		if atk.attacker.units <= 0 {
 			continue
 		}
-		defender, ok := targets[attacker]
-		if ok {
-			damage := attacker.damageTo(defender)
-			unitsLost := damage / defender.hp
-			if unitsLost > 0 {
-				unitsKilled = true
-			}
-			defender.units -= unitsLost
-			if defender.units < 0 {
-				defender.units = 0
+		damage := atk.attacker.damageTo(atk.defender)
+		unitsLost := damage / atk.defender.hp
+		if unitsLost > 0 {
+			unitsKilled = true
+			atk.defender.units -= unitsLost
+			if atk.defender.units < 0 {
+				atk.defender.units = 0
 			}
 		}
 	}
