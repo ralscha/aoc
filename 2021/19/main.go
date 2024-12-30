@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/mathx"
@@ -99,8 +100,8 @@ func part1and2(input string) {
 		return false, nil
 	}
 
-	alignedIndices := make(map[int]struct{})
-	alignedIndices[0] = struct{}{}
+	alignedIndices := container.NewSet[int]()
+	alignedIndices.Add(0)
 	aligned := make(map[int][][3]int)
 	aligned[0] = ll[0]
 	allAligned := make(map[[3]int]struct{})
@@ -109,18 +110,18 @@ func part1and2(input string) {
 	}
 	noalign := make(map[[2]int]struct{})
 
-	for len(alignedIndices) < len(ll) {
+	for alignedIndices.Len() < len(ll) {
 		for i := range ll {
-			if _, exists := alignedIndices[i]; exists {
+			if alignedIndices.Contains(i) {
 				continue
 			}
-			for j := range alignedIndices {
+			for _, j := range alignedIndices.Values() {
 				if _, exists := noalign[[2]int{i, j}]; exists {
 					continue
 				}
 				ok, remap := findAlignment(aligned[j], ll[i])
 				if ok {
-					alignedIndices[i] = struct{}{}
+					alignedIndices.Add(i)
 					aligned[i] = remap
 					for _, x := range remap {
 						allAligned[x] = struct{}{}
