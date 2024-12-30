@@ -25,29 +25,35 @@ func part1(input string) {
 	scaffold := make(map[gridutil.Coordinate]rune)
 	var x, y int
 
-	for !computer.Halted {
-		output := computer.Run()
-		if output == -1 {
-			break
+	for {
+		result, err := computer.Run()
+		if err != nil {
+			log.Fatalf("running program failed: %v", err)
 		}
-		char := rune(output)
-		if char == '\n' {
-			y++
-			x = 0
-		} else {
-			scaffold[gridutil.Coordinate{Row: y, Col: x}] = char
-			x++
+
+		switch result.Signal {
+		case intcomputer.SignalOutput:
+			char := rune(result.Value)
+			if char == '\n' {
+				y++
+				x = 0
+			} else {
+				scaffold[gridutil.Coordinate{Row: y, Col: x}] = char
+				x++
+			}
+		case intcomputer.SignalEnd:
+			alignmentSum := 0
+			for point, char := range scaffold {
+				if char == '#' && isIntersection(scaffold, point) {
+					alignmentSum += point.Row * point.Col
+				}
+			}
+			fmt.Println("Part 1", alignmentSum)
+			return
+		case intcomputer.SignalInput:
+			log.Fatal("unexpected input request")
 		}
 	}
-
-	alignmentSum := 0
-	for point, char := range scaffold {
-		if char == '#' && isIntersection(scaffold, point) {
-			alignmentSum += point.Row * point.Col
-		}
-	}
-
-	fmt.Println("Part 1", alignmentSum)
 }
 
 func isIntersection(scaffold map[gridutil.Coordinate]rune, point gridutil.Coordinate) bool {
