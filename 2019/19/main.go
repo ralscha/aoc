@@ -40,8 +40,8 @@ func part1(input string) {
 	program := conv.ToIntSliceComma(input)
 	count := 0
 
-	for y := 0; y < 50; y++ {
-		for x := 0; x < 50; x++ {
+	for y := range 50 {
+		for x := range 50 {
 			if checkPoint(program, x, y) {
 				count++
 			}
@@ -71,7 +71,7 @@ func findSquare(program []int, size int) (int, int) {
 			y++
 			continue
 		}
-		
+
 		return leftX, topY
 	}
 }
