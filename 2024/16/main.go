@@ -126,7 +126,7 @@ func part1and2(input string) {
 	}
 
 	result := pathfind(&grid, start, end, 0, false)
-	fmt.Println("Part 1:", result.score)
+	fmt.Println("Part 1", result.score)
 
 	result = pathfind(&grid, start, end, result.score, true)
 	uniquePaths := container.NewSet[string]()
@@ -135,5 +135,5 @@ func part1and2(input string) {
 			uniquePaths.Add(getKey(coord, gridutil.DirectionN))
 		}
 	}
-	fmt.Println("Part 2:", uniquePaths.Len())
+	fmt.Println("Part 2", uniquePaths.Len())
 }
