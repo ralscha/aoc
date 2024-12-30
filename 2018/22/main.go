@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/gridutil"
@@ -62,6 +63,69 @@ func getErosionLevel(x, y int, depth int, targetX, targetY int, cache map[gridut
 	return erosionLevel
 }
 
+type state struct {
+	minutes int
+	x, y    int
+	cannot  int
+}
+
 func part2(input string) {
-	fmt.Println("Part 2", "not yet implemented")
+	lines := conv.SplitNewline(input)
+	var depth, targetX, targetY int
+	conv.MustSscanf(lines[0], "depth: %d", &depth)
+	conv.MustSscanf(lines[1], "target: %d,%d", &targetX, &targetY)
+	cache := make(map[gridutil.Coordinate]int)
+	pq := container.NewPriorityQueue[state]()
+	pq.Push(state{minutes: 0, x: 0, y: 0, cannot: 1}, 0)
+
+	best := make(map[string]int)
+	maxSearch := 1000
+
+	for !pq.IsEmpty() {
+		current := pq.Pop()
+
+		key := fmt.Sprintf("%d,%d,%d", current.x, current.y, current.cannot)
+		if minutes, exists := best[key]; exists && minutes <= current.minutes {
+			continue
+		}
+		best[key] = current.minutes
+
+		if current.x == targetX && current.y == targetY && current.cannot == 1 {
+			fmt.Println("Part 2", current.minutes)
+			return
+		}
+
+		regionType := getErosionLevel(current.x, current.y, depth, targetX, targetY, cache) % 3
+		for i := 0; i < 3; i++ {
+			if i != current.cannot && i != regionType {
+				pq.Push(state{
+					minutes: current.minutes + 7,
+					x:       current.x,
+					y:       current.y,
+					cannot:  i,
+				}, current.minutes+7)
+			}
+		}
+
+		for _, dir := range []struct{ dx, dy int }{{-1, 0}, {1, 0}, {0, -1}, {0, 1}} {
+			newX := current.x + dir.dx
+			newY := current.y + dir.dy
+
+			if newX < 0 || newY < 0 || newX > targetX+maxSearch || newY > targetY+maxSearch {
+				continue
+			}
+
+			newRegionType := getErosionLevel(newX, newY, depth, targetX, targetY, cache) % 3
+			if newRegionType == current.cannot {
+				continue
+			}
+
+			pq.Push(state{
+				minutes: current.minutes + 1,
+				x:       newX,
+				y:       newY,
+				cannot:  current.cannot,
+			}, current.minutes+1)
+		}
+	}
 }
