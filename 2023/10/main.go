@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -67,8 +68,8 @@ func part1and2(input string) {
 	grid := makeGrid(input)
 	start := findStart(grid)
 
-	path := make(map[point]struct{})
-	path[start] = struct{}{}
+	path := container.NewSet[point]()
+	path.Add(start)
 
 	var direction orientation
 	var currentPosition point
@@ -108,21 +109,21 @@ func part1and2(input string) {
 		steps++
 		tile := grid[currentPosition]
 		if tile == '|' {
-			path[currentPosition] = struct{}{}
+			path.Add(currentPosition)
 			if direction == south {
 				currentPosition.y++
 			} else if direction == north {
 				currentPosition.y--
 			}
 		} else if tile == '-' {
-			path[currentPosition] = struct{}{}
+			path.Add(currentPosition)
 			if direction == east {
 				currentPosition.x++
 			} else if direction == west {
 				currentPosition.x--
 			}
 		} else if tile == '7' {
-			path[currentPosition] = struct{}{}
+			path.Add(currentPosition)
 			if direction == east {
 				currentPosition.y++
 				direction = south
@@ -131,7 +132,7 @@ func part1and2(input string) {
 				direction = west
 			}
 		} else if tile == 'J' {
-			path[currentPosition] = struct{}{}
+			path.Add(currentPosition)
 			if direction == east {
 				currentPosition.y--
 				direction = north
@@ -140,7 +141,7 @@ func part1and2(input string) {
 				direction = west
 			}
 		} else if tile == 'L' {
-			path[currentPosition] = struct{}{}
+			path.Add(currentPosition)
 			if direction == west {
 				currentPosition.y--
 				direction = north
@@ -149,7 +150,7 @@ func part1and2(input string) {
 				direction = east
 			}
 		} else if tile == 'F' {
-			path[currentPosition] = struct{}{}
+			path.Add(currentPosition)
 			if direction == west {
 				currentPosition.y++
 				direction = south
@@ -168,7 +169,7 @@ func part1and2(input string) {
 		northFacing := 0
 		for x := range line {
 			p := point{x, y}
-			if _, ok := path[p]; ok {
+			if path.Contains(p) {
 				tile := line[x]
 				if tile == '|' || tile == 'L' || tile == 'J' || tile == 'S' {
 					northFacing++
