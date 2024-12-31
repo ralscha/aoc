@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -240,7 +241,7 @@ func createValves(input string) map[string]*valve {
 }
 
 func dijkstra(valves map[string]*valve, startValve string, endValves []string) map[string]int {
-	visited := make(map[string]bool)
+	visited := container.NewSet[string]()
 	toVisit := []string{startValve}
 	lowestCost := make(map[string]int)
 	lowestCost[startValve] = 0
@@ -248,13 +249,13 @@ func dijkstra(valves map[string]*valve, startValve string, endValves []string) m
 	var curr string
 	for len(toVisit) > 0 {
 		curr, toVisit = toVisit[0], toVisit[1:]
-		if visited[curr] {
+		if visited.Contains(curr) {
 			continue
 		}
 
 		worthItAdj := make([]string, 0)
 		for _, neighbour := range valves[curr].tunnelTo {
-			if !visited[neighbour] {
+			if !visited.Contains(neighbour) {
 				worthItAdj = append(worthItAdj, neighbour)
 			}
 		}
@@ -275,7 +276,7 @@ func dijkstra(valves map[string]*valve, startValve string, endValves []string) m
 			}
 		}
 
-		visited[curr] = true
+		visited.Add(curr)
 	}
 
 	result := make(map[string]int)
