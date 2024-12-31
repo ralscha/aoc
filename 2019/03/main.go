@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/gridutil"
@@ -27,8 +28,8 @@ func part1(input string) {
 	wire2 := getWirePoints(lines[1])
 
 	minDist := math.MaxInt
-	for coord := range wire1 {
-		if wire2[coord] {
+	for _, coord := range wire1.Values() {
+		if wire2.Contains(coord) {
 			dist := mathx.MannhattanDistance(0, 0, coord.Row, coord.Col)
 			if dist < minDist {
 				minDist = dist
@@ -36,11 +37,10 @@ func part1(input string) {
 		}
 	}
 	fmt.Println("Part 1", minDist)
-
 }
 
-func getWirePoints(path string) map[gridutil.Coordinate]bool {
-	wire := make(map[gridutil.Coordinate]bool)
+func getWirePoints(path string) *container.Set[gridutil.Coordinate] {
+	wire := container.NewSet[gridutil.Coordinate]()
 	x, y := 0, 0
 	coords := strings.Split(path, ",")
 	for _, coord := range coords {
@@ -58,7 +58,7 @@ func getWirePoints(path string) map[gridutil.Coordinate]bool {
 				x++
 			}
 			coord := gridutil.Coordinate{Row: x, Col: y}
-			wire[coord] = true
+			wire.Add(coord)
 		}
 	}
 	return wire

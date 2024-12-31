@@ -178,10 +178,10 @@ func (m *maze) findShortestPathPart1() int {
 	end := m.portals["ZZ"][0].entrance
 
 	queue := container.NewQueue[gridutil.Coordinate]()
-	visited := make(map[gridutil.Coordinate]bool)
+	visited := container.NewSet[gridutil.Coordinate]()
 	distance := make(map[gridutil.Coordinate]int)
 	queue.Push(start)
-	visited[start] = true
+	visited.Add(start)
 	distance[start] = 0
 
 	for !queue.IsEmpty() {
@@ -193,8 +193,8 @@ func (m *maze) findShortestPathPart1() int {
 
 		for _, dir := range gridutil.Get4Directions() {
 			next := gridutil.Coordinate{Row: current.Row + dir.Row, Col: current.Col + dir.Col}
-			if val, exists := m.grid.GetC(next); exists && val == '.' && !visited[next] {
-				visited[next] = true
+			if val, exists := m.grid.GetC(next); exists && val == '.' && !visited.Contains(next) {
+				visited.Add(next)
 				distance[next] = distance[current] + 1
 				queue.Push(next)
 			}
@@ -207,15 +207,15 @@ func (m *maze) findShortestPathPart1() int {
 
 			if current == portals[0].entrance {
 				next := portals[1].entrance
-				if !visited[next] {
-					visited[next] = true
+				if !visited.Contains(next) {
+					visited.Add(next)
 					distance[next] = distance[current] + 1
 					queue.Push(next)
 				}
 			} else if current == portals[1].entrance {
 				next := portals[0].entrance
-				if !visited[next] {
-					visited[next] = true
+				if !visited.Contains(next) {
+					visited.Add(next)
 					distance[next] = distance[current] + 1
 					queue.Push(next)
 				}
@@ -232,10 +232,10 @@ func (m *maze) findShortestPathPart2() int {
 	maxLevel := 25
 
 	queue := container.NewQueue[state]()
-	visited := make(map[state]bool)
+	visited := container.NewSet[state]()
 	distance := make(map[state]int)
 	queue.Push(start)
-	visited[start] = true
+	visited.Add(start)
 	distance[start] = 0
 
 	for !queue.IsEmpty() {
@@ -246,8 +246,8 @@ func (m *maze) findShortestPathPart2() int {
 		}
 
 		for _, next := range m.getNeighbors(current, maxLevel) {
-			if !visited[next] {
-				visited[next] = true
+			if !visited.Contains(next) {
+				visited.Add(next)
 				distance[next] = distance[current] + 1
 				queue.Push(next)
 			}

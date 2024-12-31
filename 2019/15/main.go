@@ -42,10 +42,10 @@ func exploreMap(program []int) (gridutil.Grid2D[int], gridutil.Coordinate) {
 	area := gridutil.NewGrid2D[int](false)
 	var oxygenPos gridutil.Coordinate
 
-	visited := make(map[gridutil.Coordinate]bool)
+	visited := container.NewSet[gridutil.Coordinate]()
 	var explore func(pos gridutil.Coordinate)
 	explore = func(pos gridutil.Coordinate) {
-		visited[pos] = true
+		visited.Add(pos)
 
 		dirMap := map[int]gridutil.Direction{
 			North: {Row: -1, Col: 0},
@@ -57,7 +57,7 @@ func exploreMap(program []int) (gridutil.Grid2D[int], gridutil.Coordinate) {
 		for dir, offset := range dirMap {
 			nextPos := gridutil.Coordinate{Row: pos.Row + offset.Row, Col: pos.Col + offset.Col}
 
-			if visited[nextPos] {
+			if visited.Contains(nextPos) {
 				continue
 			}
 
@@ -108,7 +108,7 @@ func exploreMap(program []int) (gridutil.Grid2D[int], gridutil.Coordinate) {
 }
 
 func findShortestPath(area gridutil.Grid2D[int], start, target gridutil.Coordinate) int {
-	visited := make(map[gridutil.Coordinate]bool)
+	visited := container.NewSet[gridutil.Coordinate]()
 	queue := container.NewQueue[state]()
 	queue.Push(state{pos: start, steps: 0})
 
@@ -119,10 +119,10 @@ func findShortestPath(area gridutil.Grid2D[int], start, target gridutil.Coordina
 			return current.steps
 		}
 
-		if visited[current.pos] {
+		if visited.Contains(current.pos) {
 			continue
 		}
-		visited[current.pos] = true
+		visited.Add(current.pos)
 
 		for _, dir := range gridutil.Get4Directions() {
 			next := gridutil.Coordinate{
@@ -130,7 +130,7 @@ func findShortestPath(area gridutil.Grid2D[int], start, target gridutil.Coordina
 				Col: current.pos.Col + dir.Col,
 			}
 
-			if val, exists := area.GetC(next); exists && val != Wall && !visited[next] {
+			if val, exists := area.GetC(next); exists && val != Wall && !visited.Contains(next) {
 				queue.Push(state{pos: next, steps: current.steps + 1})
 			}
 		}
@@ -141,7 +141,7 @@ func findShortestPath(area gridutil.Grid2D[int], start, target gridutil.Coordina
 
 func fillWithOxygen(area gridutil.Grid2D[int], oxygenPos gridutil.Coordinate) int {
 	minutes := 0
-	oxygenated := make(map[gridutil.Coordinate]bool)
+	oxygenated := container.NewSet[gridutil.Coordinate]()
 	queue := container.NewQueue[state]()
 	queue.Push(state{pos: oxygenPos, steps: 0, oxygen: true})
 
@@ -152,10 +152,10 @@ func fillWithOxygen(area gridutil.Grid2D[int], oxygenPos gridutil.Coordinate) in
 			minutes = current.steps
 		}
 
-		if oxygenated[current.pos] {
+		if oxygenated.Contains(current.pos) {
 			continue
 		}
-		oxygenated[current.pos] = true
+		oxygenated.Add(current.pos)
 
 		for _, dir := range gridutil.Get4Directions() {
 			next := gridutil.Coordinate{
@@ -163,7 +163,7 @@ func fillWithOxygen(area gridutil.Grid2D[int], oxygenPos gridutil.Coordinate) in
 				Col: current.pos.Col + dir.Col,
 			}
 
-			if val, exists := area.GetC(next); exists && val != Wall && !oxygenated[next] {
+			if val, exists := area.GetC(next); exists && val != Wall && !oxygenated.Contains(next) {
 				queue.Push(state{pos: next, steps: current.steps + 1, oxygen: true})
 			}
 		}
