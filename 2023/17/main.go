@@ -66,7 +66,7 @@ func minHeatLoss(grid [][]int, minDistance, maxDistance int) int {
 	start := state{pos: position{x: 0, y: 0, dir: -1}, heatLoss: 0}
 	pq.Push(start, start.heatLoss)
 
-	visited := make(map[position]bool)
+	visited := container.NewSet[position]()
 
 	for pq.Len() > 0 {
 		currentState := pq.Pop()
@@ -76,10 +76,10 @@ func minHeatLoss(grid [][]int, minDistance, maxDistance int) int {
 			return currentState.heatLoss
 		}
 
-		if visited[currentPos] {
+		if visited.Contains(currentPos) {
 			continue
 		}
-		visited[currentPos] = true
+		visited.Add(currentPos)
 
 		for _, d := range []direction{up, right, down, left} {
 			if currentPos.dir == up && d == down || currentPos.dir == right && d == left || currentPos.dir == down && d == up || currentPos.dir == left && d == right {

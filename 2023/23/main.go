@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -28,7 +29,7 @@ var (
 	maxLength2 = 0
 )
 
-func dfs(start, end point, grid map[point]byte, visited map[point]bool, length int) {
+func dfs(start, end point, grid map[point]byte, visited *container.Set[point], length int) {
 	if start == end {
 		if length > maxLength {
 			maxLength = length
@@ -36,16 +37,16 @@ func dfs(start, end point, grid map[point]byte, visited map[point]bool, length i
 		return
 	}
 
-	visited[start] = true
+	visited.Add(start)
 
 	for _, delta := range slopeDirections {
 		next := point{start.x + delta.x, start.y + delta.y}
-		if tile, ok := grid[next]; ok && !visited[next] && (tile == '.' || slopeDirections[tile] == delta) {
+		if tile, ok := grid[next]; ok && !visited.Contains(next) && (tile == '.' || slopeDirections[tile] == delta) {
 			dfs(next, end, grid, visited, length+1)
 		}
 	}
 
-	visited[start] = false
+	visited.Remove(start)
 }
 
 func findStart(grid map[point]byte) point {
@@ -141,12 +142,12 @@ func findJunctions(grid [][]byte) map[point]*junction {
 }
 
 func findEdges(start point, grid [][]byte, junctions map[point]*junction) {
-	visited := make(map[point]bool)
+	visited := container.NewSet[point]()
 	queue := []struct {
 		pos    point
 		length int
 	}{{start, 0}}
-	visited[start] = true
+	visited.Add(start)
 
 	for len(queue) > 0 {
 		current := queue[0]
@@ -162,8 +163,8 @@ func findEdges(start point, grid [][]byte, junctions map[point]*junction) {
 		}
 
 		for _, next := range getNeighbors(current.pos, grid) {
-			if !visited[next] {
-				visited[next] = true
+			if !visited.Contains(next) {
+				visited.Add(next)
 				queue = append(queue, struct {
 					pos    point
 					length int
@@ -173,7 +174,7 @@ func findEdges(start point, grid [][]byte, junctions map[point]*junction) {
 	}
 }
 
-func dfsJunctions(current point, end point, junctions map[point]*junction, visited map[point]bool, length int) {
+func dfsJunctions(current point, end point, junctions map[point]*junction, visited *container.Set[point], length int) {
 	if current == end {
 		if length > maxLength2 {
 			maxLength2 = length
@@ -181,13 +182,13 @@ func dfsJunctions(current point, end point, junctions map[point]*junction, visit
 		return
 	}
 
-	visited[current] = true
+	visited.Add(current)
 	for _, edge := range junctions[current].edges {
-		if !visited[edge.to] {
+		if !visited.Contains(edge.to) {
 			dfsJunctions(edge.to, end, junctions, visited, length+edge.length)
 		}
 	}
-	visited[current] = false
+	visited.Remove(current)
 }
 
 func findLongestPath(grid [][]byte) int {
@@ -204,7 +205,7 @@ func findLongestPath(grid [][]byte) int {
 		}
 	}
 
-	visited := make(map[point]bool)
+	visited := container.NewSet[point]()
 	dfsJunctions(start, end, junctions, visited, 0)
 	return maxLength2
 }
@@ -220,7 +221,7 @@ func part1(lines []string) {
 	start := findStart(grid)
 	end := findEnd(len(lines)-1, grid)
 
-	visited := make(map[point]bool)
+	visited := container.NewSet[point]()
 	dfs(start, end, grid, visited, 0)
 	fmt.Println(maxLength)
 }

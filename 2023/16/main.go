@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -92,8 +93,8 @@ func part2(input string) {
 func energize(startPos point, startDir direction, grid [][]byte) int {
 	var beams []beam
 	beams = append(beams, beam{pos: startPos, dir: startDir})
-	energized := make(map[point]bool)
-	cycleDetection := make(map[beam]struct{})
+	energized := container.NewSet[point]()
+	cycleDetection := container.NewSet[beam]()
 	for len(beams) > 0 {
 		currentBeam := beams[0]
 		beams = beams[1:]
@@ -103,7 +104,7 @@ func energize(startPos point, startDir direction, grid [][]byte) int {
 				break
 			}
 
-			energized[currentBeam.pos] = true
+			energized.Add(currentBeam.pos)
 			tile := grid[currentBeam.pos.y][currentBeam.pos.x]
 
 			switch tile {
@@ -162,11 +163,11 @@ func energize(startPos point, startDir direction, grid [][]byte) int {
 				}
 			}
 
-			if _, ok := cycleDetection[currentBeam]; ok {
+			if cycleDetection.Contains(currentBeam) {
 				break
 			}
-			cycleDetection[currentBeam] = struct{}{}
+			cycleDetection.Add(currentBeam)
 		}
 	}
-	return len(energized)
+	return energized.Len()
 }
