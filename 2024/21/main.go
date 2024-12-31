@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/mathx"
@@ -65,13 +66,13 @@ func seeToMoveSet(start, finish []int, avoid []int) []string {
 	moveString := sb.String()
 
 	var rv []string
-	seen := make(map[string]bool)
+	seen := container.NewSet[string]()
 	moveRunes := []rune(moveString)
 	perms := mathx.Permutations(moveRunes)
 
 	for _, p := range perms {
 		perm := string(p)
-		if !seen[perm] {
+		if !seen.Contains(perm) {
 			valid := true
 			currentPos := start
 			for _, moveChar := range perm {
@@ -86,7 +87,7 @@ func seeToMoveSet(start, finish []int, avoid []int) []string {
 			if valid {
 				rv = append(rv, perm+"a")
 			}
-			seen[perm] = true
+			seen.Add(perm)
 		}
 	}
 
