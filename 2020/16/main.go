@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -140,7 +141,7 @@ func part2(input string) {
 	}
 
 	fieldOrder := make(map[int]string)
-	assigned := make(map[string]bool)
+	assigned := container.NewSet[string]()
 
 	for range numFields {
 		for j := range numFields {
@@ -149,9 +150,9 @@ func part2(input string) {
 			}
 			if len(possibleFields[j]) == 1 {
 				field := possibleFields[j][0]
-				if !assigned[field] {
+				if !assigned.Contains(field) {
 					fieldOrder[j] = field
-					assigned[field] = true
+					assigned.Add(field)
 				}
 			}
 		}
@@ -162,7 +163,7 @@ func part2(input string) {
 			}
 			newPossible := make([]string, 0)
 			for _, field := range possibleFields[j] {
-				if !assigned[field] {
+				if !assigned.Contains(field) {
 					newPossible = append(newPossible, field)
 				}
 			}
