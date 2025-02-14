@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -21,16 +22,16 @@ func main() {
 }
 
 func part1(banks [16]int) {
-	seen := make(map[[16]int]bool)
-	seen[banks] = true
+	seen := container.NewSet[[16]int]()
+	seen.Add(banks)
 	cycle := 0
 	for {
 		banks = redistribute(banks)
 		cycle++
-		if seen[banks] {
+		if seen.Contains(banks) {
 			break
 		}
-		seen[banks] = true
+		seen.Add(banks)
 	}
 	fmt.Println(cycle)
 }

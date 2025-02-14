@@ -50,31 +50,24 @@ type cell struct {
 	unit   *unit
 }
 
-type field [][]cell
-
-func parseInput(input string) (field, []*unit) {
-	var field field
+func parseInput(input string) (gridutil.Grid2D[cell], []*unit) {
+	field := gridutil.NewGrid2D[cell](false)
 	var units []*unit
-	y := 0
 
 	lines := conv.SplitNewline(input)
-	for _, line := range lines {
-		fieldRow := make([]cell, len(line))
-
-		for x, ch := range line {
+	for row, line := range lines {
+		for col, ch := range line {
 			if ch == 'G' || ch == 'E' {
-				unit := &unit{200, y, x, ch}
+				unit := &unit{200, row, col, ch}
 				units = append(units, unit)
-				fieldRow[x] = cell{isWall: false, unit: unit}
+				field.Set(row, col, cell{isWall: false, unit: unit})
 			} else {
-				fieldRow[x] = cell{isWall: ch == '#', unit: nil}
+				field.Set(row, col, cell{isWall: ch == '#', unit: nil})
 			}
 		}
-
-		field = append(field, fieldRow)
-		y++
 	}
 
+	field.SetMaxRowCol(len(lines)-1, len(lines[0])-1)
 	return field, units
 }
 
@@ -88,27 +81,23 @@ func countElves(units []*unit) int {
 	return count
 }
 
-func findMovementTarget(field field, unit *unit) *gridutil.Coordinate {
-	height, width := len(field), len(field[0])
+func findMovementTarget(field gridutil.Grid2D[cell], unit *unit) *gridutil.Coordinate {
 	start := gridutil.Coordinate{Row: unit.row, Col: unit.col}
 	queue := []gridutil.Coordinate{start}
 	seen := make(map[gridutil.Coordinate]gridutil.Coordinate)
 	seen[start] = gridutil.Coordinate{Row: -1, Col: -1}
 
 	dirs := [4]gridutil.Direction{gridutil.DirectionN, gridutil.DirectionW, gridutil.DirectionE, gridutil.DirectionS}
+
 	for len(queue) > 0 {
 		current := queue[0]
 		queue = queue[1:]
 
 		for _, dir := range dirs {
-			newRow, newCol := current.Row+dir.Row, current.Col+dir.Col
+			newPos := gridutil.Coordinate{Row: current.Row + dir.Row, Col: current.Col + dir.Col}
 
-			if newRow >= 0 && newRow < height && newCol >= 0 && newCol < width {
-				newPos := gridutil.Coordinate{Row: newRow, Col: newCol}
-
-				if _, exists := seen[newPos]; !exists {
-					cell := field[newRow][newCol]
-
+			if _, exists := seen[newPos]; !exists {
+				if cell, ok := field.GetC(newPos); ok {
 					if targetUnit := cell.unit; targetUnit != nil {
 						if targetUnit.utype != unit.utype {
 							if current == start {
@@ -133,17 +122,14 @@ func findMovementTarget(field field, unit *unit) *gridutil.Coordinate {
 	return nil
 }
 
-func findAttackTarget(field field, u *unit) *unit {
-	height, width := len(field), len(field[0])
+func findAttackTarget(field gridutil.Grid2D[cell], u *unit) *unit {
+	var targets []*unit
 	dirs := [4]gridutil.Direction{gridutil.DirectionN, gridutil.DirectionW, gridutil.DirectionE, gridutil.DirectionS}
 
-	var targets []*unit
-
 	for _, dir := range dirs {
-		newRow, newCol := u.row+dir.Row, u.col+dir.Col
-
-		if newRow >= 0 && newRow < height && newCol >= 0 && newCol < width {
-			if targetUnit := field[newRow][newCol].unit; targetUnit != nil {
+		newPos := gridutil.Coordinate{Row: u.row + dir.Row, Col: u.col + dir.Col}
+		if cell, ok := field.GetC(newPos); ok {
+			if targetUnit := cell.unit; targetUnit != nil {
 				if targetUnit.utype != u.utype {
 					targets = append(targets, targetUnit)
 				}
@@ -168,7 +154,7 @@ func findAttackTarget(field field, u *unit) *unit {
 	return targets[0]
 }
 
-func simulateBattle(field field, units []*unit, elfPower int) (map[rune]int, int) {
+func simulateBattle(field gridutil.Grid2D[cell], units []*unit, elfPower int) (map[rune]int, int) {
 	round := 0
 
 	for {
@@ -202,9 +188,9 @@ func simulateBattle(field field, units []*unit, elfPower int) (map[rune]int, int
 			}
 
 			if target := findMovementTarget(field, unit); target != nil {
-				field[unit.row][unit.col] = cell{isWall: false, unit: nil}
+				field.Set(unit.row, unit.col, cell{isWall: false, unit: nil})
 				unit.row, unit.col = target.Row, target.Col
-				field[unit.row][unit.col] = cell{isWall: false, unit: unit}
+				field.Set(unit.row, unit.col, cell{isWall: false, unit: unit})
 			}
 
 			if target := findAttackTarget(field, unit); target != nil {
@@ -215,7 +201,7 @@ func simulateBattle(field field, units []*unit, elfPower int) (map[rune]int, int
 				}
 
 				if target.health <= 0 {
-					field[target.row][target.col] = cell{isWall: false, unit: nil}
+					field.Set(target.row, target.col, cell{isWall: false, unit: nil})
 				}
 			}
 		}
@@ -231,19 +217,21 @@ func simulateBattle(field field, units []*unit, elfPower int) (map[rune]int, int
 	}
 }
 
-func copyState(f field) (field, []*unit) {
-	newField := make(field, len(f))
+func copyState(f gridutil.Grid2D[cell]) (gridutil.Grid2D[cell], []*unit) {
+	newField := f.Copy()
 	var newUnits []*unit
 
-	for i := range f {
-		newField[i] = make([]cell, len(f[i]))
-		for j := range f[i] {
-			if u := f[i][j].unit; u != nil {
-				newUnit := &unit{u.health, u.row, u.col, u.utype}
-				newUnits = append(newUnits, newUnit)
-				newField[i][j] = cell{isWall: false, unit: newUnit}
-			} else {
-				newField[i][j] = f[i][j]
+	minRow, maxRow := f.GetMinMaxRow()
+	minCol, maxCol := f.GetMinMaxCol()
+
+	for row := minRow; row <= maxRow; row++ {
+		for col := minCol; col <= maxCol; col++ {
+			if c, ok := f.Get(row, col); ok {
+				if u := c.unit; u != nil {
+					newUnit := &unit{u.health, u.row, u.col, u.utype}
+					newUnits = append(newUnits, newUnit)
+					newField.Set(row, col, cell{isWall: false, unit: newUnit})
+				}
 			}
 		}
 	}

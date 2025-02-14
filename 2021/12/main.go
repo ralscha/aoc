@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/download"
 	"bufio"
 	"fmt"
@@ -159,7 +160,7 @@ func isUpper(s string) bool {
 }
 
 func countAllPathsString(s, d string) int {
-	visited := make(map[string]struct{})
+	visited := container.NewSet[string]()
 	var pathList []string
 
 	pathList = append(pathList, s)
@@ -173,17 +174,17 @@ func countAllPaths(s, d *node) int {
 	return printAllPathsUtil(s, d, pathList, 0)
 }
 
-func printAllPathsUtilString(u, d string, visited map[string]struct{}, localPathList []string, count int) int {
+func printAllPathsUtilString(u, d string, visited *container.Set[string], localPathList []string, count int) int {
 	if u == d {
 		return 1
 	}
 
 	if !isUpper(u) {
-		visited[u] = struct{}{}
+		visited.Add(u)
 	}
 
 	for _, i := range adjmapString[u] {
-		if _, ok := visited[i]; !ok {
+		if !visited.Contains(i) {
 			localPathList = append(localPathList, i)
 			ix := len(localPathList) - 1
 			count += printAllPathsUtilString(i, d, visited, localPathList, 0)
@@ -192,7 +193,7 @@ func printAllPathsUtilString(u, d string, visited map[string]struct{}, localPath
 	}
 
 	if !isUpper(u) {
-		delete(visited, u)
+		visited.Remove(u)
 	}
 
 	return count

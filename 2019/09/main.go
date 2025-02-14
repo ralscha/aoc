@@ -22,15 +22,51 @@ func main() {
 func part1(input string) {
 	program := conv.ToIntSliceComma(input)
 	computer := intcomputer.NewIntcodeComputer(program)
-	computer.Input = 1
-	computer.Run()
-	fmt.Println("Part 1", computer.Output)
+	if err := computer.AddInput(1); err != nil {
+		log.Fatalf("adding input failed: %v", err)
+	}
+
+	var lastOutput int
+	for {
+		result, err := computer.Run()
+		if err != nil {
+			log.Fatalf("running program failed: %v", err)
+		}
+
+		switch result.Signal {
+		case intcomputer.SignalOutput:
+			lastOutput = result.Value
+		case intcomputer.SignalEnd:
+			fmt.Println("Part 1", lastOutput)
+			return
+		case intcomputer.SignalInput:
+			log.Fatal("unexpected input request")
+		}
+	}
 }
 
 func part2(input string) {
 	program := conv.ToIntSliceComma(input)
 	computer := intcomputer.NewIntcodeComputer(program)
-	computer.Input = 2
-	computer.Run()
-	fmt.Println("Part 2", computer.Output)
+	if err := computer.AddInput(2); err != nil {
+		log.Fatalf("adding input failed: %v", err)
+	}
+
+	var lastOutput int
+	for {
+		result, err := computer.Run()
+		if err != nil {
+			log.Fatalf("running program failed: %v", err)
+		}
+
+		switch result.Signal {
+		case intcomputer.SignalOutput:
+			lastOutput = result.Value
+		case intcomputer.SignalEnd:
+			fmt.Println("Part 2", lastOutput)
+			return
+		case intcomputer.SignalInput:
+			log.Fatal("unexpected input request")
+		}
+	}
 }

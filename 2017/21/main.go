@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
@@ -66,22 +67,22 @@ func (g *grid) flipHorizontal() *grid {
 }
 
 func (g *grid) getAllTransformations() []string {
-	seen := make(map[string]bool)
+	seen := container.NewSet[string]()
 
 	current := g
-	for i := 0; i < 4; i++ {
-		seen[current.String()] = true
+	for range 4 {
+		seen.Add(current.String())
 		current = current.rotate()
 	}
 
 	current = g.flipHorizontal()
-	for i := 0; i < 4; i++ {
-		seen[current.String()] = true
+	for range 4 {
+		seen.Add(current.String())
 		current = current.rotate()
 	}
 
-	result := make([]string, 0, len(seen))
-	for k := range seen {
+	result := make([]string, 0, seen.Len())
+	for _, k := range seen.Values() {
 		result = append(result, k)
 	}
 	return result

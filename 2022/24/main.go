@@ -77,7 +77,7 @@ type valley struct {
 	width         int
 	height        int
 	blizzards     []blizzard
-	blizzardCache []map[gridutil.Coordinate]bool
+	blizzardCache []*container.Set[gridutil.Coordinate]
 	cycleLength   int
 }
 
@@ -89,14 +89,14 @@ type blizzard struct {
 func (v *valley) initBlizzardCache() {
 	// Calculate cycle length (LCM of width-2 and height-2)
 	v.cycleLength = mathx.Lcm([]int{v.width - 2, v.height - 2})
-	v.blizzardCache = make([]map[gridutil.Coordinate]bool, v.cycleLength)
+	v.blizzardCache = make([]*container.Set[gridutil.Coordinate], v.cycleLength)
 
 	// Pre-calculate all blizzard positions for the entire cycle
 	for minute := 0; minute < v.cycleLength; minute++ {
-		positions := make(map[gridutil.Coordinate]bool)
+		positions := container.NewSet[gridutil.Coordinate]()
 		for _, b := range v.blizzards {
 			pos := b.posAtMinute(minute, *v)
-			positions[pos] = true
+			positions.Add(pos)
 		}
 		v.blizzardCache[minute] = positions
 	}
@@ -137,7 +137,7 @@ func (b *blizzard) posAtMinute(minute int, v valley) gridutil.Coordinate {
 }
 
 func (v *valley) isBlizzardAt(pos gridutil.Coordinate, minute int) bool {
-	return v.blizzardCache[minute%v.cycleLength][pos]
+	return v.blizzardCache[minute%v.cycleLength].Contains(pos)
 }
 
 func (v *valley) moveExpedition(minute int, pos gridutil.Coordinate, dir gridutil.Direction, toPos gridutil.Coordinate) (gridutil.Coordinate, bool) {
@@ -169,7 +169,7 @@ type state struct {
 func (v *valley) findFastestPath(minute int, fromPos, toPos gridutil.Coordinate) int {
 	queue := container.NewQueue[state]()
 	queue.Push(state{pos: fromPos, minute: minute})
-	seen := make(map[state]bool)
+	seen := container.NewSet[state]()
 
 	for !queue.IsEmpty() {
 		current := queue.Pop()
@@ -185,8 +185,8 @@ func (v *valley) findFastestPath(minute int, fromPos, toPos gridutil.Coordinate)
 				return nextMinute
 			}
 			nextState := state{pos: nextPos, minute: nextMinute % v.cycleLength}
-			if !seen[nextState] {
-				seen[nextState] = true
+			if !seen.Contains(nextState) {
+				seen.Add(nextState)
 				queue.Push(state{pos: nextPos, minute: nextMinute})
 			}
 		}
@@ -195,8 +195,8 @@ func (v *valley) findFastestPath(minute int, fromPos, toPos gridutil.Coordinate)
 		nextPos, ok := v.moveExpedition(nextMinute, current.pos, gridutil.Direction{}, toPos)
 		if ok {
 			nextState := state{pos: nextPos, minute: nextMinute % v.cycleLength}
-			if !seen[nextState] {
-				seen[nextState] = true
+			if !seen.Contains(nextState) {
+				seen.Add(nextState)
 				queue.Push(state{pos: nextPos, minute: nextMinute})
 			}
 		}

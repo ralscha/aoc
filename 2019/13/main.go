@@ -25,20 +25,34 @@ func part1(input string) {
 	computer := intcomputer.NewIntcodeComputer(program)
 	tiles := make(map[gridutil.Coordinate]int)
 
-	for !computer.Halted {
-		col := computer.Run()
-		row := computer.Run()
-		tileID := computer.Run()
-		tiles[gridutil.Coordinate{Row: row, Col: col}] = tileID
-	}
+	var outputs []int
+	for {
+		result, err := computer.Run()
+		if err != nil {
+			log.Fatalf("running program failed: %v", err)
+		}
 
-	blockCount := 0
-	for _, tile := range tiles {
-		if tile == 2 {
-			blockCount++
+		switch result.Signal {
+		case intcomputer.SignalOutput:
+			outputs = append(outputs, result.Value)
+			if len(outputs) == 3 {
+				col, row, tileID := outputs[0], outputs[1], outputs[2]
+				tiles[gridutil.Coordinate{Row: row, Col: col}] = tileID
+				outputs = outputs[:0]
+			}
+		case intcomputer.SignalEnd:
+			blockCount := 0
+			for _, tile := range tiles {
+				if tile == 2 {
+					blockCount++
+				}
+			}
+			fmt.Println("Part 1", blockCount)
+			return
+		case intcomputer.SignalInput:
+			log.Fatal("unexpected input request")
 		}
 	}
-	fmt.Println("Part 1", blockCount)
 }
 
 func part2(input string) {
@@ -48,31 +62,44 @@ func part2(input string) {
 	tiles := make(map[gridutil.Coordinate]int)
 	var score int
 	var ballCol, paddleCol int
+	var outputs []int
 
-	for !computer.Halted {
-		col := computer.Run()
-		row := computer.Run()
-		tileID := computer.Run()
-
-		if col == -1 && row == 0 {
-			score = tileID
-		} else {
-			tiles[gridutil.Coordinate{Row: row, Col: col}] = tileID
-			if tileID == 3 {
-				paddleCol = col
-			} else if tileID == 4 {
-				ballCol = col
-			}
+	for {
+		result, err := computer.Run()
+		if err != nil {
+			log.Fatalf("running program failed: %v", err)
 		}
 
-		if ballCol < paddleCol {
-			computer.Input = -1
-		} else if ballCol > paddleCol {
-			computer.Input = 1
-		} else {
-			computer.Input = 0
+		switch result.Signal {
+		case intcomputer.SignalOutput:
+			outputs = append(outputs, result.Value)
+			if len(outputs) == 3 {
+				col, row, tileID := outputs[0], outputs[1], outputs[2]
+				if col == -1 && row == 0 {
+					score = tileID
+				} else {
+					tiles[gridutil.Coordinate{Row: row, Col: col}] = tileID
+					if tileID == 3 {
+						paddleCol = col
+					} else if tileID == 4 {
+						ballCol = col
+					}
+				}
+				outputs = outputs[:0]
+			}
+		case intcomputer.SignalInput:
+			var joystick int
+			if ballCol < paddleCol {
+				joystick = -1
+			} else if ballCol > paddleCol {
+				joystick = 1
+			}
+			if err := computer.AddInput(joystick); err != nil {
+				log.Fatalf("adding input failed: %v", err)
+			}
+		case intcomputer.SignalEnd:
+			fmt.Println("Part 2", score)
+			return
 		}
 	}
-
-	fmt.Println("Part 2", score)
 }

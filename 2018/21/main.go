@@ -40,18 +40,18 @@ func part1(input string) {
 	}
 
 	reg := [6]int{}
-	seen := make(map[int]bool)
+	seen := container.NewSet[int]()
 
 	for ip := 0; ip >= 0 && ip < len(program); {
 		reg[ipReg] = ip
 		inst := program[ip]
 
 		if ip == 28 {
-			if len(seen) == 0 {
+			if seen.Len() == 0 {
 				fmt.Println("Part 1", reg[program[28].a])
 				return
 			}
-			seen[reg[program[28].a]] = true
+			seen.Add(reg[program[28].a])
 		}
 
 		reg = exec(inst, reg)

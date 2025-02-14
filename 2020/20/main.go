@@ -255,7 +255,7 @@ func generateImage(tiles map[int]tile) gridutil.Grid2D[rune] {
 	return image
 }
 
-func getMonsterTiles(image gridutil.Grid2D[rune]) map[gridutil.Coordinate]bool {
+func getMonsterTiles(image gridutil.Grid2D[rune]) *container.Set[gridutil.Coordinate] {
 	monsterPattern := []string{
 		"                  # ",
 		"#    ##    ##    ###",
@@ -282,7 +282,7 @@ func getMonsterTiles(image gridutil.Grid2D[rune]) map[gridutil.Coordinate]bool {
 		}
 	}
 
-	monsters := make(map[gridutil.Coordinate]bool)
+	monsters := container.NewSet[gridutil.Coordinate]()
 	for y := range image.Height() - maxY {
 		for x := range image.Width() - maxX {
 			isMonster := true
@@ -295,7 +295,7 @@ func getMonsterTiles(image gridutil.Grid2D[rune]) map[gridutil.Coordinate]bool {
 			}
 			if isMonster {
 				for _, coord := range monsterCoords {
-					monsters[gridutil.Coordinate{Row: y + coord.Row, Col: x + coord.Col}] = true
+					monsters.Add(gridutil.Coordinate{Row: y + coord.Row, Col: x + coord.Col})
 				}
 			}
 		}
@@ -306,23 +306,23 @@ func getMonsterTiles(image gridutil.Grid2D[rune]) map[gridutil.Coordinate]bool {
 func countNonMonsterTiles(image gridutil.Grid2D[rune]) int {
 	for _, img := range generateGridSymmetries(image) {
 		monsterTiles := getMonsterTiles(img)
-		if len(monsterTiles) == 0 {
+		if monsterTiles.Len() == 0 {
 			continue
 		}
 
-		allPounds := make(map[gridutil.Coordinate]bool)
+		allPounds := container.NewSet[gridutil.Coordinate]()
 		for y := range img.Height() {
 			for x := range img.Width() {
 				val, _ := img.Get(y, x)
 				if val == '#' {
-					allPounds[gridutil.Coordinate{Row: y, Col: x}] = true
+					allPounds.Add(gridutil.Coordinate{Row: y, Col: x})
 				}
 			}
 		}
 
 		count := 0
-		for p := range allPounds {
-			if !monsterTiles[p] {
+		for _, p := range allPounds.Values() {
+			if !monsterTiles.Contains(p) {
 				count++
 			}
 		}

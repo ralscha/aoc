@@ -42,37 +42,55 @@ func runRobot(computer *intcomputer.IntcodeComputer, startColor int) map[griduti
 
 	painted[pos] = startColor
 
-	for !computer.Halted {
-		color := painted[pos]
-		computer.Input = color
-		computer.Run()
-		if computer.Halted {
-			break
-		}
-		newColor := computer.Output
-		computer.Run()
-		turn := computer.Output
-
-		painted[pos] = newColor
-
-		if turn == 0 {
-			dir = gridutil.TurnLeft(dir)
-		} else {
-			dir = gridutil.TurnRight(dir)
+	for {
+		// Provide current color as input when requested
+		result, err := computer.Run()
+		if err != nil {
+			log.Fatalf("running program failed: %v", err)
 		}
 
-		switch dir {
-		case gridutil.DirectionN:
-			pos.Row--
-		case gridutil.DirectionE:
-			pos.Col++
-		case gridutil.DirectionS:
-			pos.Row++
-		case gridutil.DirectionW:
-			pos.Col--
+		switch result.Signal {
+		case intcomputer.SignalInput:
+			color := painted[pos]
+			if err := computer.AddInput(color); err != nil {
+				log.Fatalf("adding input failed: %v", err)
+			}
+		case intcomputer.SignalOutput:
+			// First output is the color to paint
+			newColor := result.Value
+			painted[pos] = newColor
+
+			// Get second output for turn direction
+			result, err = computer.Run()
+			if err != nil {
+				log.Fatalf("running program failed: %v", err)
+			}
+			if result.Signal != intcomputer.SignalOutput {
+				log.Fatal("expected turn direction output")
+			}
+			turn := result.Value
+
+			// Update direction and move
+			if turn == 0 {
+				dir = gridutil.TurnLeft(dir)
+			} else {
+				dir = gridutil.TurnRight(dir)
+			}
+
+			switch dir {
+			case gridutil.DirectionN:
+				pos.Row--
+			case gridutil.DirectionE:
+				pos.Col++
+			case gridutil.DirectionS:
+				pos.Row++
+			case gridutil.DirectionW:
+				pos.Col--
+			}
+		case intcomputer.SignalEnd:
+			return painted
 		}
 	}
-	return painted
 }
 
 func printRegistration(painted map[gridutil.Coordinate]int) {

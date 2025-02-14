@@ -73,7 +73,7 @@ func main() {
 func part1(input string) {
 	instructions := conv.SplitNewline(input)
 	password := "abcdefgh"
-	fmt.Println("Part 1:", scramble(password, instructions))
+	fmt.Println("Part 1", scramble(password, instructions))
 }
 
 func part2(input string) {
@@ -81,7 +81,7 @@ func part2(input string) {
 	target := "fbgdceah"
 	for _, perm := range mathx.Permutations([]rune("abcdefgh")) {
 		if scramble(string(perm), instructions) == target {
-			fmt.Println("Part 2:", string(perm))
+			fmt.Println("Part 2", string(perm))
 			return
 		}
 	}

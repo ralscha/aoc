@@ -22,7 +22,7 @@ func main() {
 func part1and2(input string) {
 	lines := conv.SplitNewline(input)
 	grid := gridutil.NewCharGrid2D(lines)
-	galaxies := make(map[gridutil.Coordinate]struct{})
+	galaxies := container.NewSet[gridutil.Coordinate]()
 
 	minRow, maxRow := grid.GetMinMaxRow()
 	minCol, maxCol := grid.GetMinMaxCol()
@@ -31,7 +31,7 @@ func part1and2(input string) {
 	for row := minRow; row <= maxRow; row++ {
 		for col := minCol; col <= maxCol; col++ {
 			if val, exists := grid.Get(row, col); exists && val == '#' {
-				galaxies[gridutil.Coordinate{Row: row, Col: col}] = struct{}{}
+				galaxies.Add(gridutil.Coordinate{Row: row, Col: col})
 			}
 		}
 	}
@@ -43,7 +43,7 @@ func part1and2(input string) {
 	for row := minRow; row <= maxRow; row++ {
 		rowEmpty := true
 		for col := minCol; col <= maxCol; col++ {
-			if _, ok := galaxies[gridutil.Coordinate{Row: row, Col: col}]; ok {
+			if galaxies.Contains(gridutil.Coordinate{Row: row, Col: col}) {
 				rowEmpty = false
 				break
 			}
@@ -56,7 +56,7 @@ func part1and2(input string) {
 	for col := minCol; col <= maxCol; col++ {
 		colEmpty := true
 		for row := minRow; row <= maxRow; row++ {
-			if _, ok := galaxies[gridutil.Coordinate{Row: row, Col: col}]; ok {
+			if galaxies.Contains(gridutil.Coordinate{Row: row, Col: col}) {
 				colEmpty = false
 				break
 			}
@@ -68,7 +68,7 @@ func part1and2(input string) {
 
 	// Convert galaxies to slice for easier iteration
 	var galaxyPoints []gridutil.Coordinate
-	for p := range galaxies {
+	for _, p := range galaxies.Values() {
 		galaxyPoints = append(galaxyPoints, p)
 	}
 

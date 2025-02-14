@@ -67,9 +67,9 @@ func fillDisk(input string, diskSize int) string {
 }
 
 func part1(input string) {
-	fmt.Println("Part 1:", fillDisk(input, 272))
+	fmt.Println("Part 1", fillDisk(input, 272))
 }
 
 func part2(input string) {
-	fmt.Println("Part 2:", fillDisk(input, 35651584))
+	fmt.Println("Part 2", fillDisk(input, 35651584))
 }

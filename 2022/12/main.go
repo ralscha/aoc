@@ -1,8 +1,10 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
+	"aoc/internal/gridutil"
 	"container/list"
 	"fmt"
 	"log"
@@ -17,10 +19,6 @@ func main() {
 
 	part1(input)
 	part2(input)
-}
-
-type point struct {
-	row, col int
 }
 
 func part1(input string) {
@@ -47,38 +45,38 @@ func part1(input string) {
 		}
 	}
 
-	steps := bfs(grid, point{startRow, startCol}, point{endRow, endCol})
-	fmt.Println(steps)
+	steps := bfs(grid, gridutil.Coordinate{Row: startRow, Col: startCol}, gridutil.Coordinate{Row: endRow, Col: endCol})
+	fmt.Println("Part 1", steps)
 }
 
-func bfs(grid [][]int, start, end point) int {
+func bfs(grid [][]int, start, end gridutil.Coordinate) int {
 	noRows := len(grid)
 	noCols := len(grid[0])
 
 	queue := list.New()
 	queue.PushBack(start)
-	visited := make(map[point]bool)
-	visited[start] = true
-	steps := make(map[point]int)
+	visited := container.NewSet[gridutil.Coordinate]()
+	visited.Add(start)
+	steps := make(map[gridutil.Coordinate]int)
 
 	dx := [4]int{0, 0, -1, 1}
 	dy := [4]int{-1, 1, 0, 0}
 
 	for queue.Len() > 0 {
 		front := queue.Front()
-		head := front.Value.(point)
+		head := front.Value.(gridutil.Coordinate)
 		queue.Remove(front)
-		if head.row == end.row && head.col == end.col {
+		if head.Row == end.Row && head.Col == end.Col {
 			break
 		}
 		for i := range 4 {
-			newRow := head.row + dx[i]
-			newCol := head.col + dy[i]
-			if newRow >= 0 && newRow < noRows && newCol >= 0 && newCol < noCols && !visited[point{newRow, newCol}] &&
-				grid[newRow][newCol] < grid[head.row][head.col]+2 {
-				steps[point{newRow, newCol}] = steps[head] + 1
-				visited[point{newRow, newCol}] = true
-				queue.PushBack(point{newRow, newCol})
+			newRow := head.Row + dx[i]
+			newCol := head.Col + dy[i]
+			if newRow >= 0 && newRow < noRows && newCol >= 0 && newCol < noCols && !visited.Contains(gridutil.Coordinate{Row: newRow, Col: newCol}) &&
+				grid[newRow][newCol] < grid[head.Row][head.Col]+2 {
+				steps[gridutil.Coordinate{Row: newRow, Col: newCol}] = steps[head] + 1
+				visited.Add(gridutil.Coordinate{Row: newRow, Col: newCol})
+				queue.PushBack(gridutil.Coordinate{Row: newRow, Col: newCol})
 			}
 		}
 	}
@@ -93,20 +91,20 @@ func part2(input string) {
 		grid[i] = make([]int, len(lines[i]))
 	}
 
-	var startPoints []point
+	var startPoints []gridutil.Coordinate
 	var endRow, endCol int
 
 	for r := range lines {
 		for c := range lines[r] {
 			if lines[r][c] == 'S' {
-				startPoints = append(startPoints, point{r, c})
+				startPoints = append(startPoints, gridutil.Coordinate{Row: r, Col: c})
 				grid[r][c] = 1
 			} else if lines[r][c] == 'E' {
 				endRow, endCol = r, c
 				grid[r][c] = 'z' - 'a' + 1
 			} else {
 				if lines[r][c] == 'a' {
-					startPoints = append(startPoints, point{r, c})
+					startPoints = append(startPoints, gridutil.Coordinate{Row: r, Col: c})
 				}
 				grid[r][c] = int(lines[r][c] - 'a' + 1)
 			}
@@ -115,10 +113,10 @@ func part2(input string) {
 
 	minSteps := math.MaxInt
 	for _, start := range startPoints {
-		steps := bfs(grid, start, point{endRow, endCol})
+		steps := bfs(grid, start, gridutil.Coordinate{Row: endRow, Col: endCol})
 		if steps != 0 && steps < minSteps {
 			minSteps = steps
 		}
 	}
-	fmt.Println(minSteps)
+	fmt.Println("Part 2", minSteps)
 }

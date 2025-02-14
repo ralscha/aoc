@@ -130,8 +130,8 @@ func findMinimumSteps(grid gridutil.Grid2D[node]) int {
 		steps int
 	}{state: startState, steps: 0})
 
-	visited := make(map[state]bool)
-	visited[startState] = true
+	visited := container.NewSet[state]()
+	visited.Add(startState)
 
 	directions := gridutil.Get4Directions()
 
@@ -158,8 +158,8 @@ func findMinimumSteps(grid gridutil.Grid2D[node]) int {
 					nextState.goal = current.state.empty
 				}
 
-				if !visited[nextState] {
-					visited[nextState] = true
+				if !visited.Contains(nextState) {
+					visited.Add(nextState)
 					queue.Push(struct {
 						state state
 						steps int

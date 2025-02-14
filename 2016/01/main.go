@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/container"
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"aoc/internal/gridutil"
@@ -32,7 +33,7 @@ func part1(input string) {
 	}
 
 	pos := gridutil.Coordinate{Col: 0, Row: 0}
-	dir := gridutil.DirectionN // Start facing north
+	dir := gridutil.DirectionN
 
 	for _, ins := range instructions {
 		if ins[0] == 'R' {
@@ -61,7 +62,7 @@ func part2(input string) {
 
 	pos := gridutil.Coordinate{Row: 0, Col: 0}
 	dir := gridutil.DirectionN // Start facing north
-	visited := make(map[gridutil.Coordinate]bool)
+	visited := container.NewSet[gridutil.Coordinate]()
 	firstVisited := gridutil.Coordinate{}
 	foundFirst := false
 
@@ -78,11 +79,11 @@ func part2(input string) {
 			pos.Row += dir.Row
 
 			if !foundFirst {
-				if visited[pos] {
+				if visited.Contains(pos) {
 					firstVisited = pos
 					foundFirst = true
 				} else {
-					visited[pos] = true
+					visited.Add(pos)
 				}
 			}
 		}
