@@ -25,6 +25,12 @@ func (s *Set[T]) Add(data T) {
 	s.m[data] = struct{}{}
 }
 
+func (s *Set[T]) AddAll(datas []T) {
+	for _, data := range datas {
+		s.Add(data)
+	}
+}
+
 // Remove deletes an element from the set if it exists.
 // If the element doesn't exist, the set remains unchanged.
 func (s *Set[T]) Remove(data T) {
