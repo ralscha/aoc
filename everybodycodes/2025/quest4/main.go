@@ -67,13 +67,11 @@ func partI() {
 
 	gears := conv.ToIntSlice(conv.SplitNewline(input))
 
-	ratio := float64(1)
-	l := len(gears) - 1
-	for i := range l {
-		ratio *= float64(gears[i]) / float64(gears[i+1])
-	}
+	firstTeeth := float64(gears[0])
+	lastTeeth := float64(gears[len(gears)-1])
 
-	result := int(ratio * 2025)
+	result := int(math.Floor(2025 * firstTeeth / lastTeeth))
+
 	fmt.Println(result)
 }
 
