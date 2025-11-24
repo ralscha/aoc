@@ -51,7 +51,7 @@ func SplitNewline(s string) []string {
 func ToIntSlice(s []string) []int {
 	result := make([]int, len(s))
 	for i, v := range s {
-		result[i] = MustAtoi(v)
+		result[i] = MustAtoi(strings.TrimSpace(v))
 	}
 	return result
 }
