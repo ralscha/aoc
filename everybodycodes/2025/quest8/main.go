@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc/internal/conv"
+	"aoc/internal/mathx"
 	"fmt"
 	"slices"
 )
@@ -24,10 +25,7 @@ func partI() {
 		nail1 := nails[i]
 		nail2 := nails[i+1]
 
-		diff := nail1 - nail2
-		if diff < 0 {
-			diff = -diff
-		}
+		diff := mathx.Abs(nail1 - nail2)
 		if diff == half {
 			count++
 		}

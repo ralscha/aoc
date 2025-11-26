@@ -1,10 +1,11 @@
 package main
 
 import (
+	"aoc/internal/conv"
+	"aoc/internal/gridutil"
 	"fmt"
 	"log"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -18,10 +19,7 @@ func partIandII(file string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
+	lines := conv.SplitNewline(string(input))
 
 	grid := make([][]rune, len(lines))
 	for i, l := range lines {
@@ -72,10 +70,7 @@ func partIII() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
+	lines := conv.SplitNewline(string(input))
 
 	grid := make([][]rune, len(lines))
 	for i, l := range lines {
@@ -132,13 +127,10 @@ func isSurrounded8(grid [][]rune, i, j int, surrounded ...rune) bool {
 	rows := len(grid)
 	cols := len(grid[0])
 
-	directions := [][2]int{
-		{-1, 0}, {1, 0}, {0, -1}, {0, 1},
-		{-1, -1}, {-1, 1}, {1, -1}, {1, 1},
-	}
+	directions := gridutil.Get8Directions()
 
 	for _, d := range directions {
-		ni, nj := i+d[0], j+d[1]
+		ni, nj := i+d.Row, j+d.Col
 		if ni < 0 || ni >= rows || nj < 0 || nj >= cols {
 			return false
 		}

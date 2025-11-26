@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"fmt"
 	"log"
 	"os"
@@ -51,13 +52,14 @@ func simulateRaceWithTrack(name string, actionStr string, loops int, track []run
 		pos++
 		trackPos = (trackPos + 1) % len(track)
 
-		if track[trackPos] == '-' {
+		switch track[trackPos] {
+		case '-':
 			if power > 0 {
 				power--
 			}
-		} else if track[trackPos] == '+' {
+		case '+':
 			power++
-		} else {
+		default:
 			if track[trackPos] == 'S' {
 				currentLoop++
 			}
@@ -84,13 +86,7 @@ func partI() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
-	if lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
+	lines := conv.SplitNewline(string(input))
 
 	chariots := make([]chariot, len(lines))
 	for i, line := range lines {
@@ -156,13 +152,7 @@ func partII() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
-	if lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
+	lines := conv.SplitNewline(string(input))
 
 	track := `S-=++=-==++=++=-=+=-=+=+=--=-=++=-==++=-+=-=+=-=+=+=++=-+==++=++=-=-=--
 -                                                                     -

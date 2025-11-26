@@ -1,8 +1,8 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -93,10 +93,7 @@ func parseInstructions(input string) []instruction {
 
 	for i, part := range parts {
 		turn := string(part[0])
-		steps, err := strconv.Atoi(part[1:])
-		if err != nil {
-			panic(err)
-		}
+		steps := conv.MustAtoi(part[1:])
 		instructions[i] = instruction{turn: turn, steps: steps}
 	}
 	return instructions

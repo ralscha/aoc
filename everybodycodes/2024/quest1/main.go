@@ -13,9 +13,10 @@ func partI() {
 
 	totalPotions := 0
 	for _, c := range input {
-		if c == 'B' {
+		switch c {
+		case 'B':
 			totalPotions++
-		} else if c == 'C' {
+		case 'C':
 			totalPotions += 3
 		}
 	}
@@ -36,23 +37,25 @@ func partII() {
 			additionalPotions = 1
 		}
 
-		if first == 'A' {
+		switch first {
+		case 'A':
 			totalPotions += 0 + additionalPotions
-		} else if first == 'B' {
+		case 'B':
 			totalPotions += 1 + additionalPotions
-		} else if first == 'C' {
+		case 'C':
 			totalPotions += 3 + additionalPotions
-		} else if first == 'D' {
+		case 'D':
 			totalPotions += 5 + additionalPotions
 		}
 
-		if second == 'A' {
+		switch second {
+		case 'A':
 			totalPotions += 0 + additionalPotions
-		} else if second == 'B' {
+		case 'B':
 			totalPotions += 1 + additionalPotions
-		} else if second == 'C' {
+		case 'C':
 			totalPotions += 3 + additionalPotions
-		} else if second == 'D' {
+		case 'D':
 			totalPotions += 5 + additionalPotions
 		}
 	}
@@ -78,13 +81,14 @@ func partIII() {
 		}
 
 		for _, c := range monsters {
-			if c == 'A' {
+			switch c {
+			case 'A':
 				totalPotions += 0 + additionalPotions
-			} else if c == 'B' {
+			case 'B':
 				totalPotions += 1 + additionalPotions
-			} else if c == 'C' {
+			case 'C':
 				totalPotions += 3 + additionalPotions
-			} else if c == 'D' {
+			case 'D':
 				totalPotions += 5 + additionalPotions
 			}
 		}

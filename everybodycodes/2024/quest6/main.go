@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc/internal/container"
+	"aoc/internal/conv"
 	"fmt"
 	"log"
 	"os"
@@ -90,13 +91,7 @@ func readGraph(fileName string) map[string]node {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
-	if lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
+	lines := conv.SplitNewline(string(input))
 
 	graph := make(map[string]node)
 	for _, line := range lines {

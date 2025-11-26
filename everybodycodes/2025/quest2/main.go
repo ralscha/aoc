@@ -1,8 +1,8 @@
 package main
 
 import (
+	"aoc/internal/conv"
 	"fmt"
-	"log"
 )
 
 func main() {
@@ -15,10 +15,7 @@ func partI() {
 	input := "A=[158,55]"
 
 	var ax, ay int
-	_, err := fmt.Sscanf(input, "A=[%d,%d]", &ax, &ay)
-	if err != nil {
-		log.Fatal(err)
-	}
+	conv.MustSscanf(input, "A=[%d,%d]", &ax, &ay)
 
 	rx, ry := 0, 0
 
@@ -40,10 +37,7 @@ func partI() {
 func partII() {
 	input := "A=[-79067,14068]"
 	var ax, ay int
-	_, err := fmt.Sscanf(input, "A=[%d,%d]", &ax, &ay)
-	if err != nil {
-		log.Fatal(err)
-	}
+	conv.MustSscanf(input, "A=[%d,%d]", &ax, &ay)
 
 	engravedCount := solve(ax, ay, 101, 10)
 	fmt.Println(engravedCount)
@@ -52,10 +46,7 @@ func partII() {
 func partIII() {
 	input := "A=[-79067,14068]"
 	var ax, ay int
-	_, err := fmt.Sscanf(input, "A=[%d,%d]", &ax, &ay)
-	if err != nil {
-		log.Fatal(err)
-	}
+	conv.MustSscanf(input, "A=[%d,%d]", &ax, &ay)
 
 	engravedCount := solve(ax, ay, 1001, 1)
 	fmt.Println(engravedCount)

@@ -47,18 +47,21 @@ This document provides a detailed description of each method within the `interna
 -   `type Set[T comparable] struct`: A generic set data structure that stores unique elements of type T.
 -   `func NewSet[T comparable]() *Set[T]`: Creates a new empty Set.
 -   `func (s *Set[T]) Add(data T)`: Adds an element to the set.
+-   `func (s *Set[T]) AddAll(datas []T)`: Adds all elements from a slice to the set.
 -   `func (s *Set[T]) Remove(data T)`: Removes an element from the set.
 -   `func (s *Set[T]) Contains(data T) bool`: Checks if the set contains a specific element.
 -   `func (s *Set[T]) Len() int`: Returns the number of elements in the set.
 -   `func (s *Set[T]) Values() []T`: Returns a slice of all elements in the set.
+-   `func (s *Set[T]) Copy() *Set[T]`: Returns a new set with the same elements as the original set.
+-   `func (s *Set[T]) Intersection(otherSet *Set[T]) *Set[T]`: Returns a new set with elements that are present in both sets.
 
 ## internal/conv
 
 ### conv.go
 
 -   `func MustSscanf(s string, format string, a ...interface{})`: Parses a string according to a format specifier, logs a fatal error and terminates the program on error.
--   `func MustAtoi(s string) int`: Converts a string to an integer, panics on error.
--   `func MustAtoi64(s string) int64`: Converts a string to an int64, panics on error.
+-   `func MustAtoi(s string) int`: Converts a string to an integer, logs a fatal error and terminates the program on error.
+-   `func MustAtoi64(s string) int64`: Converts a string to an int64, logs a fatal error and terminates the program on error.
 -   `func SplitNewline(s string) []string`: Splits a string by newlines.
 -   `func ToIntSlice(s []string) []int`: Converts a slice of strings to a slice of integers.
 -   `func ToIntSliceComma(s string) []int`: Converts a comma-separated string to a slice of integers.
@@ -127,7 +130,7 @@ This document provides a detailed description of each method within the `interna
 -   `func (g *Grid2D[T]) SetMaxRowColC(coord Coordinate)`: Sets the maximum row and column of the grid using a coordinate.
 -   `func (g Grid2D[T]) Width() int`: Returns the width of the grid.
 -   `func (g Grid2D[T]) Height() int`: Returns the height of the grid.
--   `func (g Grid2D[T]) Count() int`: Returns the number of elements in the grid.
+-   `func (g *Grid2D[T]) Count() int`: Returns the number of elements in the grid.
 -   `func (g Grid2D[T]) GetMinMaxCol() (int, int)`: Returns the minimum and maximum column of the grid.
 -   `func (g Grid2D[T]) GetMinMaxRow() (int, int)`: Returns the minimum and maximum row of the grid.
 -   `func (g Grid2D[T]) Get(row, col int) (T, bool)`: Returns the value at a given row and column.
@@ -146,6 +149,7 @@ This document provides a detailed description of each method within the `interna
 -   `func (g Grid2D[T]) GetNeighboursC(coord Coordinate, directions []Direction) []T`: Returns the neighbors of a given coordinate in the given directions.
 -   `func (g *Grid2D[T]) RotateRow(row, amount int)`: Rotates a row by a given amount.
 -   `func (g *Grid2D[T]) RotateColumn(col, amount int)`: Rotates a column by a given amount.
+-   `func (g *Grid2D[T]) String() string`: Returns a string representation of the grid.
 
 ### pathfinding.go
 
@@ -186,6 +190,15 @@ This document provides a detailed description of each method within the `interna
 -   `func (r Range) Adjacent(other Range) bool`: Checks if the range is adjacent to another range.
 -   `func (r Range) Map(transform func(int) int) Range`: Maps the range using a given transform function.
 -   `func Merge(ranges []Range) []Range`: Merges a slice of ranges.
+
+## internal/slicesx
+
+### slicesx.go
+
+-   `type Number interface`: A constraint that permits any numeric type that supports addition (int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64).
+-   `func Sum[T Number](slice []T) T`: Returns the sum of all elements in the slice. Works with any numeric type. Returns zero for an empty slice.
+-   `func SumIter[T Number](seq iter.Seq[T]) T`: Returns the sum of all elements from an iterator. Works with any numeric type. Returns zero for an empty iterator.
+-   `func Unique[T comparable](slice []T) []T`: Returns a new slice with duplicate values removed. The order of elements is not guaranteed to be preserved.
 
 ## internal/stringutil
 

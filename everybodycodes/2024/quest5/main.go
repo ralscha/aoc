@@ -31,25 +31,6 @@ func NewDance(input []string) *Dance {
 	}
 }
 
-func (d *Dance) printGrid() {
-	maxRows := 0
-	for _, c := range d.cols {
-		if len(c) > maxRows {
-			maxRows = len(c)
-		}
-	}
-
-	for r := range maxRows {
-		for _, c := range d.cols {
-			if r < len(c) {
-				fmt.Print(c[r])
-				fmt.Print(" ")
-			}
-		}
-		fmt.Println()
-	}
-}
-
 func (d *Dance) simulateClap(round int) int {
 	clapperCol := (round - 1) % len(d.cols)
 	clapperNum := d.cols[clapperCol][0]
@@ -119,13 +100,7 @@ func partI() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
-	if lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
+	lines := conv.SplitNewline(string(input))
 
 	dance := NewDance(lines)
 	var result int
@@ -140,13 +115,7 @@ func partII() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
-	if lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
+	lines := conv.SplitNewline(string(input))
 
 	dance := NewDance(lines)
 	counts := make(map[int]int)
@@ -165,13 +134,7 @@ func partIII() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines := strings.Split(string(input), "\n")
-	for i, l := range lines {
-		lines[i] = strings.TrimRight(l, "\r\n")
-	}
-	if lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
+	lines := conv.SplitNewline(string(input))
 
 	dance := NewDance(lines)
 

@@ -44,7 +44,7 @@ func dfsHelper[T comparable, S any](
 	nextNodes := callbacks.GetNextNodes(current, value, grid)
 	for _, next := range nextNodes {
 		if !visited.Contains(next) {
-			state = dfsHelper[T, S](grid, next, state, visited, callbacks)
+			state = dfsHelper(grid, next, state, visited, callbacks)
 		}
 	}
 	visited.Remove(current)
