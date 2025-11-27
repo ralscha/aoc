@@ -21,10 +21,9 @@ func main() {
 func part1(input string) {
 	lines := conv.SplitNewline(input)
 
-	// Create keypad grid
 	grid := gridutil.NewGrid2D[int](false)
 	grid.SetMaxRowCol(2, 2)
-	// Set keypad values
+
 	grid.Set(0, 0, 1)
 	grid.Set(0, 1, 2)
 	grid.Set(0, 2, 3)
@@ -52,7 +51,7 @@ func part1(input string) {
 			newPos := gridutil.Coordinate{Row: pos.Row + dir.Row, Col: pos.Col + dir.Col}
 			if val, ok := grid.GetC(newPos); ok {
 				pos = newPos
-				_ = val // Value exists, position is valid
+				_ = val
 			}
 		}
 		val, _ := grid.GetC(pos)
@@ -64,10 +63,9 @@ func part1(input string) {
 func part2(input string) {
 	lines := conv.SplitNewline(input)
 
-	// Create keypad grid
 	grid := gridutil.NewGrid2D[rune](false)
 	grid.SetMaxRowCol(4, 4)
-	// Set keypad values
+
 	grid.Set(0, 2, '1')
 	grid.Set(1, 1, '2')
 	grid.Set(1, 2, '3')
@@ -82,7 +80,7 @@ func part2(input string) {
 	grid.Set(3, 3, 'C')
 	grid.Set(4, 2, 'D')
 
-	pos := gridutil.Coordinate{Row: 2, Col: 0} // Start at 5
+	pos := gridutil.Coordinate{Row: 2, Col: 0}
 	for _, line := range lines {
 		for _, c := range line {
 			var dir gridutil.Direction

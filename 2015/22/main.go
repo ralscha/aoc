@@ -89,7 +89,6 @@ func part1and2(input string, part2 bool) {
 		}
 
 		if !currentState.playerTurn {
-			// boss turn
 			applyBossAttack(&currentState)
 			if currentState.playerHp <= 0 {
 				continue
@@ -97,9 +96,7 @@ func part1and2(input string, part2 bool) {
 			currentState.playerTurn = true
 			queue.PushBack(currentState)
 		} else {
-			// player turn
 			for _, sp := range spells {
-				// already active
 				alreadActive := false
 				if sp.duration != 0 {
 					for _, effect := range currentState.effects {
@@ -113,7 +110,6 @@ func part1and2(input string, part2 bool) {
 					continue
 				}
 
-				// not enough mana
 				if currentState.playerMana < sp.cost {
 					continue
 				}
@@ -143,7 +139,6 @@ func applyEffects(state *state) {
 		state.effects[i].duration--
 	}
 
-	// remove expired effects
 	newEffects := make([]spell, 0)
 	for _, effect := range state.effects {
 		if effect.duration > 0 {

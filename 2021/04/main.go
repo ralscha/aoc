@@ -69,7 +69,6 @@ func part1(input string) {
 	var lastCalledNumber int
 
 	for _, d := range draw {
-		// mark
 		for _, card := range cards {
 			for _, row := range card {
 				for _, col := range row {
@@ -80,7 +79,6 @@ func part1(input string) {
 			}
 		}
 
-		// check wining
 		bingoCard = checkBingo(cards)
 		if bingoCard != nil {
 			lastCalledNumber = d

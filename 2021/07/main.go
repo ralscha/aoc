@@ -66,7 +66,6 @@ func part2(input string) {
 		fuel := 0
 		for _, c := range crabs {
 			diff := mathx.Abs(c - p)
-			// Sum of arithmetic sequence: n * (n + 1) / 2
 			fuel += diff * (diff + 1) / 2
 		}
 		if fuel < leastFuel {

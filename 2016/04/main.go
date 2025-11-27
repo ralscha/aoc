@@ -42,7 +42,6 @@ func part1(input string) {
 			bag.Add(r)
 		}
 
-		// Convert bag counts to sortable slice
 		var chars []char
 		for r, count := range bag.Values() {
 			chars = append(chars, char{r, count})

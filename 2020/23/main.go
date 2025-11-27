@@ -51,7 +51,7 @@ func playGame(cups []int, moves int) string {
 	next[cups[numCups-1]] = cups[0]
 
 	currentCup := cups[0]
-	for i := 0; i < moves; i++ {
+	for range moves {
 		pickup1 := next[currentCup]
 		pickup2 := next[pickup1]
 		pickup3 := next[pickup2]

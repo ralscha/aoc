@@ -31,9 +31,10 @@ func supportsTLS(line string) bool {
 	insideBrackets := false
 	hasOutside := false
 	for i := range len(line) - 3 {
-		if line[i] == '[' {
+		switch line[i] {
+		case '[':
 			insideBrackets = true
-		} else if line[i] == ']' {
+		case ']':
 			insideBrackets = false
 		}
 		if line[i] == line[i+3] && line[i+1] == line[i+2] && line[i] != line[i+1] {
@@ -61,9 +62,10 @@ func supportsSSL(line string) bool {
 	abas := make([]string, 0)
 	babs := make([]string, 0)
 	for i := range len(line) - 2 {
-		if line[i] == '[' {
+		switch line[i] {
+		case '[':
 			insideBrackets = true
-		} else if line[i] == ']' {
+		case ']':
 			insideBrackets = false
 		}
 		if line[i] == line[i+2] && line[i] != line[i+1] {

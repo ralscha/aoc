@@ -15,9 +15,10 @@ func main() {
 	floor := 0
 	posBasement := 0
 	for pos, c := range input {
-		if c == '(' {
+		switch c {
+		case '(':
 			floor++
-		} else if c == ')' {
+		case ')':
 			floor--
 		}
 

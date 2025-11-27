@@ -68,12 +68,10 @@ func react(polymer string) string {
 	return string(stack)
 }
 
-// areReactive checks if two units react
 func areReactive(a, b rune) bool {
 	return a != b && toLower(a) == toLower(b)
 }
 
-// toLower converts a rune to lowercase
 func toLower(r rune) rune {
 	if r >= 'A' && r <= 'Z' {
 		return r + 32

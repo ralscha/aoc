@@ -4,11 +4,10 @@ import (
 	"aoc/2019/intcomputer"
 	"aoc/internal/conv"
 	"aoc/internal/download"
-	"bufio"
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
+	"slices"
 	"strings"
 )
 
@@ -76,12 +75,7 @@ func isDangerousItem(item string) bool {
 		"escape pod",
 		"molten lava",
 	}
-	for _, d := range dangerous {
-		if item == d {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(dangerous, item)
 }
 
 func sendCommand(computer *intcomputer.IntcodeComputer, command string) (string, error) {
@@ -180,38 +174,6 @@ func runAutoGame(computer *intcomputer.IntcodeComputer) error {
 			}
 
 			fmt.Println("Output:", output)
-			return nil
-		}
-	}
-}
-
-func runManualGame(computer *intcomputer.IntcodeComputer) error {
-	reader := bufio.NewReader(os.Stdin)
-
-	for {
-		result, err := computer.ReadString()
-		if err != nil {
-			return fmt.Errorf("reading output failed: %v", err)
-		}
-
-		if result.Str != "" {
-			fmt.Print(result.Str)
-		}
-
-		switch result.Signal {
-		case intcomputer.SignalInput:
-			fmt.Print("> ")
-			command, err := reader.ReadString('\n')
-			if err != nil {
-				return fmt.Errorf("reading input failed: %v", err)
-			}
-			command = strings.TrimSpace(command)
-
-			if err := computer.AddInput(command + "\n"); err != nil {
-				return fmt.Errorf("adding input failed: %v", err)
-			}
-
-		case intcomputer.SignalEnd:
 			return nil
 		}
 	}

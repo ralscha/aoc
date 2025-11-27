@@ -41,7 +41,6 @@ func isValidPassword(pw int) bool {
 		return false
 	}
 
-	// Check if digits are non-decreasing
 	for i := range len(pwStr) - 1 {
 		if pwStr[i] > pwStr[i+1] {
 			return false

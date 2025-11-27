@@ -32,9 +32,10 @@ func part1(input string) {
 		minRow := 0
 		maxRow := 127
 		for _, char := range rowStr {
-			if char == 'F' {
+			switch char {
+			case 'F':
 				maxRow = (minRow + maxRow) / 2
-			} else if char == 'B' {
+			case 'B':
 				minRow = (minRow + maxRow + 1) / 2
 			}
 		}
@@ -43,9 +44,10 @@ func part1(input string) {
 		minCol := 0
 		maxCol := 7
 		for _, char := range colStr {
-			if char == 'L' {
+			switch char {
+			case 'L':
 				maxCol = (minCol + maxCol) / 2
-			} else if char == 'R' {
+			case 'R':
 				minCol = (minCol + maxCol + 1) / 2
 			}
 		}
@@ -76,9 +78,10 @@ func part2(input string) {
 		minRow := 0
 		maxRow := 127
 		for _, char := range rowStr {
-			if char == 'F' {
+			switch char {
+			case 'F':
 				maxRow = (minRow + maxRow) / 2
-			} else if char == 'B' {
+			case 'B':
 				minRow = (minRow + maxRow + 1) / 2
 			}
 		}
@@ -87,9 +90,10 @@ func part2(input string) {
 		minCol := 0
 		maxCol := 7
 		for _, char := range colStr {
-			if char == 'L' {
+			switch char {
+			case 'L':
 				maxCol = (minCol + maxCol) / 2
-			} else if char == 'R' {
+			case 'R':
 				minCol = (minCol + maxCol + 1) / 2
 			}
 		}

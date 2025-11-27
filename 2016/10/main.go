@@ -23,7 +23,6 @@ func part1and2(lines []string) {
 	bots := make(map[int]*container.Queue[int])
 	outputs := make(map[int]int)
 
-	// Initialize queues for each bot
 	for _, line := range lines {
 		if strings.HasPrefix(line, "value") {
 			splitted := strings.Split(line, " ")
@@ -48,7 +47,6 @@ func part1and2(lines []string) {
 					continue
 				}
 
-				// Get both values from the queue
 				values := []int{bots[bot].Pop(), bots[bot].Pop()}
 				if (values[0] == 17 && values[1] == 61) || (values[0] == 61 && values[1] == 17) {
 					fmt.Println("Part 1", bot)

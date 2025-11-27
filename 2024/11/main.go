@@ -14,7 +14,6 @@ func simulateBlink(stones map[int]int64) map[int]int64 {
 
 	for stone, count := range stones {
 		if stone == 0 {
-			// Rule 1: 0 becomes 1
 			result[1] += count
 			continue
 		}
@@ -23,14 +22,12 @@ func simulateBlink(stones map[int]int64) map[int]int64 {
 		digits := len(stoneStr)
 
 		if digits%2 == 0 {
-			// Rule 2: Split into two stones
 			mid := digits / 2
 			left := conv.MustAtoi(stoneStr[:mid])
 			right := conv.MustAtoi(stoneStr[mid:])
 			result[left] += count
 			result[right] += count
 		} else {
-			// Rule 3: Multiply by 2024
 			result[stone*2024] += count
 		}
 	}

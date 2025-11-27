@@ -71,7 +71,6 @@ func part1and2(input string) {
 	}
 	fmt.Println(maxArea)
 
-	// part 2
 	regionSize := 0
 	for i := minCol; i <= maxCol; i++ {
 		for j := minRow; j <= maxRow; j++ {

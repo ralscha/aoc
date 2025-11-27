@@ -50,17 +50,14 @@ func part2(input string) {
 	youPath := container.NewSet[string]()
 	sanPath := container.NewSet[string]()
 
-	// Build path from YOU to COM
 	for k := "YOU"; k != "COM"; k = orbits[k] {
 		youPath.Add(k)
 	}
 
-	// Build path from SAN to COM
 	for k := "SAN"; k != "COM"; k = orbits[k] {
 		sanPath.Add(k)
 	}
 
-	// Find first common ancestor
 	minTransfers := len(orbits)
 	for k := "YOU"; k != "COM"; k = orbits[k] {
 		if sanPath.Contains(k) {

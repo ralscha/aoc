@@ -61,7 +61,6 @@ func part2(input string) {
 	lines := conv.SplitNewline(input)
 	sum := 0
 
-	// Generate all possible segment permutations
 	chars := []string{"a", "b", "c", "d", "e", "f", "g"}
 	allPermutations := mathx.Permutations(chars)
 
@@ -70,10 +69,8 @@ func part2(input string) {
 		patterns := strings.Fields(line[:pos])
 		outputs := strings.Fields(line[pos+1:])
 
-		// Try each permutation until we find one that works
 		for _, perm := range allPermutations {
 			if isValidPermutation(patterns, perm) {
-				// Convert output digits using the valid permutation
 				value := 0
 				for _, output := range outputs {
 					seg := convertToSegments(perm, output)

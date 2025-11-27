@@ -19,10 +19,8 @@ var slopeDirections = map[byte]point{
 	'<': {-1, 0},
 }
 
-// Part 1 globals
 var maxLength int
 
-// Part 2 globals
 var (
 	dx         = []int{0, 0, 1, -1}
 	dy         = []int{1, -1, 0, 0}

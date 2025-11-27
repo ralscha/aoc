@@ -43,14 +43,15 @@ func part1(input string) {
 		zeros := 0
 		ones := 0
 		twos := 0
-		for row := 0; row < height; row++ {
-			for col := 0; col < width; col++ {
+		for row := range height {
+			for col := range width {
 				digit, _ := layer.Get(row, col)
-				if digit == 0 {
+				switch digit {
+				case 0:
 					zeros++
-				} else if digit == 1 {
+				case 1:
 					ones++
-				} else if digit == 2 {
+				case 2:
 					twos++
 				}
 			}
@@ -84,8 +85,8 @@ func part2(input string) {
 	layers = append(layers, currentLayer)
 
 	finalImage := gridutil.NewGrid2D[int](false)
-	for row := 0; row < height; row++ {
-		for col := 0; col < width; col++ {
+	for row := range height {
+		for col := range width {
 			for _, layer := range layers {
 				pixel, _ := layer.Get(row, col)
 				if pixel != 2 { // not transparent
@@ -97,8 +98,8 @@ func part2(input string) {
 	}
 
 	fmt.Println("Part 2")
-	for row := 0; row < height; row++ {
-		for col := 0; col < width; col++ {
+	for row := range height {
+		for col := range width {
 			pixel, _ := finalImage.Get(row, col)
 			if pixel == 0 {
 				fmt.Print(" ")

@@ -15,7 +15,6 @@ func main() {
 		log.Fatalf("reading input failed: %v", err)
 	}
 
-	// Initial Sue's properties
 	realSue := map[string]int{
 		"children":    3,
 		"cats":        7,

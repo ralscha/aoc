@@ -24,7 +24,6 @@ func part1(input string) {
 	lines := conv.SplitNewline(input)
 	grid := gridutil.NewGrid2D[int](false)
 
-	// Build grid
 	for row, line := range lines {
 		for col, c := range line {
 			grid.Set(row, col, int(c-'0'))
@@ -66,7 +65,6 @@ func part2(input string) {
 	lines := conv.SplitNewline(input)
 	grid := gridutil.NewGrid2D[int](false)
 
-	// Build grid
 	for row, line := range lines {
 		for col, c := range line {
 			grid.Set(row, col, int(c-'0'))
@@ -126,7 +124,6 @@ func crawl(grid gridutil.Grid2D[int], coord gridutil.Coordinate, visited *contai
 	visited.Add(coord)
 	size := 1
 
-	// Get valid neighbors (up, down, left, right)
 	for _, dir := range []gridutil.Direction{
 		{Row: -1, Col: 0}, // up
 		{Row: 1, Col: 0},  // down

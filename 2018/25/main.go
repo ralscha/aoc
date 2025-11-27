@@ -69,7 +69,7 @@ func part1(input string) {
 
 	dsu := newDSU(points)
 
-	for i := 0; i < len(points); i++ {
+	for i := range points {
 		for j := i + 1; j < len(points); j++ {
 			if manhattanDistance(points[i], points[j]) <= 3 {
 				dsu.union(points[i], points[j])

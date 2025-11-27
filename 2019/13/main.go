@@ -79,9 +79,10 @@ func part2(input string) {
 					score = tileID
 				} else {
 					tiles[gridutil.Coordinate{Row: row, Col: col}] = tileID
-					if tileID == 3 {
+					switch tileID {
+					case 3:
 						paddleCol = col
-					} else if tileID == 4 {
+					case 4:
 						ballCol = col
 					}
 				}

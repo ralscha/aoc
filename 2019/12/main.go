@@ -100,21 +100,22 @@ func part2(input string) {
 			applyGravity(moons)
 			applyVelocity(moons)
 			state := [8]int{}
-			if i == 0 {
+			switch i {
+			case 0:
 				state = [8]int{
 					moons[0].x, moons[0].vx,
 					moons[1].x, moons[1].vx,
 					moons[2].x, moons[2].vx,
 					moons[3].x, moons[3].vx,
 				}
-			} else if i == 1 {
+			case 1:
 				state = [8]int{
 					moons[0].y, moons[0].vy,
 					moons[1].y, moons[1].vy,
 					moons[2].y, moons[2].vy,
 					moons[3].y, moons[3].vy,
 				}
-			} else {
+			default:
 				state = [8]int{
 					moons[0].z, moons[0].vz,
 					moons[1].z, moons[1].vz,

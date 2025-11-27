@@ -82,7 +82,6 @@ func violatesRule(first, second int, pagesBefore map[int]*container.Set[int]) bo
 }
 
 func reorderUpdate(update []int, rules []rule) []int {
-	// which pages (values) must come before this page (key)
 	pagesBefore := make(map[int]*container.Set[int])
 
 	for _, r := range rules {

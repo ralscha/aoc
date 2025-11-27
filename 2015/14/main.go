@@ -92,10 +92,7 @@ func (r *reindeer) distance(raceDurationInSeconds int) int {
 	period := r.duration + r.rest
 	periods := raceDurationInSeconds / period
 	distance := periods * r.duration * r.speed
-	remaining := raceDurationInSeconds % period
-	if remaining > r.duration {
-		remaining = r.duration
-	}
+	remaining := min(raceDurationInSeconds%period, r.duration)
 	distance += remaining * r.speed
 	return distance
 }

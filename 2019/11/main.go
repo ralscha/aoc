@@ -43,7 +43,6 @@ func runRobot(computer *intcomputer.IntcodeComputer, startColor int) map[griduti
 	painted[pos] = startColor
 
 	for {
-		// Provide current color as input when requested
 		result, err := computer.Run()
 		if err != nil {
 			log.Fatalf("running program failed: %v", err)
@@ -56,11 +55,9 @@ func runRobot(computer *intcomputer.IntcodeComputer, startColor int) map[griduti
 				log.Fatalf("adding input failed: %v", err)
 			}
 		case intcomputer.SignalOutput:
-			// First output is the color to paint
 			newColor := result.Value
 			painted[pos] = newColor
 
-			// Get second output for turn direction
 			result, err = computer.Run()
 			if err != nil {
 				log.Fatalf("running program failed: %v", err)
@@ -70,7 +67,6 @@ func runRobot(computer *intcomputer.IntcodeComputer, startColor int) map[griduti
 			}
 			turn := result.Value
 
-			// Update direction and move
 			if turn == 0 {
 				dir = gridutil.TurnLeft(dir)
 			} else {

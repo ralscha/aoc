@@ -180,7 +180,7 @@ func countRepetitions(pattern []any, full []any, start int) int {
 	c := 0
 	for idx := start; idx <= len(full)-patLen; idx++ {
 		match := true
-		for i := 0; i < patLen; i++ {
+		for i := range patLen {
 			if full[idx+i] != pattern[i] {
 				match = false
 				break

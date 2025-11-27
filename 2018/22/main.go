@@ -96,7 +96,7 @@ func part2(input string) {
 		}
 
 		regionType := getErosionLevel(current.x, current.y, depth, targetX, targetY, cache) % 3
-		for i := 0; i < 3; i++ {
+		for i := range 3 {
 			if i != current.cannot && i != regionType {
 				pq.Push(state{
 					minutes: current.minutes + 7,

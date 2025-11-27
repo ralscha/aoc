@@ -19,13 +19,11 @@ func main() {
 }
 
 func part1and2(lines []string) {
-	// Create a bag for each position
 	bags := make([]*container.Bag[rune], len(lines[0]))
 	for i := range bags {
 		bags[i] = container.NewBag[rune]()
 	}
 
-	// Count characters at each position
 	for _, line := range lines {
 		for i, c := range line {
 			bags[i].Add(c)

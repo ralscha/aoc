@@ -85,11 +85,11 @@ func getWirePointsWithSteps(path string) map[gridutil.Coordinate]int {
 	wire := make(map[gridutil.Coordinate]int)
 	x, y := 0, 0
 	steps := 0
-	coords := strings.Split(path, ",")
-	for _, coord := range coords {
+	coords := strings.SplitSeq(path, ",")
+	for coord := range coords {
 		dir := coord[0]
 		dist := conv.MustAtoi(coord[1:])
-		for j := 0; j < dist; j++ {
+		for range dist {
 			steps++
 			switch dir {
 			case 'U':

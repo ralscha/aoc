@@ -142,16 +142,16 @@ func parseGroup(line string, id int, isImmune bool) *group {
 	immunities := container.NewSet[string]()
 
 	if matches[3] != "" {
-		parts := strings.Split(matches[3], "; ")
-		for _, part := range parts {
+		parts := strings.SplitSeq(matches[3], "; ")
+		for part := range parts {
 			if strings.HasPrefix(part, "weak to ") {
-				types := strings.Split(part[8:], ", ")
-				for _, t := range types {
+				types := strings.SplitSeq(part[8:], ", ")
+				for t := range types {
 					weaknesses.Add(t)
 				}
 			} else if strings.HasPrefix(part, "immune to ") {
-				types := strings.Split(part[10:], ", ")
-				for _, t := range types {
+				types := strings.SplitSeq(part[10:], ", ")
+				for t := range types {
 					immunities.Add(t)
 				}
 			}

@@ -22,22 +22,19 @@ func main() {
 }
 
 func part1(input string) {
-	// Create dependency graph
 	graph := graphutil.NewGraph()
 	lines := conv.SplitNewline(input)
 
-	// Build graph from input
 	for _, line := range lines {
 		words := strings.Fields(line)
 		dependsOn, step := words[1], words[7]
 		graph.AddNode(step)
 		graph.AddNode(dependsOn)
-		graph.AddEdge(dependsOn, step, 1) // Weight doesn't matter for part 1
+		graph.AddEdge(dependsOn, step, 1)
 	}
 
-	// Find nodes with no dependencies (starting points)
 	readyNodes := make([]string, 0)
-	for _, node := range graph.GetNeighbors("") { // Empty string gets all nodes
+	for _, node := range graph.GetNeighbors("") {
 		hasIncoming := false
 		for _, otherNode := range graph.GetNeighbors("") {
 			for _, neighbor := range graph.GetNeighbors(otherNode.ID) {
@@ -65,13 +62,11 @@ func part1(input string) {
 		doneJobs.Add(job)
 		readyNodes = readyNodes[1:]
 
-		// Check which nodes are now ready
 		for _, node := range graph.GetNeighbors("") {
 			if doneJobs.Contains(node.ID) {
 				continue
 			}
 
-			// Check if all dependencies are done
 			allDependenciesDone := true
 			for _, otherNode := range graph.GetNeighbors("") {
 				for _, neighbor := range graph.GetNeighbors(otherNode.ID) {
@@ -101,11 +96,9 @@ type worker struct {
 }
 
 func part2(input string) {
-	// Create dependency graph
 	graph := graphutil.NewGraph()
 	lines := conv.SplitNewline(input)
 
-	// Build graph from input
 	for _, line := range lines {
 		words := strings.Fields(line)
 		dependsOn, step := words[1], words[7]
@@ -114,7 +107,6 @@ func part2(input string) {
 		graph.AddEdge(dependsOn, step, 1)
 	}
 
-	// Find nodes with no dependencies (starting points)
 	readyNodes := make([]string, 0)
 	for _, node := range graph.GetNeighbors("") {
 		hasIncoming := false
@@ -156,13 +148,11 @@ func part2(input string) {
 		}
 
 		if completed {
-			// Check which nodes are now ready
 			for _, node := range graph.GetNeighbors("") {
 				if doneJobs.Contains(node.ID) {
 					continue
 				}
 
-				// Check if all dependencies are done
 				allDependenciesDone := true
 				for _, otherNode := range graph.GetNeighbors("") {
 					for _, neighbor := range graph.GetNeighbors(otherNode.ID) {

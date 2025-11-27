@@ -91,13 +91,14 @@ func part2(input string) {
 		modifiedInstructions := make([]instruction, len(originalInstructions))
 		copy(modifiedInstructions, originalInstructions)
 
-		if modifiedInstructions[i].op == "jmp" {
+		switch modifiedInstructions[i].op {
+		case "jmp":
 			modifiedInstructions[i].op = "nop"
 			if acc, terminated := run(modifiedInstructions); terminated {
 				fmt.Println("Part 2", acc)
 				return
 			}
-		} else if modifiedInstructions[i].op == "nop" {
+		case "nop":
 			modifiedInstructions[i].op = "jmp"
 			if acc, terminated := run(modifiedInstructions); terminated {
 				fmt.Println("Part 2", acc)

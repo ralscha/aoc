@@ -28,7 +28,7 @@ type rule struct {
 
 func parseRules(rulesStr string) map[int]rule {
 	rules := make(map[int]rule)
-	for _, line := range strings.Split(rulesStr, "\n") {
+	for line := range strings.SplitSeq(rulesStr, "\n") {
 		parts := strings.SplitN(line, ": ", 2)
 		ruleID := conv.MustAtoi(parts[0])
 		definition := parts[1]

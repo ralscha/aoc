@@ -53,7 +53,7 @@ func parseInput(input string) ([]rule, []int, [][]int) {
 
 	yourTicketStr := conv.SplitNewline(parts[1])[1]
 	yourTicket := make([]int, 0)
-	for _, s := range strings.Split(yourTicketStr, ",") {
+	for s := range strings.SplitSeq(yourTicketStr, ",") {
 		yourTicket = append(yourTicket, conv.MustAtoi(s))
 	}
 

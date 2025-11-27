@@ -107,21 +107,18 @@ func part1and2(input string) {
 	grid.SetMinRowCol(minY, minX)
 	grid.SetMaxRowCol(maxY, maxX)
 
-	// Initialize grid with spaces
 	for row := minY; row <= maxY; row++ {
 		for col := minX; col <= maxX; col++ {
 			grid.Set(row, col, ' ')
 		}
 	}
 
-	// Plot points
 	for _, p := range points {
 		x := p.pos.Col + minBoundingBoxIndex*p.velocity.Col
 		y := p.pos.Row + minBoundingBoxIndex*p.velocity.Row
 		grid.Set(y, x, '*')
 	}
 
-	// Print grid
 	for row := minY; row <= maxY; row++ {
 		for col := minX; col <= maxX; col++ {
 			if val, ok := grid.Get(row, col); ok {

@@ -42,17 +42,14 @@ func part2(input string) {
 }
 
 func isNice(line string) bool {
-	// It contains at least three vowels
 	if stringutil.CountVowels(line) < 3 {
 		return false
 	}
 
-	// It contains at least one letter that appears twice in a row
 	if !stringutil.HasRepeatedChar(line) {
 		return false
 	}
 
-	// It does not contain the strings: ab, cd, pq, or xy
 	if strings.Contains(line, "ab") || strings.Contains(line, "cd") || strings.Contains(line, "pq") || strings.Contains(line, "xy") {
 		return false
 	}
@@ -61,11 +58,9 @@ func isNice(line string) bool {
 }
 
 func isNice2(line string) bool {
-	// It contains a pair of any two letters that appears at least twice in the string without overlapping
 	if !stringutil.HasRepeatedPair(line) {
 		return false
 	}
 
-	// It contains at least one letter which repeats with exactly one letter between them
 	return stringutil.HasSandwichedChar(line)
 }

@@ -86,7 +86,7 @@ func part2(input string) {
 		})
 
 		moved := container.NewSet[*cart]()
-		for i := 0; i < len(carts); i++ {
+		for i := range carts {
 			if carts[i].crashed || moved.Contains(carts[i]) {
 				continue
 			}

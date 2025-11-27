@@ -70,7 +70,7 @@ func parseMaze(input string) *maze {
 		return r >= 'A' && r <= 'Z'
 	}
 
-	for y := 0; y < height; y++ {
+	for y := range height {
 		for x := 0; x < width-1; x++ {
 			if val1, exists1 := grid.Get(y, x); exists1 {
 				if val2, exists2 := grid.Get(y, x+1); exists2 {
@@ -95,7 +95,7 @@ func parseMaze(input string) *maze {
 	}
 
 	for y := 0; y < height-1; y++ {
-		for x := 0; x < width; x++ {
+		for x := range width {
 			if val1, exists1 := grid.Get(y, x); exists1 {
 				if val2, exists2 := grid.Get(y+1, x); exists2 {
 					if isLetter(val1) && isLetter(val2) {
@@ -205,14 +205,15 @@ func (m *maze) findShortestPathPart1() int {
 				continue
 			}
 
-			if current == portals[0].entrance {
+			switch current {
+			case portals[0].entrance:
 				next := portals[1].entrance
 				if !visited.Contains(next) {
 					visited.Add(next)
 					distance[next] = distance[current] + 1
 					queue.Push(next)
 				}
-			} else if current == portals[1].entrance {
+			case portals[1].entrance:
 				next := portals[0].entrance
 				if !visited.Contains(next) {
 					visited.Add(next)

@@ -38,7 +38,6 @@ func part1(input string) {
 				n := len(stack) - 1
 				cl := stack[n]
 				if s != cl {
-					// log.Printf("Expected %s, but found %s instead.", cl, s)
 					switch s {
 					case ")":
 						score += 3

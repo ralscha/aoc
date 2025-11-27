@@ -85,9 +85,10 @@ func runNetwork(computers []*intcomputer.IntcodeComputer, queues [][]packet, nat
 				panic(err)
 			}
 
-			if result.Signal == intcomputer.SignalInput {
+			switch result.Signal {
+			case intcomputer.SignalInput:
 				computer.AddInput(-1)
-			} else if result.Signal == intcomputer.SignalOutput {
+			case intcomputer.SignalOutput:
 				addr := result.Value
 
 				result, err = computer.Run()

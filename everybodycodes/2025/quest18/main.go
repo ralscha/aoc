@@ -156,7 +156,7 @@ func partII() {
 		}
 	}
 
-	for i := 0; i < len(freePlants); i++ {
+	for i := range freePlants {
 		for j := i + 1; j < len(freePlants); j++ {
 			if freePlants[i] > freePlants[j] {
 				freePlants[i], freePlants[j] = freePlants[j], freePlants[i]
@@ -208,7 +208,7 @@ func partIII() {
 			freePlants = append(freePlants, id)
 		}
 	}
-	for i := 0; i < len(freePlants); i++ {
+	for i := range freePlants {
 		for j := i + 1; j < len(freePlants); j++ {
 			if freePlants[i] > freePlants[j] {
 				freePlants[i], freePlants[j] = freePlants[j], freePlants[i]

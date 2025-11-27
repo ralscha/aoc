@@ -108,7 +108,6 @@ func countCorners(coords []gridutil.Coordinate) int {
 			}
 		}
 
-		// Inner corners
 		topRight := gridutil.Coordinate{Row: coord.Row - 1, Col: coord.Col + 1}
 		if !contains(coords, topRight) &&
 			contains(coords, top) &&

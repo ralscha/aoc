@@ -61,9 +61,10 @@ func evaluate(expression string, precedence map[string]int) int {
 		values = values[:len(values)-1]
 
 		var res int
-		if operator == "+" {
+		switch operator {
+		case "+":
 			res = a + b
-		} else if operator == "*" {
+		case "*":
 			res = a * b
 		}
 		values = append(values, res)

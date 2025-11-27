@@ -175,12 +175,6 @@ func main() {
 }
 
 func part1() {
-	// Initial state:
-	// Floor 1: SG, SM, PG, PM
-	// Floor 2: TG, RG, RM, CG, CM
-	// Floor 3: TM
-	// Floor 4: (empty)
-	// Order: [Strontium, Plutonium, Thulium, Ruthenium, Curium]
 	initialState := state{
 		elevator:   1,
 		generators: []int{1, 1, 2, 2, 2}, // SG, PG, TG, RG, CG
@@ -193,9 +187,6 @@ func part1() {
 }
 
 func part2() {
-	// Same as part 1 plus:
-	// Floor 1: EG, EM, DG, DM (Elerium and Dilithium)
-	// Order: [Strontium, Plutonium, Thulium, Ruthenium, Curium, Elerium, Dilithium]
 	initialState := state{
 		elevator:   1,
 		generators: []int{1, 1, 2, 2, 2, 1, 1}, // SG, PG, TG, RG, CG, EG, DG
