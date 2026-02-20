@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -26,15 +27,15 @@ func part1and2(input string) {
 }
 
 func hexToBinary(hexStr string) string {
-	binaryStr := ""
+	var binaryStr strings.Builder
 	for _, hexChar := range hexStr {
 		bits, err := strconv.ParseUint(string(hexChar), 16, 4)
 		if err != nil {
 			log.Fatal(err)
 		}
-		binaryStr += fmt.Sprintf("%04b", bits)
+		binaryStr.WriteString(fmt.Sprintf("%04b", bits))
 	}
-	return binaryStr
+	return binaryStr.String()
 }
 
 func parsePackets(binaryStr string, vTotal int64) (string, int64, int64) {

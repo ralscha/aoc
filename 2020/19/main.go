@@ -40,7 +40,7 @@ func parseRules(rulesStr string) map[int]rule {
 			var subRulesOr [][]int
 			for _, orPart := range orParts {
 				var subRules []int
-				for _, numStr := range strings.Split(orPart, " ") {
+				for numStr := range strings.SplitSeq(orPart, " ") {
 					subRules = append(subRules, conv.MustAtoi(numStr))
 				}
 				subRulesOr = append(subRulesOr, subRules)
@@ -48,7 +48,7 @@ func parseRules(rulesStr string) map[int]rule {
 			rules[ruleID] = rule{subRulesOr: subRulesOr}
 		} else {
 			var subRules []int
-			for _, numStr := range strings.Split(definition, " ") {
+			for numStr := range strings.SplitSeq(definition, " ") {
 				subRules = append(subRules, conv.MustAtoi(numStr))
 			}
 			rules[ruleID] = rule{subRules: [][]int{subRules}}

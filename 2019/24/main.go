@@ -89,7 +89,7 @@ func part2(input string) {
 		}
 	}
 
-	for minute := 0; minute < 200; minute++ {
+	for range 200 {
 		minLevel, maxLevel := 0, 0
 		for level := range levels {
 			if level < minLevel {

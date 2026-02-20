@@ -89,7 +89,7 @@ func part1and2(input string) {
 	var maxMinuteCount int
 	var maxMinuteIndex int
 
-	for minute := 0; minute < 60; minute++ {
+	for minute := range 60 {
 		count := maxGuard.minutes.Count(minute)
 		if count > maxMinuteCount {
 			maxMinuteCount = count
@@ -104,7 +104,7 @@ func part1and2(input string) {
 	maxMinuteIndex = 0
 
 	for _, g := range guards {
-		for minute := 0; minute < 60; minute++ {
+		for minute := range 60 {
 			count := g.minutes.Count(minute)
 			if count > maxMinuteCount {
 				maxMinuteCount = count

@@ -53,12 +53,12 @@ func part1(input string) {
 			return j.count - i.count
 		})
 
-		computedCheck := ""
+		var computedCheck strings.Builder
 		for i := range 5 {
-			computedCheck += string(chars[i].c)
+			computedCheck.WriteString(string(chars[i].c))
 		}
 
-		if computedCheck == check {
+		if computedCheck.String() == check {
 			sectorID := conv.MustAtoi(line[lastDash+1 : bracket])
 			sum += sectorID
 		}

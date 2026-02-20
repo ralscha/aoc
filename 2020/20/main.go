@@ -55,8 +55,8 @@ func getEdges(tile tile) edges {
 
 func parseTiles(input string) map[int]tile {
 	tiles := make(map[int]tile)
-	blocks := strings.Split(input, "\n\n")
-	for _, block := range blocks {
+	blocks := strings.SplitSeq(input, "\n\n")
+	for block := range blocks {
 		lines := conv.SplitNewline(block)
 		if len(lines) == 0 {
 			continue

@@ -6,6 +6,7 @@ import (
 	"aoc/internal/gridutil"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func main() {
@@ -43,7 +44,7 @@ func solve(input string) (string, int) {
 	grid := gridutil.NewCharGrid2D(conv.SplitNewline(input))
 	pos := findStart(&grid)
 	dir := gridutil.DirectionS
-	letters := ""
+	var letters strings.Builder
 	steps := 1
 
 	for {
@@ -60,7 +61,7 @@ func solve(input string) (string, int) {
 		steps++
 
 		if 'A' <= val && val <= 'Z' {
-			letters += string(val)
+			letters.WriteString(string(val))
 		} else if val == '+' {
 			turned := false
 			for _, turn := range getPossibleTurns(dir) {
@@ -80,5 +81,5 @@ func solve(input string) (string, int) {
 		}
 	}
 
-	return letters, steps
+	return letters.String(), steps
 }

@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"maps"
 	"strconv"
 	"strings"
 )
@@ -20,9 +21,7 @@ func main() {
 
 func run(instructions []string, initialRegisters map[string]int) (string, bool) {
 	registers := make(map[string]int)
-	for k, v := range initialRegisters {
-		registers[k] = v
-	}
+	maps.Copy(registers, initialRegisters)
 	pc := 0
 	output := ""
 	for len(output) < 20 {

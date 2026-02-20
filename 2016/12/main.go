@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"maps"
 	"strings"
 )
 
@@ -36,9 +37,7 @@ func newCPU(initialRegisters map[string]int) *cpu {
 		"c": 0,
 		"d": 0,
 	}
-	for reg, val := range initialRegisters {
-		registers[reg] = val
-	}
+	maps.Copy(registers, initialRegisters)
 	return &cpu{
 		registers: registers,
 		pc:        0,

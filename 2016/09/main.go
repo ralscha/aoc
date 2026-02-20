@@ -19,7 +19,7 @@ func main() {
 }
 
 func part1(input string) {
-	decompressed := ""
+	var decompressed strings.Builder
 	for i := range len(input) {
 		if input[i] == '(' {
 			end := strings.Index(input[i:], ")")
@@ -27,15 +27,15 @@ func part1(input string) {
 			parts := strings.Split(marker, "x")
 			length := conv.MustAtoi(parts[0])
 			repeat := conv.MustAtoi(parts[1])
-			for j := 0; j < repeat; j++ {
-				decompressed += input[i+end+1 : i+end+1+length]
+			for range repeat {
+				decompressed.WriteString(input[i+end+1 : i+end+1+length])
 			}
 			i += end + length
 		} else {
-			decompressed += string(input[i])
+			decompressed.WriteString(string(input[i]))
 		}
 	}
-	fmt.Println(len(decompressed))
+	fmt.Println(len(decompressed.String()))
 }
 
 func part2(input string) {

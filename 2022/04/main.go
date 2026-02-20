@@ -21,7 +21,7 @@ func main() {
 func part1and2(input string) {
 	fullyContain := 0
 	partiallyContain := 0
-	for _, line := range strings.Split(input, "\n") {
+	for line := range strings.SplitSeq(input, "\n") {
 		splitted := strings.Split(line, ",")
 		if len(splitted) != 2 {
 			continue

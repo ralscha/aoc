@@ -24,7 +24,7 @@ func main() {
 func part1(input string) {
 	var stacks [][]string
 
-	for _, line := range strings.Split(input, "\n") {
+	for line := range strings.SplitSeq(input, "\n") {
 		if strings.HasPrefix(strings.TrimSpace(line), "1") {
 			break
 		}
@@ -41,7 +41,7 @@ func part1(input string) {
 		}
 	}
 
-	for _, line := range strings.Split(input, "\n") {
+	for line := range strings.SplitSeq(input, "\n") {
 		if !strings.HasPrefix(line, "move") {
 			continue
 		}
@@ -54,19 +54,19 @@ func part1(input string) {
 		}
 	}
 
-	top := ""
+	var top strings.Builder
 	for _, stack := range stacks {
 		if len(stack) > 0 {
-			top += stack[0]
+			top.WriteString(stack[0])
 		}
 	}
-	fmt.Println(top)
+	fmt.Println(top.String())
 }
 
 func part2(input string) {
 	var stacks [][]string
 
-	for _, line := range strings.Split(input, "\n") {
+	for line := range strings.SplitSeq(input, "\n") {
 		if strings.HasPrefix(strings.TrimSpace(line), "1") {
 			break
 		}
@@ -83,7 +83,7 @@ func part2(input string) {
 		}
 	}
 
-	for _, line := range strings.Split(input, "\n") {
+	for line := range strings.SplitSeq(input, "\n") {
 		if !strings.HasPrefix(line, "move") {
 			continue
 		}
@@ -99,13 +99,13 @@ func part2(input string) {
 		stacks[from] = stacks[from][move:]
 	}
 
-	top := ""
+	var top strings.Builder
 	for _, stack := range stacks {
 		if len(stack) > 0 {
-			top += stack[0]
+			top.WriteString(stack[0])
 		}
 	}
-	fmt.Println(top)
+	fmt.Println(top.String())
 }
 
 func parseLine(line string) (int, int, int) {

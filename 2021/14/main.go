@@ -27,9 +27,9 @@ func part1(input string) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		pos := strings.Index(line, " -> ")
-		if pos != -1 {
-			rules[line[:pos]] = line[pos+4:]
+		before, after, ok := strings.Cut(line, " -> ")
+		if ok {
+			rules[before] = after
 		}
 	}
 
@@ -74,9 +74,9 @@ func part2(input string) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		pos := strings.Index(line, " -> ")
-		if pos != -1 {
-			rules[line[:pos]] = line[pos+4:]
+		before, after, ok := strings.Cut(line, " -> ")
+		if ok {
+			rules[before] = after
 		}
 	}
 

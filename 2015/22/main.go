@@ -149,10 +149,7 @@ func applyEffects(state *state) {
 }
 
 func applyBossAttack(state *state) {
-	damage := state.bossDamage - state.playerArmor
-	if damage < 1 {
-		damage = 1
-	}
+	damage := max(state.bossDamage-state.playerArmor, 1)
 
 	state.playerHp -= damage
 }

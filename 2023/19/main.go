@@ -6,6 +6,7 @@ import (
 	"aoc/internal/rangeutil"
 	"fmt"
 	"log"
+	"maps"
 	"strings"
 )
 
@@ -179,9 +180,7 @@ func acceptedCombination(ranges map[byte]rangeutil.Range, currentWorkflow string
 	}
 
 	rangesCopy := make(map[byte]rangeutil.Range)
-	for k, v := range ranges {
-		rangesCopy[k] = v
-	}
+	maps.Copy(rangesCopy, ranges)
 
 	workflow := workflows[currentWorkflow]
 	total := 0

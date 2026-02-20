@@ -51,7 +51,7 @@ func part2(input string) {
 	seenStates := make(map[string]int)
 	var cycleLength, cycleStart int
 
-	for cycle := 0; cycle < 1_000_000_000; cycle++ {
+	for cycle := range 1_000_000_000 {
 		for _, dir := range directions {
 			grid = tiltGrid(grid, dir.dx, dir.dy)
 		}
@@ -67,7 +67,7 @@ func part2(input string) {
 	}
 
 	remainingCycles := (1_000_000_000-cycleStart)%cycleLength - 1
-	for cycle := 0; cycle < remainingCycles; cycle++ {
+	for range remainingCycles {
 		for _, dir := range directions {
 			grid = tiltGrid(grid, dir.dx, dir.dy)
 		}

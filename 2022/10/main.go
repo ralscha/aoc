@@ -51,8 +51,8 @@ func part1(input string) {
 
 func part2(input string) {
 	crt := gridutil.NewGrid2D[rune](false)
-	for row := 0; row < 6; row++ {
-		for col := 0; col < 40; col++ {
+	for row := range 6 {
+		for col := range 40 {
 			crt.Set(row, col, '.')
 		}
 	}
@@ -87,8 +87,8 @@ func part2(input string) {
 	}
 
 	// Print the CRT display
-	for row := 0; row < 6; row++ {
-		for col := 0; col < 40; col++ {
+	for row := range 6 {
+		for col := range 40 {
 			if val, ok := crt.Get(row, col); ok {
 				fmt.Print(string(val))
 			}

@@ -39,8 +39,8 @@ func part2(input string) {
 	input = strings.TrimSpace(input)
 	boxes := make([][]lens, 256)
 
-	steps := strings.Split(input, ",")
-	for _, step := range steps {
+	steps := strings.SplitSeq(input, ",")
+	for step := range steps {
 		var label string
 		var operation byte
 		var focalLength int

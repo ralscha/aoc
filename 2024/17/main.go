@@ -158,7 +158,7 @@ func part2(input string) {
 
 	steps := make([]int, 1024)
 	computer := newComputer(program)
-	for a := 0; a < 1024; a++ {
+	for a := range 1024 {
 		computer.reset(a, b, c)
 		computer.run()
 		if len(computer.output) > 0 {

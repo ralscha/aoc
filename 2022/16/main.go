@@ -6,6 +6,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -208,10 +209,8 @@ func part2(input string) {
 
 func overlap(a, b []string) bool {
 	for _, v := range a {
-		for _, w := range b {
-			if v == w {
-				return true
-			}
+		if slices.Contains(b, v) {
+			return true
 		}
 	}
 	return false

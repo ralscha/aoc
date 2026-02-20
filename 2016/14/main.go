@@ -23,7 +23,7 @@ func getHash(salt string, index int, stretch int, cache map[string]string) strin
 	if hash, ok := cache[key]; ok {
 		return hash
 	}
-	hash := fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprintf("%s%d", salt, index))))
+	hash := fmt.Sprintf("%x", md5.Sum(fmt.Appendf(nil, "%s%d", salt, index)))
 	for range stretch {
 		hash = fmt.Sprintf("%x", md5.Sum([]byte(hash)))
 	}

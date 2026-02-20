@@ -7,6 +7,7 @@ import (
 	"aoc/internal/gridutil"
 	"fmt"
 	"log"
+	"slices"
 )
 
 func main() {
@@ -141,12 +142,7 @@ func countCorners(coords []gridutil.Coordinate) int {
 }
 
 func contains(coords []gridutil.Coordinate, coord gridutil.Coordinate) bool {
-	for _, c := range coords {
-		if c == coord {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(coords, coord)
 }
 
 func exploreRegion(start gridutil.Coordinate, regionPlant rune, garden *gridutil.Grid2D[rune], visited *container.Set[gridutil.Coordinate]) (int, int, []gridutil.Coordinate) {

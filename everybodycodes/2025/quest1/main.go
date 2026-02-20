@@ -28,10 +28,7 @@ func partI() {
 	for _, instr := range instructions {
 		switch instr.turn {
 		case "L":
-			currentIndex = currentIndex - instr.steps
-			if currentIndex < 0 {
-				currentIndex = 0
-			}
+			currentIndex = max(currentIndex-instr.steps, 0)
 		case "R":
 			currentIndex = currentIndex + instr.steps
 			if currentIndex >= len(names) {

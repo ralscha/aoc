@@ -19,7 +19,7 @@ func main() {
 
 func part1(input string) {
 	total := 0
-	for _, line := range strings.Split(input, "\n") {
+	for line := range strings.SplitSeq(input, "\n") {
 		half := len(line) / 2
 		first, second := line[:half], line[half:]
 		for _, c := range first {

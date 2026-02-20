@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -36,11 +37,11 @@ func part1(input string) {
 		elf2Pos = (elf2Pos + 1 + scoreboard[elf2Pos]) % len(scoreboard)
 	}
 
-	result := ""
+	var result strings.Builder
 	for i := numRecipes; i < numRecipes+10; i++ {
-		result += strconv.Itoa(scoreboard[i])
+		result.WriteString(strconv.Itoa(scoreboard[i]))
 	}
-	fmt.Println("Part 1", result)
+	fmt.Println("Part 1", result.String())
 }
 
 func part2(input string) {

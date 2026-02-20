@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func main() {
@@ -19,9 +20,9 @@ func main() {
 }
 
 func part1and2(input string, numberOfZeros int) {
-	zeros := ""
+	var zeros strings.Builder
 	for range numberOfZeros {
-		zeros += "0"
+		zeros.WriteString("0")
 	}
 	input = input[:len(input)-1]
 
@@ -29,7 +30,7 @@ func part1and2(input string, numberOfZeros int) {
 	for {
 		c := input + fmt.Sprintf("%d", count)
 		hash := fmt.Sprintf("%x", md5.Sum([]byte(c)))
-		if hash[0:numberOfZeros] == zeros {
+		if hash[0:numberOfZeros] == zeros.String() {
 			fmt.Println(count)
 			break
 		}

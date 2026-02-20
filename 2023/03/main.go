@@ -6,6 +6,7 @@ import (
 	"aoc/internal/gridutil"
 	"fmt"
 	"log"
+	"strings"
 	"unicode"
 )
 
@@ -41,18 +42,19 @@ func part1and2(input string) {
 			}
 
 			// Extract full number
-			number := string(curr)
+			var number strings.Builder
+			number.WriteString(string(curr))
 			startCol := col
 			for col+1 <= maxCol {
 				next, exists := grid.Get(row, col+1)
 				if !exists || !unicode.IsDigit(next) {
 					break
 				}
-				number += string(next)
+				number.WriteString(string(next))
 				col++
 			}
 			endCol := col
-			numberInt := conv.MustAtoi(number)
+			numberInt := conv.MustAtoi(number.String())
 
 			// Check for symbol neighbors
 			hasSymbolNeighbor := false

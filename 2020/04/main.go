@@ -25,8 +25,8 @@ func part1(input string) {
 
 	for _, passportStr := range passports {
 		fields := make(map[string]string)
-		parts := strings.Fields(passportStr)
-		for _, part := range parts {
+		parts := strings.FieldsSeq(passportStr)
+		for part := range parts {
 			kv := strings.Split(part, ":")
 			if len(kv) == 2 {
 				fields[kv[0]] = kv[1]

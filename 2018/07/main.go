@@ -53,12 +53,12 @@ func part1(input string) {
 	}
 
 	slices.Sort(readyNodes)
-	jobOrder := ""
+	var jobOrder strings.Builder
 	doneJobs := container.NewSet[string]()
 
 	for len(readyNodes) > 0 {
 		job := readyNodes[0]
-		jobOrder += job
+		jobOrder.WriteString(job)
 		doneJobs.Add(job)
 		readyNodes = readyNodes[1:]
 
@@ -87,7 +87,7 @@ func part1(input string) {
 		slices.Sort(readyNodes)
 	}
 
-	fmt.Println("Part 1", jobOrder)
+	fmt.Println("Part 1", jobOrder.String())
 }
 
 type worker struct {

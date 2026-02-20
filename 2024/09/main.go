@@ -39,7 +39,7 @@ func parseDiskMap(diskMap string) []int {
 			fileID++
 		}
 		size := conv.MustAtoi(string(diskMap[i]))
-		for j := 0; j < size; j++ {
+		for range size {
 			blocks = append(blocks, id)
 		}
 	}
@@ -115,7 +115,7 @@ func compactBlocks2(blocks []int) {
 				}
 				size := blockSizes[id].size
 				if freeSize >= size {
-					for j := 0; j < size; j++ {
+					for j := range size {
 						blocks[currentIndex+j] = id
 						blocks[blockSizes[id].index+j] = -1
 					}

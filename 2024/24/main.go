@@ -51,9 +51,7 @@ func parseInput(input string) (map[string]int, map[string]gate) {
 
 func evaluateCircuit(initialWireValues map[string]int, gates map[string]gate) map[string]int {
 	wireValues := make(map[string]int)
-	for k, v := range initialWireValues {
-		wireValues[k] = v
-	}
+	maps.Copy(wireValues, initialWireValues)
 
 	evaluated := container.NewSet[string]()
 

@@ -36,8 +36,8 @@ func part1(input string) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		ix := strings.Index(line, "-")
-		start, end := line[:ix], line[ix+1:]
+		before, after, _ := strings.Cut(line, "-")
+		start, end := before, after
 		if end == "end" || start == "start" {
 			addEdgeString(start, end)
 		} else {
@@ -56,8 +56,8 @@ func part2(input string) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		ix := strings.Index(line, "-")
-		start, end := line[:ix], line[ix+1:]
+		before, after, _ := strings.Cut(line, "-")
+		start, end := before, after
 
 		startNode, ok := nodes[start]
 		if !ok {

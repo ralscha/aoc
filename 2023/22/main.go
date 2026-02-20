@@ -86,8 +86,8 @@ func convToInts(s string) []int {
 	ints := make([]int, 6)
 	i := 0
 	for s := range splitted {
-		fields := strings.Split(splitted[s], ",")
-		for _, field := range fields {
+		fields := strings.SplitSeq(splitted[s], ",")
+		for field := range fields {
 			n, err := strconv.Atoi(field)
 			if err != nil {
 				panic(err)

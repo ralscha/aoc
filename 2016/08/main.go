@@ -23,21 +23,21 @@ func part1and2(lines []string) {
 	grid.SetMaxRowCol(5, 49) // 6 rows (0-5), 50 columns (0-49)
 
 	for _, line := range lines {
-		spaceIndex := strings.Index(line, " ")
-		command := line[0:spaceIndex]
+		before, after, _ := strings.Cut(line, " ")
+		command := before
 		switch command {
 		case "rect":
-			rect := line[spaceIndex+1:]
-			xIndex := strings.Index(rect, "x")
-			col := conv.MustAtoi(rect[0:xIndex])
-			row := conv.MustAtoi(rect[xIndex+1:])
+			rect := after
+			before, after, _ := strings.Cut(rect, "x")
+			col := conv.MustAtoi(before)
+			row := conv.MustAtoi(after)
 			for y := range row {
 				for x := range col {
 					grid.Set(y, x, true)
 				}
 			}
 		case "rotate":
-			rotate := line[spaceIndex+1:]
+			rotate := after
 			equalsIndex := strings.Index(rotate, "=")
 			byIndex := strings.Index(rotate, " by ")
 			axis := rotate[0 : equalsIndex-2]

@@ -69,21 +69,21 @@ func partI() {
 func partII() {
 	graph := readGraph("everybodycodes/quest6/partII.txt")
 	result := findPowerfulFruit(graph)
-	resultStr := ""
+	var resultStr strings.Builder
 	for _, node := range result {
-		resultStr += string(node[0])
+		resultStr.WriteString(string(node[0]))
 	}
-	fmt.Println("Part II", resultStr)
+	fmt.Println("Part II", resultStr.String())
 }
 
 func partIII() {
 	graph := readGraph("everybodycodes/quest6/partIII.txt")
 	result := findPowerfulFruit(graph)
-	resultStr := ""
+	var resultStr strings.Builder
 	for _, node := range result {
-		resultStr += string(node[0])
+		resultStr.WriteString(string(node[0]))
 	}
-	fmt.Println("Part III", resultStr)
+	fmt.Println("Part III", resultStr.String())
 }
 
 func readGraph(fileName string) map[string]node {

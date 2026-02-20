@@ -30,7 +30,7 @@ func part1(input string) {
 	}
 
 	totalFlashes := 0
-	for step := 0; step < 100; step++ {
+	for range 100 {
 		totalFlashes += simulateStep(&grid)
 	}
 

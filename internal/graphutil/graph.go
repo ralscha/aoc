@@ -8,7 +8,7 @@ import (
 
 type Node struct {
 	ID   string
-	Data interface{}
+	Data any
 	Edge *Edge
 }
 

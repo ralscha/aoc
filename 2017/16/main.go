@@ -55,7 +55,7 @@ func part2(input string) {
 			remainingCycles := 1000000000 - i
 			cycleLength := i - prev
 			remaining := remainingCycles % cycleLength
-			for k := 0; k < remaining; k++ {
+			for range remaining {
 				for _, move := range moves {
 					applyMove(programs, move)
 				}

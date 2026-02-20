@@ -20,80 +20,80 @@ func main() {
 	part1and2(input)
 }
 
-func addLeft(x interface{}, n interface{}) interface{} {
+func addLeft(x any, n any) any {
 	if n == nil {
 		return x
 	}
 	switch v := x.(type) {
 	case float64:
 		return v + n.(float64)
-	case []interface{}:
-		return []interface{}{addLeft(v[0], n), v[1]}
+	case []any:
+		return []any{addLeft(v[0], n), v[1]}
 	}
 	return x
 }
 
-func addRight(x interface{}, n interface{}) interface{} {
+func addRight(x any, n any) any {
 	if n == nil {
 		return x
 	}
 	switch v := x.(type) {
 	case float64:
 		return v + n.(float64)
-	case []interface{}:
-		return []interface{}{v[0], addRight(v[1], n)}
+	case []any:
+		return []any{v[0], addRight(v[1], n)}
 	}
 	return x
 }
 
-func explode(x interface{}, n float64) (bool, interface{}, interface{}, interface{}) {
+func explode(x any, n float64) (bool, any, any, any) {
 	switch v := x.(type) {
 	case float64:
 		return false, nil, v, nil
-	case []interface{}:
+	case []any:
 		if n == 0 {
 			return true, v[0], float64(0), v[1]
 		}
 		exp, left, a, right := explode(v[0], n-1)
 		if exp {
-			return true, left, []interface{}{a, addLeft(v[1], right)}, nil
+			return true, left, []any{a, addLeft(v[1], right)}, nil
 		}
 		exp, left, b, right := explode(v[1], n-1)
 		if exp {
-			return true, nil, []interface{}{addRight(v[0], left), b}, right
+			return true, nil, []any{addRight(v[0], left), b}, right
 		}
 	}
 	return false, nil, x, nil
 }
 
-func split(x interface{}) (bool, interface{}) {
+func split(x any) (bool, any) {
 	switch v := x.(type) {
 	case float64:
 		if int(v) >= 10 {
-			return true, []interface{}{float64(int(v / 2)), float64(int(math.Ceil(float64(v) / 2)))}
+			return true, []any{float64(int(v / 2)), float64(int(math.Ceil(float64(v) / 2)))}
 		}
 		return false, v
-	case []interface{}:
+	case []any:
 		change, a := split(v[0])
 		if change {
-			return true, []interface{}{a, v[1]}
+			return true, []any{a, v[1]}
 		}
 		change, b := split(v[1])
-		return change, []interface{}{v[0], b}
+		return change, []any{v[0], b}
 	}
 	return false, x
 }
 
-func add(a, b interface{}) interface{} {
-	x := []interface{}{a, b}
+func add(a, b any) any {
+	x := []any{a, b}
 	for {
 		change, _, xNew, _ := explode(x, 4)
-		x = xNew.([]interface{})
+		x = xNew.([]any)
 		if change {
 			continue
 		}
 		change, xNew = split(x)
-		x = xNew.([]interface{})
+		x = xNew.([]any)
 		if !change {
 			break
 		}
@@ -101,17 +101,17 @@ func add(a, b interface{}) interface{} {
 	return x
 }
 
-func magnitude(x interface{}) float64 {
+func magnitude(x any) float64 {
 	switch v := x.(type) {
 	case float64:
 		return v
-	case []interface{}:
+	case []any:
 		return 3*magnitude(v[0]) + 2*magnitude(v[1])
 	}
 	return 0
 }
 
-func reduce(fn func(a, b interface{}) interface{}, list []interface{}) interface{} {
+func reduce(fn func(a, b any) any, list []any) any {
 	result := list[0]
 	for i := 1; i < len(list); i++ {
 		result = fn(result, list[i])
@@ -125,9 +125,9 @@ func splitLines(s string) []string {
 
 func part1and2(input string) {
 	input = strings.TrimSpace(input)
-	lines := make([]interface{}, 0)
+	lines := make([]any, 0)
 	for _, line := range splitLines(input) {
-		var parsed interface{}
+		var parsed any
 		if err := json.Unmarshal([]byte(line), &parsed); err != nil {
 			panic(err)
 		}

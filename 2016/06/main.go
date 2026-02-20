@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strings"
 )
 
 func main() {
@@ -30,8 +31,8 @@ func part1and2(lines []string) {
 		}
 	}
 
-	resultMax := ""
-	resultMin := ""
+	var resultMax strings.Builder
+	var resultMin strings.Builder
 	for _, bag := range bags {
 		maxCount := 0
 		maxChar := rune(0)
@@ -48,9 +49,9 @@ func part1and2(lines []string) {
 				minChar = char
 			}
 		}
-		resultMax += string(maxChar)
-		resultMin += string(minChar)
+		resultMax.WriteString(string(maxChar))
+		resultMin.WriteString(string(minChar))
 	}
-	fmt.Println(resultMax)
-	fmt.Println(resultMin)
+	fmt.Println(resultMax.String())
+	fmt.Println(resultMin.String())
 }

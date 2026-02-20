@@ -111,10 +111,10 @@ func calculateKnotHashBinary(input string) string {
 		denseHash[i] = xor
 	}
 
-	binaryString := ""
+	var binaryString strings.Builder
 	for _, val := range denseHash {
-		binaryString += fmt.Sprintf("%08b", val)
+		binaryString.WriteString(fmt.Sprintf("%08b", val))
 	}
 
-	return binaryString
+	return binaryString.String()
 }

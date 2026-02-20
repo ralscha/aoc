@@ -21,7 +21,7 @@ func main() {
 func part1(start string) {
 	password := ""
 	for i := 0; ; i++ {
-		hash := md5.Sum([]byte(fmt.Sprintf("%s%d", start, i)))
+		hash := md5.Sum(fmt.Appendf(nil, "%s%d", start, i))
 		if hash[0] == 0 && hash[1] == 0 && hash[2] < 16 {
 			hashStr := fmt.Sprintf("%x", hash)
 			password += hashStr[5:6]
@@ -36,7 +36,7 @@ func part1(start string) {
 func part2(start string) {
 	password := make([]string, 8)
 	for i := 0; ; i++ {
-		hash := md5.Sum([]byte(fmt.Sprintf("%s%d", start, i)))
+		hash := md5.Sum(fmt.Appendf(nil, "%s%d", start, i))
 		if hash[0] == 0 && hash[1] == 0 && hash[2] < 8 {
 			hashStr := fmt.Sprintf("%x", hash)
 			pos := hashStr[5]

@@ -40,8 +40,8 @@ func part1(input string) {
 func part2(input string) {
 	originalNumbers := conv.ToIntSliceComma(input)
 
-	for noun := 0; noun < 100; noun++ {
-		for verb := 0; verb < 100; verb++ {
+	for noun := range 100 {
+		for verb := range 100 {
 			numbers := make([]int, len(originalNumbers))
 			copy(numbers, originalNumbers)
 			numbers[1] = noun

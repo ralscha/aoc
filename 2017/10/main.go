@@ -55,7 +55,7 @@ func part2(input string) {
 	}
 	dense := make([]byte, 16)
 	for i := range 16 {
-		for j := 0; j < 16; j++ {
+		for j := range 16 {
 			dense[i] ^= byte(list[i*16+j])
 		}
 	}

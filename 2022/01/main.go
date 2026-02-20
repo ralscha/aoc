@@ -17,7 +17,7 @@ func main() {
 
 	var elves []int
 	totalCalories := 0
-	for _, line := range strings.Split(input, "\n") {
+	for line := range strings.SplitSeq(input, "\n") {
 		if line == "" {
 			elves = append(elves, totalCalories)
 			totalCalories = 0

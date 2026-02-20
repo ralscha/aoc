@@ -58,8 +58,8 @@ func parseGraph(strs []string) parsedGraph {
 		left := parts[0]
 		u := add(left)
 
-		right := strings.Split(parts[1], " ")
-		for _, c := range right {
+		right := strings.SplitSeq(parts[1], " ")
+		for c := range right {
 			v := add(c)
 			edges = append(edges, [2]int{u, v})
 		}

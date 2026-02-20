@@ -78,10 +78,7 @@ func getMinMaxCost(player player, boss boss) (int, int) {
 }
 
 func doesPlayerWin(player player, boss boss) bool {
-	bossDamagePerTurn := player.damage - boss.armor
-	if bossDamagePerTurn < 1 {
-		bossDamagePerTurn = 1
-	}
+	bossDamagePerTurn := max(player.damage-boss.armor, 1)
 	playerDamagePerTurn := max(boss.damage-player.armor, 1)
 
 	bossTurns := boss.hitpoints / bossDamagePerTurn

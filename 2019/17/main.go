@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -291,7 +292,8 @@ func newProgBuilder(path []any) *progBuilder {
 		mainStr = mainStr[:len(mainStr)-1]
 	}
 
-	prog := mainStr + "\n"
+	var prog strings.Builder
+	prog.WriteString(mainStr + "\n")
 	for _, p := range parts {
 		partStr := ""
 		for _, v := range p {
@@ -300,11 +302,11 @@ func newProgBuilder(path []any) *progBuilder {
 		if len(partStr) > 0 {
 			partStr = partStr[:len(partStr)-1]
 		}
-		prog += partStr + "\n"
+		prog.WriteString(partStr + "\n")
 	}
-	prog += "n\n"
+	prog.WriteString("n\n")
 
-	builder.prog = prog
+	builder.prog = prog.String()
 	return builder
 }
 
@@ -361,7 +363,7 @@ func (pb *progBuilder) options(start int) [][]any {
 	for _, i := range pb.subs {
 		if len(i) < len(pb.path)-start+1 {
 			match := true
-			for j := 0; j < len(i); j++ {
+			for j := range i {
 				if pb.path[start+j] != i[j] {
 					match = false
 					break

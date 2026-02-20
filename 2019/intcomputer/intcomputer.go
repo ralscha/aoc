@@ -2,6 +2,7 @@ package intcomputer
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Signal string
@@ -69,7 +70,7 @@ func (c *IntcodeComputer) GetState() State {
 	}
 }
 
-func (c *IntcodeComputer) AddInput(inputs ...interface{}) error {
+func (c *IntcodeComputer) AddInput(inputs ...any) error {
 	for _, input := range inputs {
 		switch v := input.(type) {
 		case int:
@@ -91,16 +92,16 @@ func (c *IntcodeComputer) ReadString() (*Result, error) {
 		return nil, err
 	}
 
-	var str string
+	var str strings.Builder
 	for result.Signal == SignalOutput && result.Value > 0 && result.Value <= 255 {
-		str += string(rune(result.Value))
+		str.WriteString(string(rune(result.Value)))
 		result, err = c.Run()
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	result.Str = str
+	result.Str = str.String()
 	return result, nil
 }
 

@@ -156,8 +156,8 @@ func (r *Rules) apply(g *grid) *grid {
 		newCells[i] = make([]string, newSize)
 	}
 
-	for i := 0; i < numSubs; i++ {
-		for j := 0; j < numSubs; j++ {
+	for i := range numSubs {
+		for j := range numSubs {
 			sub := g.subGrid(i*subSize, j*subSize, subSize)
 			var output []string
 			for _, pattern := range sub.getAllTransformations() {

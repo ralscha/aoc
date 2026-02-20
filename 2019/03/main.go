@@ -42,11 +42,11 @@ func part1(input string) {
 func getWirePoints(path string) *container.Set[gridutil.Coordinate] {
 	wire := container.NewSet[gridutil.Coordinate]()
 	x, y := 0, 0
-	coords := strings.Split(path, ",")
-	for _, coord := range coords {
+	coords := strings.SplitSeq(path, ",")
+	for coord := range coords {
 		dir := coord[0]
 		dist := conv.MustAtoi(coord[1:])
-		for j := 0; j < dist; j++ {
+		for range dist {
 			switch dir {
 			case 'U':
 				y++

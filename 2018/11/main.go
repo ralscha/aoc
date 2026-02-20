@@ -40,8 +40,8 @@ func part1(input string) {
 	for y := 1; y <= 298; y++ {
 		for x := 1; x <= 298; x++ {
 			totalPower := 0
-			for dy := 0; dy < 3; dy++ {
-				for dx := 0; dx < 3; dx++ {
+			for dy := range 3 {
+				for dx := range 3 {
 					totalPower += getPowerLevel(x+dx, y+dy, serialNumber)
 				}
 			}

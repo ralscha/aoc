@@ -35,7 +35,7 @@ func part1and2(input string) {
 			red := 0
 			blue := 0
 			green := 0
-			for _, color := range strings.Split(play, ",") {
+			for color := range strings.SplitSeq(play, ",") {
 				colorSplitted := strings.Split(strings.TrimSpace(color), " ")
 				number := conv.MustAtoi(strings.TrimSpace(colorSplitted[0]))
 				color := strings.TrimSpace(colorSplitted[1])

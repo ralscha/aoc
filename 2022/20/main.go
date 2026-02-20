@@ -41,7 +41,7 @@ func part2(input string) {
 		numbers[ix] = number{value: conv.MustAtoi(n) * descriptionKey, index: ix}
 	}
 
-	for r := 0; r < 10; r++ {
+	for range 10 {
 		numbers = mix(numbers)
 	}
 	printResult(numbers)

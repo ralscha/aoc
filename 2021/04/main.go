@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -192,9 +193,9 @@ func checkBingo(cards []card) *card {
 			}
 		}
 
-		for col := 0; col < 5; col++ {
+		for col := range 5 {
 			bingo := true
-			for row := 0; row < 5; row++ {
+			for row := range 5 {
 				if !card[row][col].marked {
 					bingo = false
 					break
@@ -232,9 +233,9 @@ func checkBingo2(cards []card, bingoCards []int) ([]*card, []int) {
 			}
 		}
 
-		for col := 0; col < 5; col++ {
+		for col := range 5 {
 			bingo := true
-			for row := 0; row < 5; row++ {
+			for row := range 5 {
 				if !card[row][col].marked {
 					bingo = false
 					break
@@ -252,10 +253,5 @@ func checkBingo2(cards []card, bingoCards []int) ([]*card, []int) {
 }
 
 func contains(array []int, value int) bool {
-	for _, b := range array {
-		if b == value {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(array, value)
 }

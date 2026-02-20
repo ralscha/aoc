@@ -44,9 +44,9 @@ func part1(input string) {
 	count := 0
 
 	for _, line := range lines {
-		pos := strings.IndexByte(line, '|')
-		outputs := strings.Fields(line[pos+1:])
-		for _, output := range outputs {
+		_, after, _ := strings.Cut(line, "|")
+		outputs := strings.FieldsSeq(after)
+		for output := range outputs {
 			switch len(output) {
 			case 2, 3, 4, 7: // digits 1, 7, 4, 8
 				count++
@@ -65,9 +65,9 @@ func part2(input string) {
 	allPermutations := mathx.Permutations(chars)
 
 	for _, line := range lines {
-		pos := strings.IndexByte(line, '|')
-		patterns := strings.Fields(line[:pos])
-		outputs := strings.Fields(line[pos+1:])
+		before, after, _ := strings.Cut(line, "|")
+		patterns := strings.Fields(before)
+		outputs := strings.Fields(after)
 
 		for _, perm := range allPermutations {
 			if isValidPermutation(patterns, perm) {

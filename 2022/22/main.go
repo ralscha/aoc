@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func main() {
@@ -43,16 +44,16 @@ func part1(input string) {
 			facing = nextFacing(facing, rune(instruction))
 			instructionIndex++
 		} else {
-			numberStr := ""
+			var numberStr strings.Builder
 			for instructionIndex < len(instructions) {
 				instruction = instructions[instructionIndex]
 				if instruction == 'R' || instruction == 'L' {
 					break
 				}
-				numberStr += string(instruction)
+				numberStr.WriteString(string(instruction))
 				instructionIndex++
 			}
-			number := conv.MustAtoi(numberStr)
+			number := conv.MustAtoi(numberStr.String())
 			currentPosition = move(g, currentPosition, facing, number)
 		}
 	}
@@ -164,16 +165,16 @@ func part2(input string) {
 			facing = nextFacing(facing, rune(instruction))
 			instructionIndex++
 		} else {
-			numberStr := ""
+			var numberStr strings.Builder
 			for instructionIndex < len(instructions) {
 				instruction = instructions[instructionIndex]
 				if instruction == 'R' || instruction == 'L' {
 					break
 				}
-				numberStr += string(instruction)
+				numberStr.WriteString(string(instruction))
 				instructionIndex++
 			}
-			number := conv.MustAtoi(numberStr)
+			number := conv.MustAtoi(numberStr.String())
 			currentPosition, facing = move3d(g, currentPosition, facing, number)
 		}
 	}

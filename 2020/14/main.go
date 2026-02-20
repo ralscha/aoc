@@ -7,6 +7,7 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -51,18 +52,18 @@ func part1(input string) {
 
 func applyMaskPart1(value int64, mask string) int64 {
 	valueBits := fmt.Sprintf("%036b", value)
-	maskedBits := ""
+	var maskedBits strings.Builder
 	for i := range 36 {
 		switch mask[i] {
 		case '0':
-			maskedBits += "0"
+			maskedBits.WriteString("0")
 		case '1':
-			maskedBits += "1"
+			maskedBits.WriteString("1")
 		case 'X':
-			maskedBits += string(valueBits[i])
+			maskedBits.WriteString(string(valueBits[i]))
 		}
 	}
-	maskedValue, _ := strconv.ParseInt(maskedBits, 2, 64)
+	maskedValue, _ := strconv.ParseInt(maskedBits.String(), 2, 64)
 	return maskedValue
 }
 
@@ -100,16 +101,16 @@ func part2(input string) {
 
 func applyMaskPart2(address int64, mask string) []int64 {
 	addressBits := fmt.Sprintf("%036b", address)
-	maskedBits := ""
+	var maskedBits strings.Builder
 	var floatingIndices []int
 	for i := range 36 {
 		switch mask[i] {
 		case '0':
-			maskedBits += string(addressBits[i])
+			maskedBits.WriteString(string(addressBits[i]))
 		case '1':
-			maskedBits += "1"
+			maskedBits.WriteString("1")
 		case 'X':
-			maskedBits += "X"
+			maskedBits.WriteString("X")
 			floatingIndices = append(floatingIndices, i)
 		}
 	}
@@ -117,7 +118,7 @@ func applyMaskPart2(address int64, mask string) []int64 {
 	var addresses []int64
 	numFloating := len(floatingIndices)
 	for i := range 1 << numFloating {
-		currentBits := maskedBits
+		currentBits := maskedBits.String()
 		temp := i
 		for j := range numFloating {
 			bit := temp & 1

@@ -6,6 +6,7 @@ import (
 	"aoc/internal/gridutil"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func main() {
@@ -130,13 +131,13 @@ func gridToPattern(grid *gridutil.Grid2D[rune]) []string {
 	minCol, maxCol := grid.GetMinMaxCol()
 
 	for row := minRow; row <= maxRow; row++ {
-		line := ""
+		var line strings.Builder
 		for col := minCol; col <= maxCol; col++ {
 			if val, exists := grid.Get(row, col); exists {
-				line += string(val)
+				line.WriteString(string(val))
 			}
 		}
-		pattern = append(pattern, line)
+		pattern = append(pattern, line.String())
 	}
 	return pattern
 }
@@ -188,18 +189,18 @@ func findMirrorColumnVertically(pattern []string, ignore int) int {
 func isMirrorHorizontally(pattern []string, middle int) bool {
 	cols := len(pattern[0])
 	for range middle {
-		for col := 0; col < cols; col++ {
+		for col := range cols {
 			upper := ""
-			lower := ""
-			for row := 0; row < middle; row++ {
+			var lower strings.Builder
+			for row := range middle {
 				if middle-row-1 < 0 || middle+row >= len(pattern) {
 					break
 				}
 				upper += string(pattern[middle-row-1][col])
-				lower += string(pattern[middle+row][col])
+				lower.WriteString(string(pattern[middle+row][col]))
 			}
 
-			if upper != "" && upper != lower {
+			if upper != "" && upper != lower.String() {
 				return false
 			}
 		}
@@ -209,7 +210,7 @@ func isMirrorHorizontally(pattern []string, middle int) bool {
 
 func isMirrorVertically(pattern []string, middle int) bool {
 	for _, row := range pattern {
-		for col := 0; col < middle; col++ {
+		for col := range middle {
 			if middle-col-1 < 0 || middle+col >= len(row) {
 				break
 			}

@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"slices"
 )
 
 type state struct {
@@ -19,10 +20,8 @@ func (s state) isValid() bool {
 		if mFloor == s.generators[i] {
 			continue
 		}
-		for _, gFloor := range s.generators {
-			if mFloor == gFloor {
-				return false
-			}
+		if slices.Contains(s.generators, mFloor) {
+			return false
 		}
 	}
 	return true

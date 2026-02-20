@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -41,12 +42,12 @@ func part1(input string) {
 		current = next
 	}
 
-	result := ""
+	var result strings.Builder
 	for i := range 8 {
-		result += strconv.Itoa(current[i])
+		result.WriteString(strconv.Itoa(current[i]))
 	}
 
-	fmt.Println("Part 1", result)
+	fmt.Println("Part 1", result.String())
 }
 
 func part2(input string) {
@@ -74,10 +75,10 @@ func part2(input string) {
 		current = next
 	}
 
-	result := ""
+	var result strings.Builder
 	for i := range 8 {
-		result += strconv.Itoa(current[offset+i])
+		result.WriteString(strconv.Itoa(current[offset+i]))
 	}
 
-	fmt.Println("Part 2", result)
+	fmt.Println("Part 2", result.String())
 }

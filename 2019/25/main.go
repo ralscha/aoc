@@ -51,8 +51,8 @@ func parseOutput(output string) ([]string, []string) {
 			inDoors = true
 			continue
 		}
-		if strings.HasPrefix(line, "- ") {
-			item := strings.TrimPrefix(line, "- ")
+		if after, ok := strings.CutPrefix(line, "- "); ok {
+			item := after
 			if inItems {
 				items = append(items, item)
 			} else if inDoors {

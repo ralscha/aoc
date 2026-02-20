@@ -51,11 +51,11 @@ func (d *Dance) simulateClap(round int) int {
 		d.insertAfter(targetPos, targetCol, clapperNum)
 	}
 
-	var result string
+	var result strings.Builder
 	for _, c := range d.cols {
-		result += strconv.Itoa(c[0])
+		result.WriteString(strconv.Itoa(c[0]))
 	}
-	return conv.MustAtoi(result)
+	return conv.MustAtoi(result.String())
 }
 
 func (d *Dance) moveUp(col int) {

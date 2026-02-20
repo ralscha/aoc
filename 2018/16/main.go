@@ -206,7 +206,7 @@ func part2(input string) {
 			if possibleNames.Len() == 1 {
 				for _, name := range possibleNames.Values() {
 					finalOpcodes[opcodeNum] = name
-					for i := 0; i < 16; i++ {
+					for i := range 16 {
 						if i != opcodeNum {
 							opcodesMap[i].Remove(name)
 						}
