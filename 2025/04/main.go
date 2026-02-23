@@ -43,7 +43,7 @@ func part1(input string) {
 			}
 		}
 	}
-	fmt.Println("Part 1:", count)
+	fmt.Println("Part 1", count)
 }
 
 func part2(input string) {
@@ -81,5 +81,5 @@ func part2(input string) {
 		}
 		total += len(toRemove)
 	}
-	fmt.Println("Part 2:", total)
+	fmt.Println("Part 2", total)
 }
