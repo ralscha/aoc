@@ -19,18 +19,18 @@ func main() {
 }
 
 func part1(start string) {
-	password := ""
+	var password strings.Builder
 	for i := 0; ; i++ {
 		hash := md5.Sum(fmt.Appendf(nil, "%s%d", start, i))
 		if hash[0] == 0 && hash[1] == 0 && hash[2] < 16 {
 			hashStr := fmt.Sprintf("%x", hash)
-			password += hashStr[5:6]
-			if len(password) == 8 {
+			password.WriteString(hashStr[5:6])
+			if len(password.String()) == 8 {
 				break
 			}
 		}
 	}
-	fmt.Println(password)
+	fmt.Println(password.String())
 }
 
 func part2(start string) {

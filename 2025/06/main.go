@@ -68,15 +68,15 @@ func part2(input string) {
 	total := 0
 
 	for {
-		numString := ""
+		var numString strings.Builder
 		for _, row := range numRows {
 			ch := row[currentIndex]
 			if ch != ' ' {
-				numString += string(ch)
+				numString.WriteString(string(ch))
 			}
 		}
-		if numString != "" {
-			numStrings = append(numStrings, numString)
+		if numString.String() != "" {
+			numStrings = append(numStrings, numString.String())
 		}
 
 		currentIndex++

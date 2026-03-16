@@ -73,16 +73,16 @@ func part2(input string) {
 		lastDash := strings.LastIndex(line, "-")
 		sectorID := conv.MustAtoi(line[lastDash+1 : bracket])
 
-		decrypted := ""
+		var decrypted strings.Builder
 		for _, r := range line[:lastDash] {
 			if r == '-' {
-				decrypted += " "
+				decrypted.WriteString(" ")
 				continue
 			}
-			decrypted += string(rune((int(r)-'a'+sectorID)%26 + 'a'))
+			decrypted.WriteString(string(rune((int(r)-'a'+sectorID)%26 + 'a')))
 		}
-		if strings.Contains(decrypted, "north") {
-			fmt.Println("Part 2", decrypted, sectorID)
+		if strings.Contains(decrypted.String(), "north") {
+			fmt.Println("Part 2", decrypted.String(), sectorID)
 		}
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -33,26 +34,26 @@ func part1(input string) {
 		}
 	}
 
-	gamma := ""
-	epsilon := ""
+	var gamma strings.Builder
+	var epsilon strings.Builder
 
 	for ix := range ones {
 		if ones[ix] > zeros[ix] {
-			gamma += "1"
-			epsilon += "0"
+			gamma.WriteString("1")
+			epsilon.WriteString("0")
 		} else {
-			gamma += "0"
-			epsilon += "1"
+			gamma.WriteString("0")
+			epsilon.WriteString("1")
 		}
 	}
 
-	gammaNumber, err := strconv.ParseInt(gamma, 2, 64)
+	gammaNumber, err := strconv.ParseInt(gamma.String(), 2, 64)
 	if err != nil {
-		log.Fatalf("ParseInt failed: %s %v", gamma, err)
+		log.Fatalf("ParseInt failed: %s %v", gamma.String(), err)
 	}
-	epsilonNumber, err := strconv.ParseInt(epsilon, 2, 64)
+	epsilonNumber, err := strconv.ParseInt(epsilon.String(), 2, 64)
 	if err != nil {
-		log.Fatalf("ParseInt failed: %s %v", epsilon, err)
+		log.Fatalf("ParseInt failed: %s %v", epsilon.String(), err)
 	}
 	fmt.Println("Part 1", gammaNumber*epsilonNumber)
 }

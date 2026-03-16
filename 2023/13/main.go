@@ -190,17 +190,17 @@ func isMirrorHorizontally(pattern []string, middle int) bool {
 	cols := len(pattern[0])
 	for range middle {
 		for col := range cols {
-			upper := ""
+			var upper strings.Builder
 			var lower strings.Builder
 			for row := range middle {
 				if middle-row-1 < 0 || middle+row >= len(pattern) {
 					break
 				}
-				upper += string(pattern[middle-row-1][col])
+				upper.WriteString(string(pattern[middle-row-1][col]))
 				lower.WriteString(string(pattern[middle+row][col]))
 			}
 
-			if upper != "" && upper != lower.String() {
+			if upper.String() != "" && upper.String() != lower.String() {
 				return false
 			}
 		}
