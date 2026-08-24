@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"slices"
 	"strings"
 )
 
@@ -125,8 +126,8 @@ func part2(input string) {
 	shuffle := newLinFunc(1, 0, deckSize.Int64())
 
 	lines := conv.SplitNewline(input)
-	for i := len(lines) - 1; i >= 0; i-- {
-		line := lines[i]
+	for _, line := range slices.Backward(lines) {
+
 		var f linFunc
 
 		if line == "deal into new stack" {

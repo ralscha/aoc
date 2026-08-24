@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"slices"
 )
 
 // https://github.com/jonathanpaulson/AdventOfCode/blob/master/2021/23.py
@@ -69,8 +70,8 @@ func topIdx(col []string) int {
 }
 
 func destIdx(col []string) int {
-	for i := len(col) - 1; i >= 0; i-- {
-		if col[i] == "E" {
+	for i, c := range slices.Backward(col) {
+		if c == "E" {
 			return i
 		}
 	}

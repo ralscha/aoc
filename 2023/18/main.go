@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -104,8 +105,8 @@ func shoelace(points []point, perimeter int) {
 
 func reverse(points []point) []point {
 	var res []point
-	for i := len(points) - 1; i >= 0; i-- {
-		res = append(res, points[i])
+	for _, point := range slices.Backward(points) {
+		res = append(res, point)
 	}
 	return res
 }

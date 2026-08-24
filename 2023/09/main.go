@@ -5,6 +5,7 @@ import (
 	"aoc/internal/download"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -34,9 +35,9 @@ func part1and2(input string) {
 
 		extrapolatedLast := 0
 		extrapolatedFirst := 0
-		for i := len(sequence) - 1; i >= 0; i-- {
-			extrapolatedLast += sequence[i][len(sequence[i])-1]
-			extrapolatedFirst = sequence[i][0] - extrapolatedFirst
+		for _, s := range slices.Backward(sequence) {
+			extrapolatedLast += s[len(s)-1]
+			extrapolatedFirst = s[0] - extrapolatedFirst
 		}
 		sumLast += extrapolatedLast
 		sumFirst += extrapolatedFirst

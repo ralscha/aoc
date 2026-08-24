@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -149,8 +150,8 @@ func partIII() {
 		}
 	} else {
 		targetPos -= rightLen
-		for i := len(leftRanges) - 1; i >= 0; i-- {
-			r := leftRanges[i]
+		for _, r := range slices.Backward(leftRanges) {
+
 			if targetPos < r.count {
 				fmt.Println(r.end - targetPos)
 				return
