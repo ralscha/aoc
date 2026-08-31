@@ -4,9 +4,10 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
-	"github.com/aclements/go-z3/z3"
 	"log"
 	"strings"
+
+	z3 "github.com/Z3Prover/z3/src/api/go"
 )
 
 func main() {
@@ -22,9 +23,8 @@ func main() {
 func part1and2(input string, part2 bool) {
 	lines := conv.SplitNewline(input)
 
-	config := z3.NewContextConfig()
-	ctx := z3.NewContext(config)
-	solver := z3.NewSolver(ctx)
+	ctx := z3.NewContext()
+	solver := ctx.NewSolver()
 
 	for _, line := range lines {
 		colonIx := strings.Index(line, ":")
@@ -32,45 +32,43 @@ func part1and2(input string, part2 bool) {
 		job := line[colonIx+2:]
 		yells := 0
 		if part2 && name == "humn" {
-			ctx.IntConst("humn")
+			ctx.MkIntConst("humn")
 			continue
 		}
-		d := ctx.IntConst(name)
+		d := ctx.MkIntConst(name)
 		if job[0] >= '0' && job[0] <= '9' {
 			yells = conv.MustAtoi(job)
-			solver.Assert(d.Eq(ctx.FromInt(int64(yells), ctx.IntSort()).(z3.Int)))
+			solver.Assert(ctx.MkEq(d, ctx.MkInt(yells, ctx.MkIntSort())))
 		} else {
 			splitted := strings.Fields(job)
 			operation := splitted[1]
-			left := ctx.IntConst(splitted[0])
-			right := ctx.IntConst(splitted[2])
+			left := ctx.MkIntConst(splitted[0])
+			right := ctx.MkIntConst(splitted[2])
 			if part2 && name == "root" {
-				solver.Assert(left.Eq(right))
+				solver.Assert(ctx.MkEq(left, right))
 			} else {
 				switch operation {
 				case "+":
-					solver.Assert(d.Eq(left.Add(right)))
+					solver.Assert(ctx.MkEq(d, ctx.MkAdd(left, right)))
 				case "-":
-					solver.Assert(d.Eq(left.Sub(right)))
+					solver.Assert(ctx.MkEq(d, ctx.MkSub(left, right)))
 				case "*":
-					solver.Assert(d.Eq(left.Mul(right)))
+					solver.Assert(ctx.MkEq(d, ctx.MkMul(left, right)))
 				case "/":
-					solver.Assert(d.Eq(left.Div(right)))
+					solver.Assert(ctx.MkEq(d, ctx.MkDiv(left, right)))
 				}
 			}
 		}
 
 	}
 
-	ok, err := solver.Check()
-	if err != nil {
-		panic(err)
-	}
-	if ok {
+	if solver.Check() == z3.Satisfiable {
 		if part2 {
-			fmt.Println(solver.Model().Eval(ctx.IntConst("humn"), true))
+			value, _ := solver.Model().Eval(ctx.MkIntConst("humn"), true)
+			fmt.Println(value)
 		} else {
-			fmt.Println(solver.Model().Eval(ctx.IntConst("root"), true))
+			value, _ := solver.Model().Eval(ctx.MkIntConst("root"), true)
+			fmt.Println(value)
 		}
 	} else {
 		fmt.Println("unsat")

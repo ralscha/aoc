@@ -4,11 +4,12 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
-	"github.com/aclements/go-z3/z3"
 	"log"
 	"math"
 	"strconv"
 	"strings"
+
+	z3 "github.com/Z3Prover/z3/src/api/go"
 )
 
 func main() {
@@ -30,27 +31,25 @@ func part2(input string) {
 }
 
 func solve(input string, part2 bool) {
-	config := z3.NewContextConfig()
-	ctx := z3.NewContext(config)
-
-	solver := z3.NewSolver(ctx)
+	ctx := z3.NewContext()
+	solver := ctx.NewSolver()
 
 	lines := conv.SplitNewline(input)
 
 	next := 0
-	var inputs []z3.Int
+	var inputs []*z3.Expr
 
 	for i := range 14 {
-		d := ctx.IntConst("i" + strconv.Itoa(i))
-		solver.Assert(d.LE(ctx.FromInt(9, ctx.IntSort()).(z3.Int)))
-		solver.Assert(d.GE(ctx.FromInt(1, ctx.IntSort()).(z3.Int)))
+		d := ctx.MkIntConst("i" + strconv.Itoa(i))
+		solver.Assert(ctx.MkLe(d, ctx.MkInt(9, ctx.MkIntSort())))
+		solver.Assert(ctx.MkGe(d, ctx.MkInt(1, ctx.MkIntSort())))
 		inputs = append(inputs, d)
 	}
 
-	zero := ctx.FromInt(0, ctx.IntSort()).(z3.Int)
-	one := ctx.FromInt(1, ctx.IntSort()).(z3.Int)
+	zero := ctx.MkInt(0, ctx.MkIntSort())
+	one := ctx.MkInt(1, ctx.MkIntSort())
 
-	registers := make(map[rune]z3.Int)
+	registers := make(map[rune]*z3.Expr)
 	registers['w'] = zero
 	registers['x'] = zero
 	registers['y'] = zero
@@ -65,38 +64,42 @@ func solve(input string, part2 bool) {
 			next++
 			continue
 		}
-		c := ctx.IntConst("c" + strconv.Itoa(i))
+		c := ctx.MkIntConst("c" + strconv.Itoa(i))
 		aStr := splitted[1]
 		bStr := splitted[2]
 
 		a := registers[rune(aStr[0])]
-		var b z3.Int
+		var b *z3.Expr
 		if bStr[0] >= 'w' && bStr[0] <= 'z' {
 			b = registers[rune(bStr[0])]
 		} else {
-			b = ctx.FromInt(int64(conv.MustAtoi(bStr)), ctx.IntSort()).(z3.Int)
+			b = ctx.MkInt(conv.MustAtoi(bStr), ctx.MkIntSort())
 		}
 
 		if instruction == "add" {
-			solver.Assert(c.Eq(a.Add(b)))
+			solver.Assert(ctx.MkEq(c, ctx.MkAdd(a, b)))
 		} else if instruction == "mul" {
-			solver.Assert(c.Eq(a.Mul(b)))
+			solver.Assert(ctx.MkEq(c, ctx.MkMul(a, b)))
 		} else if instruction == "div" {
-			solver.Assert(b.NE(zero))
-			solver.Assert(c.Eq(a.Div(b)))
+			solver.Assert(ctx.MkNot(ctx.MkEq(b, zero)))
+			solver.Assert(ctx.MkEq(c, ctx.MkDiv(a, b)))
 		} else if instruction == "mod" {
-			solver.Assert(a.GE(zero))
-			solver.Assert(b.GT(zero))
-			solver.Assert(c.Eq(a.Mod(b)))
+			solver.Assert(ctx.MkGe(a, zero))
+			solver.Assert(ctx.MkGt(b, zero))
+			solver.Assert(ctx.MkEq(c, ctx.MkMod(a, b)))
 		} else if instruction == "eql" {
-			solver.Assert(c.Eq(a.Eq(b).IfThenElse(one, zero).(z3.Int)))
+			equal := ctx.MkEq(a, b)
+			solver.Assert(ctx.MkOr(
+				ctx.MkAnd(equal, ctx.MkEq(c, one)),
+				ctx.MkAnd(ctx.MkNot(equal), ctx.MkEq(c, zero)),
+			))
 		} else {
 			panic("unknown instruction")
 		}
 		registers[rune(aStr[0])] = c
 	}
 
-	solver.Assert(registers['z'].Eq(zero))
+	solver.Assert(ctx.MkEq(registers['z'], zero))
 
 	var best int64
 	if part2 {
@@ -105,29 +108,37 @@ func solve(input string, part2 bool) {
 		best = 0
 	}
 
+search:
 	for {
 		solver.Push()
 		sum := zero
 		for i, d := range inputs {
-			sum = sum.Add(d.Mul(ctx.FromInt(int64(math.Pow(10, float64(13-i))), ctx.IntSort()).(z3.Int)))
+			place := ctx.MkInt64(int64(math.Pow(10, float64(13-i))), ctx.MkIntSort())
+			sum = ctx.MkAdd(sum, ctx.MkMul(d, place))
 		}
 
 		if part2 {
-			solver.Assert(sum.LT(ctx.FromInt(best, ctx.IntSort()).(z3.Int)))
+			solver.Assert(ctx.MkLt(sum, ctx.MkInt64(best, ctx.MkIntSort())))
 		} else {
-			solver.Assert(sum.GT(ctx.FromInt(best, ctx.IntSort()).(z3.Int)))
+			solver.Assert(ctx.MkGt(sum, ctx.MkInt64(best, ctx.MkIntSort())))
 		}
-		ok, err := solver.Check()
-		if err != nil {
-			panic(err)
-		}
-		if ok {
-			b := solver.Model().Eval(sum, true).(z3.Int)
-			best, _, _ = b.AsInt64()
-		} else {
+		switch status := solver.Check(); status {
+		case z3.Satisfiable:
+			value, ok := solver.Model().Eval(sum, true)
+			if !ok {
+				panic("failed to evaluate model number")
+			}
+			parsedBest, err := strconv.ParseInt(value.String(), 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			best = parsedBest
+		case z3.Unsatisfiable:
 			fmt.Println(best)
-			break
+			break search
+		default:
+			panic("Z3 returned unknown")
 		}
-		solver.Pop()
+		solver.Pop(1)
 	}
 }

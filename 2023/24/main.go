@@ -4,10 +4,11 @@ import (
 	"aoc/internal/conv"
 	"aoc/internal/download"
 	"fmt"
-	"github.com/aclements/go-z3/z3"
 	"log"
 	"strconv"
 	"strings"
+
+	z3 "github.com/Z3Prover/z3/src/api/go"
 )
 
 func main() {
@@ -79,38 +80,34 @@ func part1and2(input string) {
 
 	fmt.Println(intersections)
 
-	config := z3.NewContextConfig()
-	ctx := z3.NewContext(config)
-	solver := z3.NewSolver(ctx)
+	ctx := z3.NewContext()
+	solver := ctx.NewSolver()
 
-	x := ctx.IntConst("x")
-	y := ctx.IntConst("y")
-	z := ctx.IntConst("z")
-	vx := ctx.IntConst("vx")
-	vy := ctx.IntConst("vy")
-	vz := ctx.IntConst("vz")
+	x := ctx.MkIntConst("x")
+	y := ctx.MkIntConst("y")
+	z := ctx.MkIntConst("z")
+	vx := ctx.MkIntConst("vx")
+	vy := ctx.MkIntConst("vy")
+	vz := ctx.MkIntConst("vz")
 
 	for i, hs := range hailstones[:3] {
-		a := ctx.FromInt(int64(hs.position.x), ctx.IntSort()).(z3.Int)
-		va := ctx.FromInt(int64(hs.velocity.x), ctx.IntSort()).(z3.Int)
-		b := ctx.FromInt(int64(hs.position.y), ctx.IntSort()).(z3.Int)
-		vb := ctx.FromInt(int64(hs.velocity.y), ctx.IntSort()).(z3.Int)
-		c := ctx.FromInt(int64(hs.position.z), ctx.IntSort()).(z3.Int)
-		vc := ctx.FromInt(int64(hs.velocity.z), ctx.IntSort()).(z3.Int)
+		a := ctx.MkInt64(int64(hs.position.x), ctx.MkIntSort())
+		va := ctx.MkInt64(int64(hs.velocity.x), ctx.MkIntSort())
+		b := ctx.MkInt64(int64(hs.position.y), ctx.MkIntSort())
+		vb := ctx.MkInt64(int64(hs.velocity.y), ctx.MkIntSort())
+		c := ctx.MkInt64(int64(hs.position.z), ctx.MkIntSort())
+		vc := ctx.MkInt64(int64(hs.velocity.z), ctx.MkIntSort())
 
-		t := ctx.IntConst("t" + strconv.Itoa(i))
-		solver.Assert(t.GT(ctx.FromInt(0, ctx.IntSort()).(z3.Int)))
-		solver.Assert(x.Add(vx.Mul(t)).Eq(a.Add(va.Mul(t))))
-		solver.Assert(y.Add(vy.Mul(t)).Eq(b.Add(vb.Mul(t))))
-		solver.Assert(z.Add(vz.Mul(t)).Eq(c.Add(vc.Mul(t))))
+		t := ctx.MkIntConst("t" + strconv.Itoa(i))
+		solver.Assert(ctx.MkGt(t, ctx.MkInt(0, ctx.MkIntSort())))
+		solver.Assert(ctx.MkEq(ctx.MkAdd(x, ctx.MkMul(vx, t)), ctx.MkAdd(a, ctx.MkMul(va, t))))
+		solver.Assert(ctx.MkEq(ctx.MkAdd(y, ctx.MkMul(vy, t)), ctx.MkAdd(b, ctx.MkMul(vb, t))))
+		solver.Assert(ctx.MkEq(ctx.MkAdd(z, ctx.MkMul(vz, t)), ctx.MkAdd(c, ctx.MkMul(vc, t))))
 	}
 
-	ok, err := solver.Check()
-	if err != nil {
-		panic(err)
-	}
-	if ok {
-		fmt.Println(solver.Model().Eval(x.Add(y).Add(z), true))
+	if solver.Check() == z3.Satisfiable {
+		value, _ := solver.Model().Eval(ctx.MkAdd(x, y, z), true)
+		fmt.Println(value)
 	} else {
 		fmt.Println("Failed to solve!")
 	}

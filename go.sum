@@ -1,2 +1,2 @@
-github.com/aclements/go-z3 v0.0.0-20220809013456-4675d5f90ca5 h1:A27FEXOK2zSHuCwXwmPIKfrHcT+caybRGb1kaW4KOBI=
-github.com/aclements/go-z3 v0.0.0-20220809013456-4675d5f90ca5/go.mod h1:Dcqk4DTCIWIVv0jiFnYg5nnTIOWZ3JgU/mYjb5puA1s=
+github.com/Z3Prover/z3/src/api/go v0.0.0-20260830193611-6aa9416d4a9e h1:zTObUlvzpmgR+71G2RNdzInPcry1FPDtkbw4eaS8f7Y=
+github.com/Z3Prover/z3/src/api/go v0.0.0-20260830193611-6aa9416d4a9e/go.mod h1:4uqsFzLnAPPSuF7CqYgRd7/UeSBfz8tCtTSocv4uzkU=
