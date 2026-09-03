@@ -1,2 +1,4 @@
 github.com/Z3Prover/z3/src/api/go v0.0.0-20260830193611-6aa9416d4a9e h1:zTObUlvzpmgR+71G2RNdzInPcry1FPDtkbw4eaS8f7Y=
 github.com/Z3Prover/z3/src/api/go v0.0.0-20260830193611-6aa9416d4a9e/go.mod h1:4uqsFzLnAPPSuF7CqYgRd7/UeSBfz8tCtTSocv4uzkU=
+github.com/Z3Prover/z3/src/api/go v0.0.0-20260903053033-aded9b63afd0 h1:AwmBLcq2gb6f5ICJJiXaqgYLYQ2TtEA0zHnwpZYSliQ=
+github.com/Z3Prover/z3/src/api/go v0.0.0-20260903053033-aded9b63afd0/go.mod h1:4uqsFzLnAPPSuF7CqYgRd7/UeSBfz8tCtTSocv4uzkU=
