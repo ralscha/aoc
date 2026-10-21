@@ -1,5 +1,5 @@
 module aoc
 
-go 1.27.1
+go 1.27.2
 
-require github.com/Z3Prover/z3/src/api/go v0.0.0-20261003145154-0f985010a6dd
+require github.com/Z3Prover/z3/src/api/go v0.0.0-20261015220316-566243ea965c
