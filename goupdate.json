@@ -1,0 +1,17 @@
+{
+  "env": {
+    "CGO_ENABLED": "1"
+  },
+  "platforms": {
+    "windows": {
+      "env": {
+        "CGO_ENABLED": "1",
+        "CC": "${DIR}/../../preblog/cgo/llvm/bin/gcc.exe",
+        "CXX": "${DIR}/../../preblog/cgo/llvm/bin/g++.exe",
+        "PATH": "${DIR}/../../blog2025/z3/z3/bin;${DIR}/../../preblog/cgo/llvm/bin;${DIR}/../../preblog/cgo/llvm/x86_64-w64-mingw32/bin;${PATH}",
+        "CGO_CFLAGS": "-I${DIR}/../../blog2025/z3/z3/include",
+        "CGO_LDFLAGS": "-L${DIR}/../../blog2025/z3/z3/bin -lz3"
+      }
+    }
+  }
+}
